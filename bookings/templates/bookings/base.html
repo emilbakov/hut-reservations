@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#173f38"><title>{% block title %}Reservations{% endblock %} · {{ HUT_NAME }}</title>
+<link rel="stylesheet" href="{% load static %}{% static 'bookings/site.css' %}">
+</head><body>
+<a class="skip-link" href="#main-content">Skip to content</a><header class="site-header"><div class="shell header-inner"><a class="brand" href="{% url 'bookings:book' %}"><span class="brand-icon">▲</span><span>{{ HUT_NAME }}<small>STAY CLOSER TO NATURE</small></span></a><nav aria-label="Main navigation"><span class="nav-caption">Explore the mountains</span><a href="{% url 'bookings:book' %}">Book your stay</a>{% if request.user.is_staff %}<a href="{% url 'bookings:dashboard' %}">Dashboard</a><a href="{% url 'admin:index' %}">Admin</a>{% endif %}</nav></div></header>
+<main id="main-content" class="shell">{% for message in messages %}<p class="notice" role="status">{{ message }}</p>{% endfor %}{% block content %}{% endblock %}</main>
+<footer class="site-footer"><div class="shell footer-inner"><div><strong>{{ HUT_NAME }}</strong><small>Plan less. Explore more.</small></div><div>{{ HUT_NAME }} <span>·</span> Mountain stays made simple</div></div></footer>
+</body></html>

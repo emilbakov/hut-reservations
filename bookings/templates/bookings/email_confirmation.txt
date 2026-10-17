@@ -1,0 +1,14 @@
+{% autoescape off %}Hello {{ reservation.name }},
+
+Your reservation at {{ HUT_NAME }} is {{ reservation.get_status_display|lower }}.
+
+Arrival:   {{ reservation.check_in|date:"l j F Y" }}
+Departure: {{ reservation.check_out|date:"l j F Y" }} ({{ reservation.nights }} night{{ reservation.nights|pluralize }})
+{% for item in reservation.items.all %}
+{{ item.beds }} bed{{ item.beds|pluralize }} in {{ item.room.name }}{% endfor %}
+
+Total: {{ reservation.total_price }} {{ CURRENCY }}
+
+View or cancel your reservation:
+{{ link }}
+{% endautoescape %}
