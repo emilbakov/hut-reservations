@@ -1,0 +1,16 @@
+{% extends "bookings/base.html" %}
+{% block title %}Confirm calendar move{% endblock %}
+{% block content %}
+<h1>Confirm reservation move</h1>
+<p>Reservation <strong>{{ reservation.code }}</strong> for {{ reservation.name }}</p>
+<p>From: {{ reservation.check_in }} – {{ reservation.check_out }}, {{ item.room.name }} ({{ item.beds }} beds)</p>
+<p>To: <strong>{{ check_in }} – {{ check_out }}</strong>, <strong>{{ target_room.name }}</strong> ({{ item.beds }} beds)</p>
+<p>Availability will be checked again on submission. This action does not automatically notify the guest.</p>
+<form method="post">{% csrf_token %}
+<input type="hidden" name="code" value="{{ reservation.code }}">
+<input type="hidden" name="room" value="{{ target_room.pk }}">
+<input type="hidden" name="check_in" value="{{ check_in|date:'Y-m-d' }}">
+<button type="submit" name="confirm" value="yes">Confirm move</button>
+<a href="{% url 'bookings:availability_calendar' %}">Cancel</a>
+</form>
+{% endblock %}

@@ -1,6 +1,7 @@
 {% extends "bookings/base.html" %}
 {% block title %}Availability calendar{% endblock %}
 {% block content %}
+<p><a href="{% url 'bookings:calendar_timeline' %}{% if selected_slug %}?hut={{ selected_slug|urlencode }}{% endif %}">Open weekly drag-and-drop timeline →</a></p>
 <style>
 .av-scroll{overflow-x:auto;max-width:100%;border:1px solid #d1d5db;border-radius:12px}.av-table{border-collapse:separate;border-spacing:0;font-size:.8rem;min-width:max-content;width:100%}.av-table th,.av-table td{padding:.45rem;text-align:center;border-bottom:1px solid #e5e7eb;border-right:1px solid #e5e7eb;vertical-align:top;min-width:48px}.av-table th:first-child,.av-table td:first-child{position:sticky;left:0;background:var(--surface,#fff);min-width:175px;z-index:2;text-align:left}.av-table thead th{background:#f3f4f6;color:#111827}.av-open{background:#ecfdf5;color:#065f46}.av-limited{background:#fef3c7;color:#92400e}.av-full{background:#fee2e2;color:#991b1b}.av-over{background:#7f1d1d;color:#fff}.av-number{font-weight:700}.av-detail{font-size:.72rem;line-height:1.5}.av-detail summary{cursor:pointer;text-decoration:underline}.av-toolbar{display:flex;gap:1rem;flex-wrap:wrap;align-items:center;margin:1rem 0}.av-toolbar a{padding:.4rem .7rem;border:1px solid #d1d5db;border-radius:8px}.av-key{display:flex;gap:1rem;flex-wrap:wrap;margin:1rem 0}.av-key span{padding:.25rem .6rem;border-radius:5px}
 </style>

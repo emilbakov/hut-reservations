@@ -150,3 +150,10 @@ urlpatterns += [
     path('staff/availability/new/', calendar_create, name='calendar_create'),
     path('staff/availability/edit/<str:code>/', calendar_edit, name='calendar_edit'),
 ]
+
+from .calendar_timeline import calendar_timeline
+from .calendar_drag import calendar_move
+urlpatterns += [
+    path('staff/availability/week/', calendar_timeline, name='calendar_timeline'),
+    path('staff/availability/move/', calendar_move, name='calendar_move'),
+]

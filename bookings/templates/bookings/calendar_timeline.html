@@ -1,0 +1,40 @@
+{% extends "bookings/base.html" %}
+{% block title %}Weekly reservation timeline{% endblock %}
+{% block content %}
+<style>
+.tl-wrap{overflow-x:auto}.tl-table{border-collapse:collapse;min-width:900px;width:100%}.tl-table th,.tl-table td{border:1px solid #d1d5db;padding:.5rem;vertical-align:top;min-width:115px}.tl-table th:first-child{min-width:170px;text-align:left}.tl-slot{min-height:80px}.tl-booking{display:block;margin:.25rem 0;padding:.4rem;border:1px solid #64748b;border-radius:6px;background:#e0f2fe;color:#0c4a6e;cursor:grab;font-size:.85rem}.tl-booking:focus{outline:2px solid #2563eb}.tl-drop{outline:3px dashed #2563eb;outline-offset:-4px}.tl-free{font-size:.75rem;color:#166534}.tl-over{color:#b91c1c}
+</style>
+<h1>Weekly room timeline</h1>
+<p>Drag a booking to another room or date to preview a move. The original length of stay and number of beds are preserved. Moves require confirmation and availability validation.</p>
+<form method="get"><label>Week starting <input type="date" name="start" value="{{ start|date:'Y-m-d' }}"></label>
+<label>Hut <select name="hut">{% if request.user.is_superuser %}<option value="">All huts</option>{% endif %}{% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_slug == hut.slug %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}</select></label><button type="submit">Show</button></form>
+<p><a href="?start={{ prev|date:'Y-m-d' }}{% if selected_slug %}&amp;hut={{ selected_slug|urlencode }}{% endif %}">← Previous week</a> · <a href="?start={{ next|date:'Y-m-d' }}{% if selected_slug %}&amp;hut={{ selected_slug|urlencode }}{% endif %}">Next week →</a> · <a href="{% url 'bookings:availability_calendar' %}">Monthly calendar</a></p>
+<div class="tl-wrap"><table class="tl-table"><thead><tr><th>Room</th>{% for day in days %}<th>{{ day|date:'D d M' }}</th>{% endfor %}</tr></thead><tbody>
+{% for row in rows %}<tr><th>{{ row.room.hut.name }}<br>{{ row.room.name }}<br>Capacity {{ row.room.capacity }}</th>
+{% for cell in row.cells %}<td class="tl-slot" data-room="{{ row.room.pk }}" data-day="{{ cell.day|date:'Y-m-d' }}" data-hut="{{ row.room.hut_id }}">
+<span class="{% if cell.free < 0 %}tl-over{% else %}tl-free{% endif %}">{{ cell.free }} free</span>
+{% for item in cell.items %}{% if item.reservation.check_in == cell.day or forloop.parentloop.first %}
+<a draggable="true" class="tl-booking" href="{% url 'bookings:calendar_edit' item.reservation.code %}" data-code="{{ item.reservation.code }}" data-start="{{ item.reservation.check_in|date:'Y-m-d' }}" data-hut="{{ row.room.hut_id }}" title="Drag to move; click to edit">{{ item.reservation.code }} · {{ item.beds }} bed{{ item.beds|pluralize }}</a>
+{% endif %}{% endfor %}
+</td>{% endfor %}</tr>{% empty %}<tr><td colspan="8">No rooms assigned.</td></tr>{% endfor %}
+</tbody></table></div>
+<p id="tl-status" role="status" aria-live="polite">You can also move a reservation through its edit form without dragging.</p>
+<script>
+(function(){
+let moving=null;
+function isoAdd(value,offset){const parts=value.split('-').map(Number);const d=new Date(Date.UTC(parts[0],parts[1]-1,parts[2]+offset));return d.toISOString().slice(0,10)}
+document.querySelectorAll('.tl-booking').forEach(el=>el.addEventListener('dragstart',event=>{moving={code:el.dataset.code,start:el.dataset.start,hut:el.dataset.hut};event.dataTransfer.setData('text/plain',moving.code);event.dataTransfer.effectAllowed='move'}));
+document.querySelectorAll('.tl-slot').forEach(cell=>{
+cell.addEventListener('dragover',event=>{if(moving&&moving.hut===cell.dataset.hut){event.preventDefault();cell.classList.add('tl-drop')}});
+cell.addEventListener('dragleave',()=>cell.classList.remove('tl-drop'));
+cell.addEventListener('drop',event=>{event.preventDefault();cell.classList.remove('tl-drop');if(!moving||moving.hut!==cell.dataset.hut)return;
+const offset=Math.round((Date.parse(cell.dataset.day+'T00:00:00Z')-Date.parse(moving.start+'T00:00:00Z'))/86400000);
+const target=isoAdd(moving.start,offset);
+const params=new URLSearchParams({code:moving.code,room:cell.dataset.room,check_in:target});
+window.location.assign('{% url "bookings:calendar_move" %}?'+params.toString());moving=null;
+});
+});
+document.addEventListener('dragend',()=>{moving=null;document.querySelectorAll('.tl-drop').forEach(el=>el.classList.remove('tl-drop'))});
+})();
+</script>
+{% endblock %}
