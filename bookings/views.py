@@ -347,9 +347,11 @@ def send_confirmation(request, reservation):
     recipients = [reservation.email]
     if settings.BOOKING_NOTIFY_EMAIL:
         recipients.append(settings.BOOKING_NOTIFY_EMAIL)
+    from .guest_links import append_guest_portal_to_confirmation
+    guest_body = append_guest_portal_to_confirmation(request, reservation, body)
     for recipient in recipients:
         try:
-            send_mail(custom_confirmation_subject or f"Your reservation at {settings.HUT_NAME}", body, None, [recipient])
+            send_mail(custom_confirmation_subject or f"Your reservation at {settings.HUT_NAME}", (guest_body if recipient == reservation.email else body), None, [recipient])
         except Exception:
             logger.exception("Could not send confirmation for %s", reservation.code)
 

@@ -1,0 +1,30 @@
+{% extends "bookings/base.html" %}
+{% block title %}Manage your reservation{% endblock %}
+{% block content %}
+<h1>Your reservation at {{ hut.name }}</h1>
+<p>Reference: <strong>{{ reservation.code }}</strong> · Status: {{ reservation.get_status_display }}</p>
+<p>{{ reservation.check_in }} – {{ reservation.check_out }} · {{ reservation.nights }} nights</p>
+<table><thead><tr><th>Room</th><th>Beds</th><th>Price per night</th></tr></thead><tbody>
+{% for item in items %}<tr><td>{{ item.room.name }}</td><td>{{ item.beds }}</td><td>{{ item.price_per_night }} {{ currency }}</td></tr>{% endfor %}
+</tbody></table>
+<p><strong>Total: {{ reservation.total_price }} {{ currency }}</strong></p>
+{% if summary %}
+<p>Deposit required: {{ summary.target }} {{ currency }} · Net payments: {{ summary.net_paid }} {{ currency }} · Deposit remaining: {{ summary.remaining }} {{ currency }} · Due: {{ summary.due_date }}</p>
+{% endif %}
+{% if can_request %}
+<section class="card"><h2>Request a change</h2>
+<p>Requests do not change or cancel your booking automatically. The hut manager must review them.</p>
+<form method="post">{% csrf_token %}
+<label>Request type <select name="request_type" required><option value="change">Change dates / booking</option><option value="cancellation">Request cancellation</option></select></label>
+<label>Requested arrival (for changes) <input type="date" name="requested_check_in"></label>
+<label>Requested departure (for changes) <input type="date" name="requested_check_out"></label>
+<label>Additional details <textarea name="details" maxlength="2000"></textarea></label>
+<button type="submit">Submit request</button>
+</form></section>
+{% endif %}
+<section class="card"><h2>Your requests</h2>
+{% for change in requests %}<p>{{ change.created_at }} — {{ change.get_request_type_display }} — {{ change.get_status_display }}{% if change.manager_note %} · {{ change.manager_note }}{% endif %}</p>
+{% empty %}<p>No requests submitted.</p>{% endfor %}
+</section>
+<p>Keep this private link safe. Anyone with it can view the reservation and submit requests.</p>
+{% endblock %}

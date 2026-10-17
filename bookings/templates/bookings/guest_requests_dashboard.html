@@ -1,0 +1,26 @@
+{% extends "bookings/base.html" %}
+{% block title %}Guest change requests{% endblock %}
+{% block content %}
+<h1>Guest change and cancellation requests</h1>
+<p>Approval records a decision only. Update booking dates, beds, and status separately using your reservation tools.</p>
+<form method="get"><label>Hut <select name="hut">
+{% if request.user.is_superuser %}<option value="">All huts</option>{% endif %}
+{% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_slug == hut.slug %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}
+</select></label><button type="submit">Filter</button></form>
+{% for change in requests %}
+<section class="card">
+<h2>{{ change.reservation.code }} — {{ change.get_request_type_display }}</h2>
+<p>{{ change.reservation.name }} · {{ change.created_at }} · {{ change.get_status_display }}</p>
+{% if change.requested_check_in %}<p>Requested dates: {{ change.requested_check_in }} to {{ change.requested_check_out }}</p>{% endif %}
+<p>{{ change.details }}</p>
+{% if change.status == "pending" %}
+<form method="post">{% csrf_token %}
+<input type="hidden" name="request_id" value="{{ change.pk }}">
+<label>Manager note <textarea name="manager_note" maxlength="2000"></textarea></label>
+<button name="decision" value="approved" type="submit">Approve for manual processing</button>
+<button name="decision" value="rejected" type="submit">Reject</button>
+</form>
+{% else %}<p>Reviewed by {{ change.reviewed_by }}{% if change.manager_note %} · {{ change.manager_note }}{% endif %}</p>{% endif %}
+</section>
+{% empty %}<p>No requests.</p>{% endfor %}
+{% endblock %}

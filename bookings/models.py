@@ -423,3 +423,40 @@ class GuestMessageLog(models.Model):
             models.UniqueConstraint(fields=["reservation", "message_type", "event_date"],
                                     name="unique_guest_message_event")
         ]
+
+
+def make_guest_access_token():
+    import secrets
+    return secrets.token_urlsafe(32)
+
+
+class GuestAccessLink(models.Model):
+    """Separate revocable, high-entropy guest access token."""
+    reservation = models.OneToOneField(Reservation, on_delete=models.CASCADE, related_name="guest_access")
+    token = models.CharField(max_length=64, unique=True, default=make_guest_access_token, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    revoked_at = models.DateTimeField(null=True, blank=True)
+
+
+class GuestChangeRequest(models.Model):
+    class Status(models.TextChoices):
+        PENDING = "pending", "Pending"
+        APPROVED = "approved", "Approved for manual processing"
+        REJECTED = "rejected", "Rejected"
+
+    reservation = models.ForeignKey(Reservation, on_delete=models.CASCADE, related_name="guest_change_requests")
+    request_type = models.CharField(max_length=20, choices=[
+        ("change", "Change request"), ("cancellation", "Cancellation request")
+    ])
+    requested_check_in = models.DateField(null=True, blank=True)
+    requested_check_out = models.DateField(null=True, blank=True)
+    details = models.TextField(blank=True)
+    status = models.CharField(max_length=12, choices=Status.choices, default=Status.PENDING)
+    created_at = models.DateTimeField(auto_now_add=True)
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    reviewed_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True,
+                                    on_delete=models.SET_NULL, related_name="reviewed_guest_requests")
+    manager_note = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ["-created_at"]

@@ -128,3 +128,25 @@ from .communications import communications_dashboard
 urlpatterns += [
     path('staff/communications/', communications_dashboard, name='communications_dashboard'),
 ]
+
+from .self_service import guest_self_service, guest_requests_dashboard
+urlpatterns += [
+    path('guest/manage/<str:token>/', guest_self_service, name='guest_self_service'),
+    path('staff/guest-requests/', guest_requests_dashboard, name='guest_requests_dashboard'),
+]
+
+from .guest_links import guest_link_controls
+urlpatterns += [
+    path('staff/guest-links/', guest_link_controls, name='guest_link_controls'),
+]
+
+from .availability_calendar import availability_calendar
+urlpatterns += [
+    path('staff/availability/', availability_calendar, name='availability_calendar'),
+]
+
+from .calendar_actions import calendar_create, calendar_edit
+urlpatterns += [
+    path('staff/availability/new/', calendar_create, name='calendar_create'),
+    path('staff/availability/edit/<str:code>/', calendar_edit, name='calendar_edit'),
+]

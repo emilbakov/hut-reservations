@@ -1,0 +1,65 @@
+{% extends "bookings/base.html" %}
+{% block title %}Manage hut reservations{% endblock %}
+{% block content %}
+<p><a href="{% url 'bookings:guest_link_controls' %}">Guest access links</a></p>
+<p><a href="{% url 'bookings:guest_requests_dashboard' %}">Guest change &amp; cancellation requests</a></p>
+<p><a href="{% url 'bookings:communications_dashboard' %}">Guest communications &amp; message history</a></p>
+<p><a href="{% url 'bookings:deposit_dashboard' %}">Deposit deadlines &amp; overdue payments</a></p>
+<div class="eyebrow">STAFF / RESERVATIONS</div>
+<h1>Hut reservations</h1>
+<p class="lead">Review, confirm, and cancel reservations for your permitted huts.</p>
+<p><a href="{% url 'bookings:dashboard' %}">← Operations dashboard</a> · <a href="{% url 'bookings:manual_booking' %}{% if selected_slug %}?hut={{ selected_slug|urlencode }}{% endif %}" class="button">+ New Reservation</a></p>
+<section class="card">
+<form method="get">
+  <label for="hut">Mountain hut</label>
+  <select name="hut" id="hut">
+    {% if not manager_mode %}<option value="">All huts</option>{% endif %}
+    {% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_slug == hut.slug %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}
+  </select>
+  <label for="q">Guest, email or reference</label>
+  <input id="q" type="search" name="q" value="{{ q }}" maxlength="120">
+  <label for="status">Status</label>
+  <select name="status" id="status">
+    <option value="">All statuses</option>
+    {% for value,label in statuses %}<option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+  </select>
+  <button type="submit">Search</button>
+</form>
+</section>
+<section class="card">
+<div class="table-wrap"><table>
+<thead><tr><th>Guest</th><th>Hut</th><th>Dates</th><th>Beds</th><th>Status</th><th>Actions</th></tr></thead>
+<tbody>
+{% for reservation in page %}
+<tr>
+  <td><strong>{{ reservation.name }}</strong><div>{{ reservation.email }}</div><small>{{ reservation.code }}</small></td>
+  <td>{% for item in reservation.items.all %}{{ item.room.hut.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+  <td>{{ reservation.check_in|date:"j M Y" }} – {{ reservation.check_out|date:"j M Y" }}</td>
+  <td>{{ reservation.total_beds }}</td>
+  <td>{{ reservation.get_status_display }}</td>
+  <td>
+  <a href="{% url 'bookings:reservation_payments' reservation.code %}">Payments</a>
+   {% if reservation.status == 'pending' %}
+    <form method="post" action="{% url 'bookings:manager_reservation_action' reservation.code %}">
+      {% csrf_token %}<input type="hidden" name="action" value="confirm">
+      <button type="submit">Confirm</button>
+    </form>
+  {% endif %}
+  {% if reservation.status != 'cancelled' %}
+    <form method="post" action="{% url 'bookings:manager_reservation_action' reservation.code %}" onsubmit="return confirm('Cancel this reservation?');">
+      {% csrf_token %}<input type="hidden" name="action" value="cancel">
+      <button type="submit">Cancel</button>
+    </form>
+  {% endif %}
+  </td>
+</tr>
+{% empty %}<tr><td colspan="6">No matching reservations.</td></tr>
+{% endfor %}
+</tbody></table></div>
+{% if page.has_other_pages %}<nav aria-label="Pages">
+{% if page.has_previous %}<a href="?hut={{ selected_slug|urlencode }}&amp;q={{ q|urlencode }}&amp;status={{ status_filter|urlencode }}&amp;page={{ page.previous_page_number }}">← Previous</a>{% endif %}
+Page {{ page.number }} of {{ page.paginator.num_pages }}
+{% if page.has_next %}<a href="?hut={{ selected_slug|urlencode }}&amp;q={{ q|urlencode }}&amp;status={{ status_filter|urlencode }}&amp;page={{ page.next_page_number }}">Next →</a>{% endif %}
+</nav>{% endif %}
+</section>
+{% endblock %}

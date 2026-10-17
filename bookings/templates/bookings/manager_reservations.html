@@ -1,6 +1,9 @@
 {% extends "bookings/base.html" %}
 {% block title %}Manage hut reservations{% endblock %}
 {% block content %}
+<p><a href="{% url 'bookings:availability_calendar' %}">Availability calendar</a></p>
+<p><a href="{% url 'bookings:guest_link_controls' %}">Guest access links</a></p>
+<p><a href="{% url 'bookings:guest_requests_dashboard' %}">Guest change &amp; cancellation requests</a></p>
 <p><a href="{% url 'bookings:communications_dashboard' %}">Guest communications &amp; message history</a></p>
 <p><a href="{% url 'bookings:deposit_dashboard' %}">Deposit deadlines &amp; overdue payments</a></p>
 <div class="eyebrow">STAFF / RESERVATIONS</div>
