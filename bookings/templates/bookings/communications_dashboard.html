@@ -1,0 +1,41 @@
+{% extends "bookings/base.html" %}
+{% block title %}Guest communications{% endblock %}
+{% block content %}
+<h1>Guest communications</h1>
+<p>Customize email text by hut and review recent delivery history. Supported placeholders:
+<code>{guest}</code>, <code>{hut}</code>, <code>{code}</code>,
+<code>{check_in}</code>, <code>{check_out}</code>, <code>{total}</code>,
+<code>{currency}</code>, <code>{remaining}</code>, <code>{due_date}</code>.</p>
+<form method="get"><label>Hut <select name="hut">
+{% if request.user.is_superuser %}<option value="">All huts</option>{% endif %}
+{% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_slug == hut.slug %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}
+</select></label><button type="submit">Select</button></form>
+{% if selected_hut %}
+<section class="card">
+<h2>Customize template for {{ selected_hut.name }}</h2>
+<p>Save a template to override the built-in text. Disabled templates fall back to built-in text.</p>
+<form method="post">{% csrf_token %}
+<input type="hidden" name="hut_id" value="{{ selected_hut.pk }}">
+<label>Message type <select name="message_type">
+{% for value,label in kinds %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+</select></label>
+<label>Subject <input name="subject" maxlength="200" required></label>
+<label>Body <textarea name="body" rows="8" required></textarea></label>
+<label><input type="checkbox" name="enabled" checked> Enable custom template</label>
+<button type="submit">Save template</button>
+</form>
+</section>
+{% endif %}
+<section class="card"><h2>Saved templates</h2>
+<table><thead><tr><th>Hut</th><th>Type</th><th>Subject</th><th>Enabled</th></tr></thead><tbody>
+{% for t in templates %}<tr><td>{{ t.hut.name }}</td><td>{{ t.get_message_type_display }}</td>
+<td>{{ t.subject }}</td><td>{{ t.enabled|yesno:"Yes,No" }}</td></tr>
+{% empty %}<tr><td colspan="4">Using built-in templates.</td></tr>{% endfor %}
+</tbody></table></section>
+<section class="card"><h2>Recent message history</h2>
+<table><thead><tr><th>Date</th><th>Reservation</th><th>Type</th><th>Status</th></tr></thead><tbody>
+{% for log in logs %}<tr><td>{{ log.created_at }}</td><td>{{ log.reservation.code }}</td>
+<td>{{ log.get_message_type_display }}</td><td>{{ log.status }}</td></tr>
+{% empty %}<tr><td colspan="4">No messages sent yet.</td></tr>{% endfor %}
+</tbody></table></section>
+{% endblock %}

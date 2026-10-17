@@ -1,16 +1,379 @@
-{% extends "bookings/base.html" %}{% load static %}
-{% block title %}Book a bed{% endblock %}
+
+{% extends "bookings/base.html" %}
+{% load static %}
+
+{% block title %}
+    {% if hut %}Book {{ hut.name }}{% else %}Book a bed{% endif %}
+{% endblock %}
+
 {% block content %}
-<section class="hero hero-feature"><div class="hero-copy"><div class="eyebrow">YOUR NEXT MOUNTAIN ESCAPE</div><h1>Find your place<br><em>in the mountains.</em></h1><p>Simple bed reservations, transparent prices, and more time outdoors.</p><div class="hero-benefits"><span>✓ Simple booking</span><span>✓ Clear nightly prices</span><span>✓ Mountain-ready stays</span></div></div><div class="hero-art" aria-hidden="true"><span class="hero-sun"></span><span class="peak peak-back"></span><span class="peak peak-front"></span><span class="hero-art-label">YOUR NEXT ADVENTURE AWAITS</span></div></section>
-<section class="card search-card" id="find-stay"><div class="section-head"><div><div class="eyebrow">01 / PLAN YOUR STAY</div><h2>Choose your dates</h2></div></div>
-<form method="get">{{ search.non_field_errors }}<div class="date-grid"><div class="field">{{ search.check_in.label_tag }}{{ search.check_in }}{{ search.check_in.errors }}</div><div class="field">{{ search.check_out.label_tag }}{{ search.check_out }}{{ search.check_out.errors }}</div><button type="submit">Check availability →</button></div></form></section>
-<section class="card calendar-card" id="availability"><div class="section-head"><div><div class="eyebrow">AVAILABILITY AT A GLANCE</div><h2>Bed availability calendar</h2></div><div class="calendar-controls"><button type="button" id="cal-prev" class="quiet">←</button><strong id="cal-title"></strong><button type="button" id="cal-next" class="quiet">→</button></div></div><p class="muted">Select a day to fill your arrival date. Green means beds are available; red means fully booked.</p><div id="availability-calendar" data-endpoint="{% url 'bookings:calendar' %}" class="calendar-grid" aria-live="polite"></div></section>
+
+<section class="hero hero-feature">
+    <div class="hero-copy">
+        <div class="eyebrow">
+            YOUR NEXT MOUNTAIN ESCAPE
+        </div>
+
+        <h1>
+            {% if hut %}
+                Stay at<br>
+                <em>{{ hut.name }}</em>
+            {% else %}
+                Find your place<br>
+                <em>in the mountains.</em>
+            {% endif %}
+        </h1>
+
+        <p>
+            {% if hut and hut.description %}
+                {{ hut.description }}
+            {% else %}
+                Simple bed reservations, transparent prices,
+                and more time outdoors.
+            {% endif %}
+        </p>
+
+        {% if hut %}
+            {% if hut.location %}
+                <p class="muted">{{ hut.location }}</p>
+            {% endif %}
+
+            <p>
+                <a href="{% url 'bookings:hut_list' %}">
+                    ← Choose another hut
+                </a>
+            </p>
+        {% endif %}
+
+        <div class="hero-benefits">
+            <span>✓ Simple booking</span>
+            <span>✓ Clear nightly prices</span>
+            <span>✓ Mountain-ready stays</span>
+        </div>
+    </div>
+
+    <div class="hero-art" aria-hidden="true">
+        <span class="hero-sun"></span>
+        <span class="peak peak-back"></span>
+        <span class="peak peak-front"></span>
+        <span class="hero-art-label">
+            YOUR NEXT ADVENTURE AWAITS
+        </span>
+    </div>
+</section>
+
+
+<section class="card search-card" id="find-stay">
+    <div class="section-head">
+        <div>
+            <div class="eyebrow">01 / PLAN YOUR STAY</div>
+            <h2>Choose your dates</h2>
+
+            {% if hut %}
+                <p class="muted">
+                    Check availability at {{ hut.name }}.
+                </p>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if hut %}
+        <form
+            method="get"
+            action="{% url 'bookings:hut_detail' hut.slug %}"
+        >
+    {% else %}
+        <form
+            method="get"
+            action="{% url 'bookings:book' %}"
+        >
+    {% endif %}
+
+        {{ search.non_field_errors }}
+
+        <div class="date-grid">
+            <div class="field">
+                {{ search.check_in.label_tag }}
+                {{ search.check_in }}
+                {{ search.check_in.errors }}
+            </div>
+
+            <div class="field">
+                {{ search.check_out.label_tag }}
+                {{ search.check_out }}
+                {{ search.check_out.errors }}
+            </div>
+
+            <button type="submit">
+                Check availability →
+            </button>
+        </div>
+    </form>
+</section>
+
+
+<section class="card calendar-card" id="availability">
+    <div class="section-head">
+        <div>
+            <div class="eyebrow">
+                AVAILABILITY AT A GLANCE
+            </div>
+
+            <h2>
+                {% if hut %}
+                    {{ hut.name }} availability
+                {% else %}
+                    Bed availability calendar
+                {% endif %}
+            </h2>
+        </div>
+
+        <div class="calendar-controls">
+            <button
+                type="button"
+                id="cal-prev"
+                class="quiet"
+                aria-label="Previous month"
+            >
+                ←
+            </button>
+
+            <strong id="cal-title"></strong>
+
+            <button
+                type="button"
+                id="cal-next"
+                class="quiet"
+                aria-label="Next month"
+            >
+                →
+            </button>
+        </div>
+    </div>
+
+    <p class="muted">
+        Select a day to fill your arrival date.
+        Green means beds are available;
+        red means fully booked.
+    </p>
+
+    <div
+        id="availability-calendar"
+        data-endpoint="{% url 'bookings:calendar' %}"
+        data-hut-slug="{% if hut %}{{ hut.slug }}{% endif %}"
+        class="calendar-grid"
+        aria-live="polite"
+    ></div>
+</section>
+
 <script src="{% static 'bookings/calendar.js' %}" defer></script>
-{% if booking %}<form method="post" class="card booking-card" id="booking-form">{% csrf_token %}<input type="hidden" name="check_in" value="{{ check_in|date:'Y-m-d' }}"><input type="hidden" name="check_out" value="{{ check_out|date:'Y-m-d' }}">
-<div class="section-head"><div><div class="eyebrow">02 / SELECT YOUR BEDS</div><h2>Available rooms</h2><p class="muted">{{ check_in|date:"j M" }} – {{ check_out|date:"j M Y" }} · {{ nights }} night{{ nights|pluralize }}</p></div></div>
-{{ booking.non_field_errors }}{% if not any_free %}<p class="notice bad">The hut is fully booked on at least one night. Please try other dates.</p>{% endif %}
-<div class="room-list">{% for room, free, field in booking.rows %}<div class="room"><span class="room-mark" aria-hidden="true">⌂</span><div class="room-main"><h3>{{ room.name }}</h3><p class="muted">{{ room.description|default:"A cozy spot to rest after a day outside." }}</p><span class="availability">{% if free %}{{ free }} of {{ room.capacity }} beds available{% else %}Full{% endif %}</span>{% if field %}{{ field.errors }}{% endif %}</div><div class="room-price"><strong>{{ room.price_per_night }} {{ CURRENCY }}</strong><small>per bed / night</small></div><div class="room-select">{% if field %}<label for="{{ field.id_for_label }}">Beds</label>{{ field }}{% else %}<span class="muted">Unavailable</span>{% endif %}</div></div>{% empty %}<p class="muted">No rooms available yet. Please contact the hut keeper.</p>{% endfor %}</div>
-<div class="total"><span>Estimated total</span><strong><span id="total" aria-live="polite">0.00</span> {{ CURRENCY }}</strong></div>
-{% if any_free %}<div class="guest-section"><div class="eyebrow">03 / COMPLETE YOUR BOOKING</div><h2>Your details</h2><div class="guest-grid">{% for field in booking.visible_fields %}{% if field.name == 'name' or field.name == 'email' or field.name == 'phone' or field.name == 'notes' %}<div class="field {% if field.name == 'notes' %}wide{% endif %}">{{ field.label_tag }}{{ field }}{{ field.errors }}</div>{% endif %}{% endfor %}</div><p class="muted">Your confirmation and private reservation link will be sent by email.</p><button type="submit" class="primary">Confirm reservation →</button></div>{% endif %}</form>
-<script>document.addEventListener('DOMContentLoaded',()=>{const inputs=document.querySelectorAll('input.beds'),total=document.getElementById('total'),nights={{ nights }};function update(){let cents=0;inputs.forEach(el=>{const beds=Math.max(0,parseInt(el.value,10)||0);cents+=Math.round(Number(el.dataset.price)*100)*beds*nights});total.textContent=(cents/100).toFixed(2)}inputs.forEach(el=>el.addEventListener('input',update));update()});</script>{% endif %}
+
+
+{% if booking %}
+
+    {% if hut %}
+        <form
+            method="post"
+            action="{% url 'bookings:hut_detail' hut.slug %}"
+            class="card booking-card"
+            id="booking-form"
+        >
+    {% else %}
+        <form
+            method="post"
+            action="{% url 'bookings:book' %}"
+            class="card booking-card"
+            id="booking-form"
+        >
+    {% endif %}
+
+        {% csrf_token %}
+
+        <input
+            type="hidden"
+            name="check_in"
+            value="{{ check_in|date:'Y-m-d' }}"
+        >
+
+        <input
+            type="hidden"
+            name="check_out"
+            value="{{ check_out|date:'Y-m-d' }}"
+        >
+
+        <div class="section-head">
+            <div>
+                <div class="eyebrow">
+                    02 / SELECT YOUR BEDS
+                </div>
+
+                <h2>
+                    {% if hut %}
+                        Rooms at {{ hut.name }}
+                    {% else %}
+                        Available rooms
+                    {% endif %}
+                </h2>
+
+                <p class="muted">
+                    {{ check_in|date:"j M" }}
+                    –
+                    {{ check_out|date:"j M Y" }}
+                    · {{ nights }} night{{ nights|pluralize }}
+                </p>
+            </div>
+        </div>
+
+        {{ booking.non_field_errors }}
+
+        {% if not any_free %}
+            <p class="notice bad">
+                No beds are available for the entire stay.
+                Please try other dates.
+            </p>
+        {% endif %}
+
+        <div class="room-list">
+            {% for room, free, field in booking.rows %}
+
+                <div class="room">
+                    <span class="room-mark" aria-hidden="true">
+                        ⌂
+                    </span>
+
+                    <div class="room-main">
+                        <h3>{{ room.name }}</h3>
+
+                        <p class="muted">
+                            {{ room.description|default:"A cozy spot to rest after a day outside." }}
+                        </p>
+
+                        <span class="availability">
+                            {% if free %}
+                                {{ free }} of {{ room.capacity }}
+                                beds available
+                            {% else %}
+                                Full
+                            {% endif %}
+                        </span>
+
+                        {% if field %}
+                            {{ field.errors }}
+                        {% endif %}
+                    </div>
+
+                    <div class="room-price">
+                        <strong>
+                            {{ room.price_per_night }}
+                            {{ CURRENCY }}
+                        </strong>
+
+                        <small>per bed / night</small>
+                    </div>
+
+                    <div class="room-select">
+                        {% if field %}
+                            <label for="{{ field.id_for_label }}">
+                                Beds
+                            </label>
+
+                            {{ field }}
+                        {% else %}
+                            <span class="muted">
+                                Unavailable
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+            {% empty %}
+
+                <p class="muted">
+                    No rooms are available at this hut yet.
+                    Please contact the hut keeper.
+                </p>
+
+            {% endfor %}
+        </div>
+
+        <div class="total">
+            <span>Estimated total</span>
+
+            <strong>
+                <span id="total" aria-live="polite">
+                    0.00
+                </span>
+                {{ CURRENCY }}
+            </strong>
+        </div>
+
+        {% if any_free %}
+            <div class="guest-section">
+                <div class="eyebrow">
+                    03 / COMPLETE YOUR BOOKING
+                </div>
+
+                <h2>Your details</h2>
+
+                <div class="guest-grid">
+                    {% for field in booking.visible_fields %}
+                        {% if field.name == 'name' or field.name == 'email' or field.name == 'phone' or field.name == 'notes' %}
+                            <div class="field {% if field.name == 'notes' %}wide{% endif %}">
+                                {{ field.label_tag }}
+                                {{ field }}
+                                {{ field.errors }}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <p class="muted">
+                    Your confirmation and private reservation
+                    link will be sent by email.
+                </p>
+
+                <button type="submit" class="primary">
+                    Confirm reservation →
+                </button>
+            </div>
+        {% endif %}
+
+    </form>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const inputs = document.querySelectorAll("input.beds");
+            const total = document.getElementById("total");
+            const nights = {{ nights }};
+
+            function updateTotal() {
+                let cents = 0;
+
+                inputs.forEach((input) => {
+                    const beds = Math.max(
+                        0,
+                        parseInt(input.value, 10) || 0
+                    );
+
+                    const price = Number(input.dataset.price) || 0;
+
+                    cents += Math.round(price * 100) * beds * nights;
+                });
+
+                if (total) {
+                    total.textContent = (cents / 100).toFixed(2);
+                }
+            }
+
+            inputs.forEach((input) => {
+                input.addEventListener("input", updateTotal);
+                input.addEventListener("change", updateTotal);
+            });
+
+            updateTotal();
+        });
+    </script>
+
+{% endif %}
+
 {% endblock %}

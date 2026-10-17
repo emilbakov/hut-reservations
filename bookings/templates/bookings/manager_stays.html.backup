@@ -1,0 +1,28 @@
+{% extends "bookings/base.html" %}
+{% block title %}Arrivals and departures{% endblock %}
+{% block content %}
+<div class="eyebrow">STAFF / GUEST OPERATIONS</div>
+<h1>Arrivals &amp; departures</h1>
+<p class="lead">Record actual arrivals and departures for your hut.</p>
+<p><a href="{% url 'bookings:dashboard' %}">← Dashboard</a> · <a href="{% url 'bookings:manager_reservations' %}">Reservations</a></p>
+<section class="card">
+<form method="get">
+<label for="hut">Hut</label>
+<select id="hut" name="hut">
+{% if not manager_mode %}<option value="">All huts</option>{% endif %}
+{% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_slug == hut.slug %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}
+</select>
+<label for="date">Date</label><input type="date" id="date" name="date" value="{{ target_date|date:'Y-m-d' }}">
+<button type="submit">Show guests</button>
+</form>
+</section>
+<section class="card"><h2>Arriving · {{ target_date|date:"j M Y" }} ({{ arriving|length }})</h2>
+{% include "bookings/_stay_rows.html" with reservations=arriving %}
+</section>
+<section class="card"><h2>Departing · {{ target_date|date:"j M Y" }} ({{ departing|length }})</h2>
+{% include "bookings/_stay_rows.html" with reservations=departing %}
+</section>
+<section class="card"><h2>Currently in house ({{ in_house|length }})</h2>
+{% include "bookings/_stay_rows.html" with reservations=in_house %}
+</section>
+{% endblock %}

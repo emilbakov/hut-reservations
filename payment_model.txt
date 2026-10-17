@@ -1,0 +1,28 @@
+
+class PaymentTransaction(models.Model):
+    """Append-only manual ledger; positive amounts for receipts and refunds."""
+    class Kind(models.TextChoices):
+        PAYMENT = 'payment', 'Payment'
+        DEPOSIT = 'deposit', 'Deposit'
+        REFUND = 'refund', 'Refund'
+
+    class Method(models.TextChoices):
+        CASH = 'cash', 'Cash'
+        BANK = 'bank', 'Bank transfer'
+        CARD = 'card', 'Card (external)'
+        OTHER = 'other', 'Other'
+
+    reservation = models.ForeignKey(Reservation, on_delete=models.PROTECT, related_name='payment_transactions')
+    kind = models.CharField(max_length=12, choices=Kind.choices)
+    method = models.CharField(max_length=12, choices=Method.choices)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    note = models.CharField(max_length=500, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    recorded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='recorded_hut_payments')
+
+    class Meta:
+        ordering = ['-created', '-pk']
+        constraints = [models.CheckConstraint(condition=Q(amount__gt=0), name='payment_transaction_positive')]
+
+    def __str__(self):
+        return f'{self.kind} {self.amount} for {self.reservation.code}'

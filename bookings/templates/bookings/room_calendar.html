@@ -1,0 +1,78 @@
+{% extends "bookings/base.html" %}
+{% block title %}Room availability calendar{% endblock %}
+{% block content %}
+<div class="eyebrow">STAFF / ROOM AVAILABILITY</div>
+<h1>Room availability calendar</h1>
+<p class="lead">Beds available per room and night. Select a day to inspect reservations or start a new booking.</p>
+<p><a href="{% url 'bookings:dashboard' %}">← Operations dashboard</a> · <a href="{% url 'bookings:manager_reservations' %}">Reservations</a></p>
+<section class="card">
+  <form method="get" style="display:flex;gap:1rem;flex-wrap:wrap;align-items:end">
+    <div><label for="hut">Mountain hut</label><select id="hut" name="hut">
+      {% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_hut.pk == hut.pk %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}
+    </select></div>
+    <div><label for="month">Month</label><input id="month" type="month" value="{{ month|date:'Y-m' }}" min="2000-01" max="2100-12"></div>
+    <input type="hidden" name="year" id="calendar-year" value="{{ month.year }}">
+    <input type="hidden" name="month" id="calendar-month" value="{{ month.month }}">
+    <button type="submit">Show availability</button>
+  </form>
+  <p><a href="?hut={{ selected_hut.slug|urlencode }}&amp;year={{ prev.year }}&amp;month={{ prev.month }}">← Previous month</a> · <strong>{{ month|date:'F Y' }}</strong> · <a href="?hut={{ selected_hut.slug|urlencode }}&amp;year={{ next.year }}&amp;month={{ next.month }}">Next month →</a></p>
+</section>
+{% if selected_hut %}
+<section class="card">
+  <p><strong>{{ selected_hut.name }}</strong> · Green: empty · Amber: partially booked · Red: full · Grey: inactive room</p>
+  <div style="overflow-x:auto;max-width:100%">
+    <table style="border-collapse:separate;border-spacing:3px;min-width:1050px;width:100%">
+      <thead><tr><th scope="col" style="position:sticky;left:0;background:var(--card-bg,#fff);z-index:1;min-width:130px">Room</th>
+        {% for day in days %}<th scope="col" style="text-align:center;min-width:42px">{{ day|date:'D'|slice:':1' }}<br>{{ day|date:'j' }}</th>{% endfor %}
+      </tr></thead>
+      <tbody>{% for row in rows %}<tr>
+        <th scope="row" style="position:sticky;left:0;background:var(--card-bg,#fff);z-index:1;text-align:left">{{ row.room.name }}<br><a href="{% url 'bookings:bed_management' row.room.pk %}?day={{ today|date:'Y-m-d' }}">Manage beds</a><br><small>{{ row.room.capacity }} beds{% if not row.room.is_active %} · Inactive{% endif %}</small></th>
+        {% for cell in row.cells %}<td style="padding:0;text-align:center">
+          <button type="button" class="room-cell" data-room="{{ row.room.name }}" data-day="{{ cell.date|date:'Y-m-d' }}" data-free="{{ cell.free }}" data-capacity="{{ row.room.capacity }}"
+            style="width:100%;min-width:39px;padding:9px 2px;border:1px solid #aaa;border-radius:5px;cursor:pointer;background:{% if not row.room.is_active %}#e5e7eb{% elif cell.is_full %}#fecaca{% elif cell.is_empty %}#bbf7d0{% else %}#fde68a{% endif %};color:#111827"
+            aria-label="{{ row.room.name }}, {{ cell.date|date:'j F Y' }}, {{ cell.free }} beds free">
+            <strong>{{ cell.free }}</strong>
+          </button>
+          <template class="room-detail"><ul>{% for booking in cell.details %}<li>{{ booking.name }} · {{ booking.beds }} bed(s) · {{ booking.status }} · {{ booking.code }}</li>{% empty %}<li>No viewable guest details for this date.</li>{% endfor %}</ul></template>
+        </td>{% endfor %}
+      </tr>{% empty %}<tr><td colspan="32">No rooms in this hut.</td></tr>{% endfor %}</tbody>
+    </table>
+  </div>
+</section>
+<section class="card" id="selected-day" aria-live="polite">
+  <h2 id="selected-heading">Select a room and date</h2>
+  <p id="selected-count">Click a calendar cell to see availability.</p>
+  <div id="selected-details"></div>
+  <p><a id="book-link" href="{% url 'bookings:manual_booking' %}?hut={{ selected_hut.pk }}" hidden>+ New reservation for this date →</a></p>
+</section>
+{% endif %}
+<script>
+(function () {
+  const monthInput = document.getElementById('month');
+  if (monthInput) monthInput.addEventListener('change', function () {
+    const parts = this.value.split('-');
+    if (parts.length === 2) {
+      document.getElementById('calendar-year').value = parts[0];
+      document.getElementById('calendar-month').value = Number(parts[1]);
+    }
+  });
+  const bookLink = document.getElementById('book-link');
+  if (!bookLink) return;
+  document.querySelectorAll('.room-cell').forEach(function (button) {
+    button.addEventListener('click', function () {
+      document.getElementById('selected-heading').textContent = button.dataset.room + ' · ' + button.dataset.day;
+      document.getElementById('selected-count').textContent = button.dataset.free + ' free of ' + button.dataset.capacity + ' beds';
+      const details = button.parentElement.querySelector('.room-detail');
+      document.getElementById('selected-details').replaceChildren(details.content.cloneNode(true));
+      const start = button.dataset.day;
+      const endDate = new Date(start + 'T12:00:00');
+      endDate.setDate(endDate.getDate() + 1);
+      const end = [endDate.getFullYear(), String(endDate.getMonth()+1).padStart(2,'0'), String(endDate.getDate()).padStart(2,'0')].join('-');
+      const params = new URLSearchParams({hut:'{{ selected_hut.pk }}', check_in:start, check_out:end});
+      bookLink.href = '{% url "bookings:manual_booking" %}?' + params.toString();
+      bookLink.hidden = Number(button.dataset.free) === 0 || start < '{{ today|date:"Y-m-d" }}';
+    });
+  });
+})();
+</script>
+{% endblock %}

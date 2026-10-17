@@ -1,0 +1,20 @@
+<div class="table-wrap"><table>
+<thead><tr><th>Guest</th><th>Contact</th><th>Dates</th><th>Rooms / beds</th><th>Actual stay</th><th>Action</th></tr></thead>
+<tbody>{% for reservation in reservations %}
+<tr>
+<td><strong>{{ reservation.name }}</strong><small> · {{ reservation.code }}</small></td>
+<td>{{ reservation.email }}{% if reservation.phone %}<div>{{ reservation.phone }}</div>{% endif %}</td>
+<td>{{ reservation.check_in|date:"j M" }} – {{ reservation.check_out|date:"j M Y" }}</td>
+<td>{% for item in reservation.items.all %}{{ item.room.name }} ({{ item.beds }}){% if not forloop.last %}, {% endif %}{% endfor %}</td>
+<td>{% if reservation.guest_stay.checked_out_at %}Checked out {{ reservation.guest_stay.checked_out_at|date:"j M H:i" }}
+{% elif reservation.guest_stay.checked_in_at %}Checked in {{ reservation.guest_stay.checked_in_at|date:"j M H:i" }}
+{% else %}Expected{% endif %}</td>
+<td>
+{% if not reservation.guest_stay.checked_in_at %}
+<form method="post" action="{% url 'bookings:manager_stay_action' reservation.code %}">{% csrf_token %}<input type="hidden" name="action" value="check_in"><button type="submit">Check in</button></form>
+{% elif not reservation.guest_stay.checked_out_at %}
+<form method="post" action="{% url 'bookings:manager_stay_action' reservation.code %}">{% csrf_token %}<input type="hidden" name="action" value="check_out"><button type="submit">Check out</button></form>
+{% else %}Completed{% endif %}
+</td></tr>
+{% empty %}<tr><td colspan="6">No guests in this group.</td></tr>{% endfor %}
+</tbody></table></div>

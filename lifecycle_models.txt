@@ -1,0 +1,17 @@
+
+class ReservationLifecycleEvent(models.Model):
+    """Audit trail for deposit deadline warnings and automated cancellations."""
+    reservation = models.ForeignKey(Reservation, on_delete=models.CASCADE, related_name="lifecycle_events")
+    event_type = models.CharField(max_length=30, choices=[
+        ("warning", "Warning issued"), ("cancelled", "Automatically cancelled"),
+    ])
+    due_date = models.DateField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    details = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        constraints = [
+            models.UniqueConstraint(fields=["reservation", "event_type", "due_date"],
+                                    name="unique_lifecycle_event_per_due_date")
+        ]

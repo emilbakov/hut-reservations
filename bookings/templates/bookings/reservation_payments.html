@@ -1,0 +1,32 @@
+{% extends "bookings/base.html" %}
+{% block title %}Reservation payments{% endblock %}
+{% block content %}
+<div class="eyebrow">STAFF / PAYMENTS</div>
+<h1>Payments · {{ reservation.name }}</h1>
+<p><a href="{% url 'bookings:manager_reservations' %}">← Reservations</a> · Reference {{ reservation.code }}</p>
+<section class="card">
+  <h2>Balance ({{ currency }})</h2>
+  <p><strong>Reservation total:</strong> {{ reservation.total_price|floatformat:2 }}</p>
+  <p><strong>Received:</strong> {{ summary.paid|floatformat:2 }}</p>
+  <p><strong>Refunded:</strong> {{ summary.refunded|floatformat:2 }}</p>
+  <p><strong>Net received:</strong> {{ summary.net|floatformat:2 }}</p>
+  <p><strong>Remaining:</strong> {{ summary.due|floatformat:2 }}</p>
+  <p><strong>Status:</strong> {{ summary.status|capfirst }}</p>
+  {% if reservation.status == 'cancelled' %}<p>This reservation is cancelled. Review any refunds manually.</p>{% endif %}
+</section>
+<section class="card">
+  <h2>Record transaction</h2>
+  <form method="post">{% csrf_token %}
+    <label for="kind">Type</label><select name="kind" id="kind" required>{% for value,label in kinds %}<option value="{{ value }}">{{ label }}</option>{% endfor %}</select>
+    <label for="amount">Amount ({{ currency }})</label><input id="amount" name="amount" type="number" min="0.01" max="99999999.99" step="0.01" required>
+    <label for="method">Method</label><select name="method" id="method" required>{% for value,label in methods %}<option value="{{ value }}">{{ label }}</option>{% endfor %}</select>
+    <label for="note">Reference or note</label><input id="note" name="note" maxlength="500">
+    <button type="submit">Save transaction</button>
+  </form>
+</section>
+<section class="card"><h2>Transaction history</h2>
+<div class="table-wrap"><table><thead><tr><th>Recorded</th><th>Type</th><th>Amount</th><th>Method</th><th>Note</th><th>Staff</th></tr></thead><tbody>
+{% for t in transactions %}<tr><td>{{ t.created|date:'j M Y H:i' }}</td><td>{{ t.get_kind_display }}</td><td>{{ t.amount|floatformat:2 }} {{ currency }}</td><td>{{ t.get_method_display }}</td><td>{{ t.note }}</td><td>{{ t.recorded_by|default:'—' }}</td></tr>
+{% empty %}<tr><td colspan="6">No payments recorded.</td></tr>{% endfor %}
+</tbody></table></div></section>
+{% endblock %}

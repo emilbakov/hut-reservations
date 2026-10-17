@@ -1,0 +1,47 @@
+{% extends "bookings/base.html" %}
+{% block title %}New manual reservation{% endblock %}
+{% block content %}
+<div class="eyebrow">STAFF / RESERVATIONS</div>
+<h1>New manual reservation</h1>
+<p class="lead">Create a confirmed booking for a walk-in or telephone guest. An email address is optional; a phone number or email is required.</p>
+<p><a href="{% url 'bookings:manager_reservations' %}">← Back to reservations</a></p>
+<section class="card">
+<form method="get">
+  <label for="hut-choice">Hut</label>
+  <select id="hut-choice" name="hut" required>
+    <option value="">Choose a hut</option>
+    {% for hut in form.fields.hut.queryset %}
+    <option value="{{ hut.pk }}" {% if selected_hut.pk == hut.pk %}selected{% endif %}>{{ hut.name }}</option>
+    {% endfor %}
+  </select>
+  <label for="arrival-choice">Arrival</label>
+  <input type="date" id="arrival-choice" name="check_in" value="{{ request.GET.check_in|default:'' }}" required>
+  <label for="departure-choice">Departure</label>
+  <input type="date" id="departure-choice" name="check_out" value="{{ request.GET.check_out|default:'' }}" required>
+  <button type="submit">Check available beds</button>
+</form>
+</section>
+{% if selected_hut %}
+<section class="card">
+<h2>Book at {{ selected_hut.name }}</h2>
+<form method="post">
+  {% csrf_token %}
+  <input type="hidden" name="hut" value="{{ selected_hut.pk }}">
+  {% if form.non_field_errors %}<div role="alert">{{ form.non_field_errors }}</div>{% endif %}
+  {% for field in form %}{% if field.name != 'hut' %}
+    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+    {{ field }}
+    {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+    {% if field.errors %}<div role="alert">{{ field.errors }}</div>{% endif %}
+  {% endif %}{% endfor %}
+  <h3>Room beds</h3>
+  <p>Enter a number for each room. Check available beds first for the chosen dates.</p>
+  {% for row in room_rows %}
+    <label for="beds_{{ row.room.pk }}">{{ row.room.name }} — capacity {{ row.room.capacity }}{% if row.free != None %}, available {{ row.free }}{% endif %}</label>
+    <input id="beds_{{ row.room.pk }}" type="number" min="0" max="{{ row.room.capacity }}" step="1" name="beds_{{ row.room.pk }}" value="{{ row.requested }}">
+  {% empty %}<p>No active rooms available.</p>{% endfor %}
+  <button type="submit">Create confirmed reservation</button>
+</form>
+</section>
+{% endif %}
+{% endblock %}

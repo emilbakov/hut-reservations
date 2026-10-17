@@ -1,0 +1,28 @@
+
+class HutExpense(models.Model):
+    """Recorded operational expense, allocated to one hut and expense date."""
+    class Category(models.TextChoices):
+        FOOD = 'food', 'Food and supplies'
+        UTILITIES = 'utilities', 'Electricity and utilities'
+        HEATING = 'heating', 'Heating and fuel'
+        MAINTENANCE = 'maintenance', 'Maintenance'
+        STAFF = 'staff', 'Staff costs'
+        TRANSPORT = 'transport', 'Transport'
+        OTHER = 'other', 'Other'
+
+    hut = models.ForeignKey(Hut, on_delete=models.PROTECT, related_name='expenses')
+    category = models.CharField(max_length=20, choices=Category.choices)
+    expense_date = models.DateField()
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    description = models.CharField(max_length=250)
+    reference = models.CharField(max_length=100, blank=True)
+    recorded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='recorded_hut_expenses')
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-expense_date', '-pk']
+        constraints = [models.CheckConstraint(condition=Q(amount__gt=0), name='hut_expense_positive')]
+        indexes = [models.Index(fields=['hut', 'expense_date'])]
+
+    def __str__(self):
+        return f'{self.hut}: {self.amount} ({self.category})'

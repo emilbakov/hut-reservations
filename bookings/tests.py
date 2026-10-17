@@ -2,12 +2,17 @@ from datetime import timedelta
 
 from django.contrib.auth import get_user_model
 from django.core import mail
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from .models import Reservation, Room
-from .services import NotAvailable, create_reservation, expire_pending, free_beds
+from .models import Hut, Reservation, ReservationItem, Room
+
+from .services import (
+    NotAvailable, create_reservation, expire_pending, free_beds,
+    modify_reservation,
+)
 
 
 def day(offset):
@@ -17,9 +22,14 @@ def day(offset):
 GUEST = {"name": "Ana", "email": "ana@example.com"}
 
 
+def make_hut(slug="test-hut"):
+    return Hut.objects.create(name=slug.replace("-", " ").title(), slug=slug)
+
+
 class AvailabilityTests(TestCase):
     def setUp(self):
-        self.room = Room.objects.create(name="Dorm", capacity=4, price_per_night="10.00")
+        self.hut = make_hut()
+        self.room = Room.objects.create(hut=self.hut, name="Dorm", capacity=4, price_per_night="10.00")
 
     def book(self, start, end, beds, **kwargs):
         return create_reservation(
@@ -90,9 +100,10 @@ class AvailabilityTests(TestCase):
 
 class BookingPageTests(TestCase):
     def setUp(self):
-        self.dorm = Room.objects.create(name="Dorm", capacity=4, price_per_night="10.00")
-        self.small = Room.objects.create(name="Small", capacity=2, price_per_night="20.00")
-        self.url = reverse("bookings:book")
+        self.hut = make_hut()
+        self.dorm = Room.objects.create(hut=self.hut, name="Dorm", capacity=4, price_per_night="10.00")
+        self.small = Room.objects.create(hut=self.hut, name="Small", capacity=2, price_per_night="20.00")
+        self.url = reverse("bookings:hut_detail", args=[self.hut.slug])
 
     def post(self, start=1, end=3, **beds):
         data = {
@@ -154,7 +165,8 @@ class BookingPageTests(TestCase):
 
 class AdminTests(TestCase):
     def setUp(self):
-        self.room = Room.objects.create(name="Dorm", capacity=4)
+        self.hut = make_hut()
+        self.room = Room.objects.create(hut=self.hut, name="Dorm", capacity=4)
         user = get_user_model().objects.create_superuser("keeper", "k@example.com", "pw")
         self.client.force_login(user)
         create_reservation(
@@ -184,7 +196,8 @@ class AdminTests(TestCase):
 
 class ServiceValidationTests(TestCase):
     def setUp(self):
-        self.room = Room.objects.create(name="Validation dorm", capacity=3, price_per_night="12.00")
+        self.hut = make_hut()
+        self.room = Room.objects.create(hut=self.hut, name="Validation dorm", capacity=3, price_per_night="12.00")
 
     def reserve(self, start=1, end=2, beds=1, **kwargs):
         return create_reservation(
@@ -221,17 +234,18 @@ class ServiceValidationTests(TestCase):
         self.assertIn("/admin/login/", response.url)
 
     def test_staff_dashboard_shows_occupancy(self):
-        user = get_user_model().objects.create_user("staff", password="pass", is_staff=True)
+        user = get_user_model().objects.create_superuser("staff", password="pass")
         self.reserve(beds=2)
         self.client.force_login(user)
         response = self.client.get(reverse("bookings:dashboard"))
-        self.assertContains(response, "Hut overview")
+        self.assertContains(response, "Occupancy calendar")
         self.assertContains(response, "Upcoming arrivals")
 
 
 class CalendarAndModificationTests(TestCase):
     def setUp(self):
-        self.room = Room.objects.create(name="Calendar Dorm", capacity=3, price_per_night="20.00")
+        self.hut = make_hut()
+        self.room = Room.objects.create(hut=self.hut, name="Calendar Dorm", capacity=3, price_per_night="20.00")
         self.reservation = create_reservation(check_in=day(2), check_out=day(4),
             beds_by_room={self.room.pk: 2}, **GUEST)
 
@@ -299,8 +313,87 @@ class DashboardPhaseFourTests(TestCase):
     def test_dashboard_displays_month_for_staff(self):
         from django.contrib.auth import get_user_model
         from django.urls import reverse
-        user = get_user_model().objects.create_user(username="phase4viewer", password="test-password", is_staff=True)
+        user = get_user_model().objects.create_superuser(username="phase4viewer", password="test-password")
         self.client.force_login(user)
         response = self.client.get(reverse("bookings:dashboard"), {"year": "2026", "month": "10"})
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Occupancy calendar")
+
+
+class MultiHutTests(TestCase):
+    def setUp(self):
+        self.first_hut = make_hut("first-hut")
+        self.second_hut = make_hut("second-hut")
+        self.first_room = Room.objects.create(
+            hut=self.first_hut, name="Dorm", capacity=4, price_per_night="10.00"
+        )
+        self.second_room = Room.objects.create(
+            hut=self.second_hut, name="Dorm", capacity=4, price_per_night="15.00"
+        )
+
+    def test_same_room_name_allowed_in_different_huts(self):
+        self.assertNotEqual(self.first_room.hut_id, self.second_room.hut_id)
+        self.assertEqual(self.first_room.name, self.second_room.name)
+
+    def test_service_rejects_rooms_from_different_huts(self):
+        with self.assertRaises(ValidationError):
+            create_reservation(
+                check_in=day(1), check_out=day(3),
+                beds_by_room={self.first_room.pk: 1, self.second_room.pk: 1},
+                **GUEST,
+            )
+        self.assertFalse(Reservation.objects.exists())
+
+    def test_service_rejects_room_without_hut(self):
+        unassigned = Room.objects.create(
+            name="Unassigned", capacity=2, price_per_night="10.00"
+        )
+        with self.assertRaises(ValidationError):
+            create_reservation(
+                check_in=day(1), check_out=day(3),
+                beds_by_room={unassigned.pk: 1}, **GUEST,
+            )
+
+    def test_hut_booking_page_only_shows_its_rooms(self):
+        response = self.client.get(
+            reverse("bookings:hut_detail", args=[self.first_hut.slug]),
+            {"check_in": day(1).isoformat(), "check_out": day(3).isoformat()},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.first_hut.name)
+        self.assertContains(response, f'name="room_{self.first_room.pk}"')
+        self.assertNotContains(response, f'name="room_{self.second_room.pk}"')
+
+    def test_calendar_filters_by_hut(self):
+        create_reservation(
+            check_in=day(2), check_out=day(4),
+            beds_by_room={self.first_room.pk: 4}, **GUEST,
+        )
+        target = day(2)
+        url = reverse("bookings:calendar")
+        params = {"year": target.year, "month": target.month}
+        first = self.client.get(url, {**params, "hut": self.first_hut.slug})
+        second = self.client.get(url, {**params, "hut": self.second_hut.slug})
+        self.assertEqual(first.status_code, 200)
+        self.assertEqual(second.status_code, 200)
+        first_day = next(x for x in first.json()["days"] if x["date"] == target.isoformat())
+        second_day = next(x for x in second.json()["days"] if x["date"] == target.isoformat())
+        self.assertEqual(first_day["free_beds"], 0)
+        self.assertEqual(second_day["free_beds"], 4)
+
+    def test_modification_cannot_move_reservation_to_another_hut(self):
+        reservation = create_reservation(
+            check_in=day(1), check_out=day(3),
+            beds_by_room={self.first_room.pk: 1}, **GUEST,
+        )
+        with self.assertRaises(ValidationError):
+            modify_reservation(
+                code=reservation.code, check_in=day(2), check_out=day(4),
+                beds_by_room={self.second_room.pk: 1},
+            )
+        reservation.refresh_from_db()
+        self.assertEqual(reservation.check_in, day(1))
+        self.assertEqual(
+            list(reservation.items.values_list("room_id", flat=True)),
+            [self.first_room.pk],
+        )

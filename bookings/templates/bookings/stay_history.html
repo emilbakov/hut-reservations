@@ -1,0 +1,57 @@
+{% extends "bookings/base.html" %}
+{% block title %}Guest stay history{% endblock %}
+{% block content %}
+<div class="eyebrow">STAFF / REPORTS</div>
+<h1>Guest stay history</h1>
+<p class="lead">Actual guest arrivals and departures, plus booked occupancy estimates.</p>
+<p><a href="{% url 'bookings:dashboard' %}">← Dashboard</a> · <a href="{% url 'bookings:manager_stays' %}">Today's stays</a></p>
+<section class="card">
+<form method="get">
+<label for="hut">Hut</label>
+<select id="hut" name="hut">
+{% if not manager_mode %}<option value="">All huts</option>{% endif %}
+{% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_slug == hut.slug %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}
+</select>
+<label for="year">Year</label><input id="year" name="year" type="number" min="2000" max="2100" value="{{ year }}">
+<label for="month">Month</label><input id="month" name="month" type="number" min="1" max="12" value="{{ month_number }}">
+<label for="q">Guest, email or reference</label><input id="q" name="q" value="{{ q }}" maxlength="120">
+<button type="submit">Show report</button>
+</form>
+<p><a href="{% url 'bookings:stay_history_export' %}?hut={{ selected_slug|urlencode }}&amp;year={{ year }}&amp;month={{ month_number }}&amp;q={{ q|urlencode }}">Export filtered CSV ↓</a></p>
+</section>
+<div class="metrics">
+<div class="metric"><span>Actual check-ins this month</span><strong>{{ arrivals }}</strong></div>
+<div class="metric"><span>Actual check-outs this month</span><strong>{{ departures }}</strong></div>
+<div class="metric"><span>Booked bed-nights</span><strong>{{ booked_bed_nights }}</strong></div>
+<div class="metric"><span>Booked occupancy estimate</span><strong>{{ occupancy }}%</strong></div>
+</div>
+<p class="dashboard-help">Monthly metrics ignore the text search. Occupancy uses currently active room capacity and confirmed booking dates; it is not a count of actual nights stayed.</p>
+<section class="card" aria-labelledby="occupancy-heading">
+<h2 id="occupancy-heading">Booked occupancy · {{ month|date:"F Y" }}</h2>
+<p><strong>{{ occupancy }}%</strong> of currently available bed capacity was booked for this month.</p>
+<div style="height:18px;background:#e5e7eb;border-radius:12px;overflow:hidden" role="img" aria-label="Booked occupancy: {{ occupancy }} percent">
+<div style="height:100%;width:{% if occupancy > 100 %}100{% elif occupancy < 0 %}0{% else %}{{ occupancy }}{% endif %}%;background:#166534"></div>
+</div>
+<p class="dashboard-help">This bar shows booked capacity, not measured overnight attendance. Current capacity is used for historical months.</p>
+</section>
+<section class="card">
+<h2>Stay events · {{ month|date:"F Y" }}</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Guest</th><th>Booked dates</th><th>Actual check-in</th><th>Recorded by</th><th>Actual check-out</th><th>Recorded by</th></tr></thead>
+<tbody>
+{% for stay in page %}
+<tr>
+<td>{{ stay.reservation.name }}<div><small>{{ stay.reservation.code }}</small></div></td>
+<td>{{ stay.reservation.check_in|date:"j M Y" }} – {{ stay.reservation.check_out|date:"j M Y" }}</td>
+<td>{{ stay.checked_in_at|date:"j M Y H:i"|default:"—" }}</td>
+<td>{{ stay.checked_in_by.get_username|default:"—" }}</td>
+<td>{{ stay.checked_out_at|date:"j M Y H:i"|default:"—" }}</td>
+<td>{{ stay.checked_out_by.get_username|default:"—" }}</td>
+</tr>
+{% empty %}<tr><td colspan="6">No recorded stay events match this period.</td></tr>{% endfor %}
+</tbody></table></div>
+<p>Page {{ page.number }} of {{ page.paginator.num_pages }}</p>
+{% if page.has_previous %}<a href="?hut={{ selected_slug|urlencode }}&amp;year={{ year }}&amp;month={{ month_number }}&amp;q={{ q|urlencode }}&amp;page={{ page.previous_page_number }}">← Previous</a>{% endif %}
+{% if page.has_next %}<a href="?hut={{ selected_slug|urlencode }}&amp;year={{ year }}&amp;month={{ month_number }}&amp;q={{ q|urlencode }}&amp;page={{ page.next_page_number }}">Next →</a>{% endif %}
+</section>
+{% endblock %}

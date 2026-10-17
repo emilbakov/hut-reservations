@@ -2,6 +2,7 @@
 from collections import defaultdict
 
 from django.contrib import admin
+from django.core.exceptions import PermissionDenied
 from django.core.exceptions import ValidationError
 from django.forms.models import BaseInlineFormSet
 
@@ -12,6 +13,29 @@ from .services import free_beds, lock_rooms
 # ----------------------------------
 # HUT ADMIN
 # ----------------------------------
+
+def is_hut_manager(request):
+    return (not request.user.is_superuser and
+            Hut.objects.filter(managers=request.user).exists())
+
+
+class ProtectManagerAdmin:
+    """Managers use the read-only dashboard, not unrestricted Django Admin."""
+    def has_module_permission(self, request):
+        return not is_hut_manager(request) and super().has_module_permission(request)
+
+    def has_view_permission(self, request, obj=None):
+        return not is_hut_manager(request) and super().has_view_permission(request, obj)
+
+    def has_add_permission(self, request):
+        return not is_hut_manager(request) and super().has_add_permission(request)
+
+    def has_change_permission(self, request, obj=None):
+        return not is_hut_manager(request) and super().has_change_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        return not is_hut_manager(request) and super().has_delete_permission(request, obj)
+
 
 class RoomInline(admin.TabularInline):
     model = Room
@@ -28,7 +52,7 @@ class RoomInline(admin.TabularInline):
 
 
 @admin.register(Hut)
-class HutAdmin(admin.ModelAdmin):
+class HutAdmin(ProtectManagerAdmin, admin.ModelAdmin):
     list_display = [
         "name",
         "location",
@@ -39,6 +63,7 @@ class HutAdmin(admin.ModelAdmin):
     search_fields = ["name", "location"]
     prepopulated_fields = {"slug": ("name",)}
     inlines = [RoomInline]
+    filter_horizontal = ["managers"]
 
     @admin.display(description="Rooms")
     def room_count(self, obj):
@@ -50,7 +75,7 @@ class HutAdmin(admin.ModelAdmin):
 # ----------------------------------
 
 @admin.register(Room)
-class RoomAdmin(admin.ModelAdmin):
+class RoomAdmin(ProtectManagerAdmin, admin.ModelAdmin):
     list_display = [
         "name",
         "hut",
@@ -179,7 +204,7 @@ class HutReservationFilter(admin.SimpleListFilter):
 
 
 @admin.register(Reservation)
-class ReservationAdmin(admin.ModelAdmin):
+class ReservationAdmin(ProtectManagerAdmin, admin.ModelAdmin):
     list_display = [
         "name",
         "hut_name",

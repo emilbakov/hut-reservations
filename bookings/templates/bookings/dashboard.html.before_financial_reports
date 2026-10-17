@@ -1,0 +1,114 @@
+{% extends "bookings/base.html" %}
+{% block title %}Operations dashboard{% endblock %}
+{% block content %}
+<nav aria-label="Staff tools" class="card"><a href="{% url 'bookings:manual_booking' %}{% if selected_slug %}?hut={{ selected_slug|urlencode }}{% endif %}" class="button">+ New Reservation</a> · <strong>Staff tools</strong> · <a href="{% url 'bookings:room_calendar' %}{% if selected_slug %}?hut={{ selected_slug|urlencode }}{% endif %}">Room calendar →</a><p><a href="{% url 'bookings:manager_stays' %}?hut={{ selected_slug|urlencode }}">Check-in / check-out →</a> · <a href="{% url 'bookings:manager_reservations' %}?hut={{ selected_slug|urlencode }}">Reservations →</a> · <a href="{% url 'bookings:stay_history' %}?hut={{ selected_slug|urlencode }}">Stay history & reports →</a> · <a href="{% url 'bookings:yearly_performance' %}?hut={{ selected_slug|urlencode }}&amp;year={{ month.year }}">Annual performance →</a></p></nav>
+<div class="eyebrow">STAFF / {{ today|date:"j M Y" }}</div>
+<h1>Operations dashboard</h1>
+<p class="lead">Daily occupancy, bookings, and projected accommodation revenue.</p>
+
+<section class="card">
+  <form method="get" action="{% url 'bookings:dashboard' %}">
+    <label for="hut-filter"><strong>Mountain hut</strong></label>
+    <select id="hut-filter" name="hut">
+      {% if not manager_mode %}<option value="">All huts</option>{% endif %}
+      {% for hut in huts %}
+        <option value="{{ hut.slug }}" {% if selected_slug == hut.slug %}selected{% endif %}>{{ hut.name }}</option>
+      {% endfor %}
+    </select>
+    <input type="hidden" name="year" value="{{ month.year }}">
+    <input type="hidden" name="month" value="{{ month.month }}">
+    <button type="submit">Apply filter</button>
+  </form>
+  {% if selected_hut %}
+    <p class="dashboard-help">Showing {{ selected_hut.name }} only.</p>
+  {% else %}
+    <p class="dashboard-help">Showing all huts.</p>
+  {% endif %}
+</section>
+
+
+<div class="metrics">
+  <div class="metric"><span>Beds occupied today</span><strong>{{ occupied }} / {{ capacity }}</strong></div>
+  <div class="metric"><span>Arrivals / departures today</span><strong>{{ arrival_count }} / {{ departure_count }}</strong></div>
+  <div class="metric"><span>Pending bookings</span><strong>{{ pending_count }}</strong></div>
+  <div class="metric"><span>{{ month|date:"F Y" }} occupancy</span><strong>{{ occupancy }}%</strong></div>
+  <div class="metric"><span>Booked bed-nights</span><strong>{{ booked_nights }}</strong></div>
+  <div class="metric"><span>Projected monthly revenue</span><strong>{{ revenue|floatformat:2 }} {{ currency }}</strong></div>
+</div>
+
+<section class="card">
+  <div class="section-head">
+    <h2>Occupancy calendar · {{ month|date:"F Y" }}</h2>
+    <div class="dashboard-actions">
+      <a href="?year={{ previous_year }}&amp;month={{ previous_month }}&amp;hut={{ selected_slug|urlencode }}" aria-label="Previous month">← Previous</a>
+      <a href="?year={{ next_year }}&amp;month={{ next_month }}&amp;hut={{ selected_slug|urlencode }}">Next →</a>
+      <a href="{% url 'bookings:dashboard_export' %}?year={{ month.year }}&amp;month={{ month.month }}&amp;hut={{ selected_slug|urlencode }}">Export CSV ↓</a>
+    </div>
+  </div>
+  <p class="dashboard-help">Beds occupied per night. Select a day to see the reservations below.</p>
+  <div class="occupancy-grid" role="list" aria-label="Daily occupancy">
+    {% for day in daily %}
+      <a role="listitem" class="occupancy-day {% if day.date == today %}is-today{% endif %}"
+         href="#day-{{ day.date|date:'Ymd' }}"
+         title="{{ day.occupied }} occupied, {{ day.free }} free, {{ day.revenue }} {{ currency }}">
+        <span>{{ day.date|date:"j" }}</span>
+        <strong>{{ day.occupied }}/{{ capacity }}</strong>
+        <meter min="0" max="{{ capacity|default:1 }}" value="{{ day.occupied }}">{{ day.occupied }}</meter>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="card">
+  <div class="section-head">
+    <h2>Upcoming arrivals</h2>
+    {% if not manager_mode %}<a href="{% url 'admin:bookings_reservation_changelist' %}">Manage reservations →</a>{% endif %}
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Guest</th><th>Arrival</th><th>Departure</th><th>Beds</th><th>Status</th></tr></thead>
+      <tbody>
+        {% for row in upcoming %}
+          <tr>
+            <td>{% if manager_mode %}{{ row.reservation.name }}{% else %}<a href="{% url 'admin:bookings_reservation_change' row.reservation.pk %}">{{ row.reservation.name }}</a>{% endif %}</td>
+            <td>{{ row.reservation.check_in|date:"j M Y" }}</td>
+            <td>{{ row.reservation.check_out|date:"j M Y" }}</td>
+            <td>{{ row.beds }}</td>
+            <td>{{ row.reservation.get_status_display }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="5">No upcoming arrivals.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Daily reservation details</h2>
+  <div class="day-details">
+    {% for day in daily %}
+      <details id="day-{{ day.date|date:'Ymd' }}">
+        <summary><strong>{{ day.date|date:"D j M" }}</strong> · {{ day.occupied }} occupied · {{ day.free }} free · {{ day.revenue|floatformat:2 }} {{ currency }}</summary>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Guest</th><th>Dates</th><th>Beds</th><th>Status</th></tr></thead>
+            <tbody>
+              {% for row in day.reservations %}
+                <tr>
+                  <td>{% if manager_mode %}{{ row.reservation.name }}{% else %}<a href="{% url 'admin:bookings_reservation_change' row.reservation.pk %}">{{ row.reservation.name }}</a>{% endif %}</td>
+                  <td>{{ row.reservation.check_in }} – {{ row.reservation.check_out }}</td>
+                  <td>{{ row.beds }}</td>
+                  <td>{{ row.reservation.get_status_display }}</td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="4">No reservations for this night.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </details>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

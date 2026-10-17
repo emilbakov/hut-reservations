@@ -1,0 +1,31 @@
+{% extends "bookings/base.html" %}
+{% block title %}Deposit deadlines{% endblock %}
+{% block content %}
+<p><a href="{% url 'bookings:lifecycle_dashboard' %}">Deposit lifecycle &amp; audit log →</a></p>
+<div class="eyebrow">STAFF / DEPOSITS</div>
+<h1>Deposits &amp; payment deadlines</h1>
+<p><a href="{% url 'bookings:manager_reservations' %}">← Reservations</a> · <a href="{% url 'bookings:financial_dashboard' %}">Financial dashboard</a></p>
+<section class="card">
+<form method="get"><label for="hut">Mountain hut</label><select id="hut" name="hut">
+{% if not manager_mode %}<option value="">All huts</option>{% endif %}
+{% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_slug == hut.slug %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}
+</select><button type="submit">Show</button></form>
+</section>
+{% if selected_hut %}
+<section class="card"><h2>Deposit policy — {{ selected_hut.name }}</h2>
+<form method="post">{% csrf_token %}
+<input type="hidden" name="hut_id" value="{{ selected_hut.pk }}">
+<label for="percentage">Deposit percentage</label><input id="percentage" name="percentage" type="number" min="0" max="100" value="{% if policy %}{{ policy.percentage }}{% else %}30{% endif %}" required>
+<label for="due_days">Days after booking until due</label><input id="due_days" name="due_days" type="number" min="0" max="365" value="{% if policy %}{{ policy.due_days }}{% else %}3{% endif %}" required>
+<label><input type="checkbox" name="reminders_enabled" {% if policy.reminders_enabled or not policy %}checked{% endif %}> Enable email reminders</label>
+<button type="submit">Save policy</button></form>
+<p><small>Changes also affect existing bookings. Deadline is measured from the reservation creation date.</small></p>
+</section>
+{% endif %}
+<section class="card"><h2>Awaiting deposit: {{ total_awaiting }} · Overdue: {{ overdue_count }}</h2>
+<p><small>Only active reservations with an unpaid deposit appear. The list shows the first 200; narrow by hut if needed.</small></p>
+<div class="table-wrap"><table><thead><tr><th>Guest</th><th>Arrival</th><th>Deposit due</th><th>Required</th><th>Received (net)</th><th>Remaining</th><th>Status</th><th>Action</th></tr></thead><tbody>
+{% for row in rows %}<tr><td>{{ row.reservation.name }}<br><small>{{ row.reservation.code }}</small></td><td>{{ row.reservation.check_in }}</td><td>{{ row.due_date }}</td><td>{{ row.target|floatformat:2 }} {{ currency }}</td><td>{{ row.net_paid|floatformat:2 }} {{ currency }}</td><td>{{ row.remaining|floatformat:2 }} {{ currency }}</td><td>{% if row.overdue %}<strong>Overdue</strong>{% else %}Awaiting{% endif %}</td><td><a href="{% url 'bookings:reservation_payments' row.reservation.code %}">Payments</a></td></tr>
+{% empty %}<tr><td colspan="8">No deposits awaiting payment.</td></tr>{% endfor %}
+</tbody></table></div></section>
+{% endblock %}

@@ -1,0 +1,24 @@
+
+class HutDepositPolicy(models.Model):
+    """Per-hut deposit requirement and payment deadline."""
+    hut = models.OneToOneField(Hut, on_delete=models.CASCADE, related_name='deposit_policy')
+    percentage = models.PositiveSmallIntegerField(default=30)
+    due_days = models.PositiveSmallIntegerField(default=3)
+    reminders_enabled = models.BooleanField(default=True)
+
+    class Meta:
+        constraints = [models.CheckConstraint(condition=Q(percentage__lte=100), name='deposit_percentage_max_100')]
+
+    def clean(self):
+        if self.percentage > 100:
+            raise ValidationError({'percentage': 'Percentage cannot exceed 100.'})
+
+
+class DepositReminderLog(models.Model):
+    """One reminder per reservation and due date, to avoid repeated emails."""
+    reservation = models.ForeignKey(Reservation, on_delete=models.CASCADE, related_name='deposit_reminders')
+    due_date = models.DateField()
+    sent_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=['reservation', 'due_date'], name='unique_deposit_reminder_due_date')]

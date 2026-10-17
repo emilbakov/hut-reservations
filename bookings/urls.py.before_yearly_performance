@@ -1,0 +1,68 @@
+
+from django.urls import path
+
+from . import views
+
+app_name = "bookings"
+
+urlpatterns = [
+    # Homepage — choose a hut
+    path("", views.hut_list, name="hut_list"),
+
+    # Booking page for a specific hut
+    path("huts/<slug:slug>/", views.hut_detail, name="hut_detail"),
+
+    # Existing booking view (temporary legacy URL)
+    path("book/", views.book, name="book"),
+
+    # Availability calendar
+    path(
+        "availability/calendar/",
+        views.availability_calendar,
+        name="calendar",
+    ),
+
+    # Reservation management
+    path(
+        "r/<str:code>/modify/",
+        views.reservation_modify,
+        name="modify",
+    ),
+    path(
+        "r/<str:code>/",
+        views.reservation_detail,
+        name="reservation",
+    ),
+    path(
+        "r/<str:code>/cancel/",
+        views.reservation_cancel,
+        name="cancel",
+    ),
+
+    # Hut manager reservation management
+    path("staff/reservations/", views.manager_reservations, name="manager_reservations"),
+    path("staff/reservations/<str:code>/action/", views.manager_reservation_action, name="manager_reservation_action"),
+
+    # Manager arrivals, departures, and actual stay events
+    path("staff/stays/", views.manager_stays, name="manager_stays"),
+    path("staff/stays/<str:code>/action/", views.manager_stay_action, name="manager_stay_action"),
+
+    # Staff dashboard
+    path(
+        "staff/dashboard/",
+        views.dashboard,
+        name="dashboard",
+    ),
+    path(
+        "staff/dashboard/export/",
+        views.dashboard_export,
+        name="dashboard_export",
+    ),
+]
+
+# Guest stay history and reports
+from . import reports
+urlpatterns += [
+    path("staff/history/", reports.stay_history, name="stay_history"),
+    path("staff/history/export/", reports.stay_history_export, name="stay_history_export"),
+]

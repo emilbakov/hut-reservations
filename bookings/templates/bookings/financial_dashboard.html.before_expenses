@@ -1,0 +1,51 @@
+{% extends "bookings/base.html" %}
+{% block title %}Financial dashboard{% endblock %}
+{% block content %}
+<div class="eyebrow">STAFF / FINANCES</div>
+<h1>Financial dashboard</h1>
+<p class="lead">Actual cash movements and current outstanding balances for your hut.</p>
+<p><a href="{% url 'bookings:dashboard' %}">← Dashboard</a> · <a href="{% url 'bookings:manager_reservations' %}">Reservations</a></p>
+<section class="card">
+<form method="get">
+<label for="hut">Mountain hut</label>
+<select id="hut" name="hut">
+{% if not manager_mode %}<option value="">All permitted huts</option>{% endif %}
+{% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_slug == hut.slug %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}
+</select>
+<label for="month">Month</label><select id="month" name="month">
+{% for value,label in month_options %}<option value="{{ value }}" {% if month.month == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+</select>
+<label for="year">Year</label><input id="year" type="number" name="year" value="{{ month.year }}" min="2000" max="2100">
+<button type="submit">Show report</button>
+</form>
+<p><a href="?hut={{ selected_slug|urlencode }}&amp;year={{ previous.year }}&amp;month={{ previous.month }}">← Previous month</a> ·
+<a href="?hut={{ selected_slug|urlencode }}&amp;year={{ next.year }}&amp;month={{ next.month }}">Next month →</a> ·
+<a href="{% url 'bookings:financial_export' %}?hut={{ selected_slug|urlencode }}&amp;year={{ month.year }}&amp;month={{ month.month }}">Export CSV</a></p>
+</section>
+<section class="card"><h2>Cash movements · {{ month|date:"F Y" }}</h2>
+<table><tbody>
+<tr><th>Payments + deposits received</th><td>{{ receipts|floatformat:2 }} {{ currency }}</td></tr>
+<tr><th>Of which deposits</th><td>{{ deposits|floatformat:2 }} {{ currency }}</td></tr>
+<tr><th>Refunds</th><td>{{ refunds|floatformat:2 }} {{ currency }}</td></tr>
+<tr><th>Net cash received</th><td><strong>{{ net_cash|floatformat:2 }} {{ currency }}</strong></td></tr>
+</tbody></table>
+<p><small>Based on transaction recording dates. Deposits are included in receipts, not added again.</small></p>
+</section>
+<section class="card"><h2>Bookings arriving · {{ month|date:"F Y" }}</h2>
+<table><tbody>
+<tr><th>Active reservations</th><td>{{ arrival_count }}</td></tr>
+<tr><th>Current booking value</th><td>{{ booked|floatformat:2 }} {{ currency }}</td></tr>
+<tr><th>Net paid for these bookings</th><td>{{ paid_for_arrivals|floatformat:2 }} {{ currency }}</td></tr>
+<tr><th>Outstanding balance</th><td><strong>{{ outstanding|floatformat:2 }} {{ currency }}</strong></td></tr>
+<tr><th>Overpayments</th><td>{{ overpaid|floatformat:2 }} {{ currency }}</td></tr>
+</tbody></table>
+<p><small>Current snapshot for non-cancelled bookings with check-in during this month; includes payments recorded outside this month. Not a historical month-end balance.</small></p>
+</section>
+<section class="card"><h2>Transactions recorded this month</h2>
+<div class="table-wrap"><table><thead><tr><th>Date</th><th>Guest</th><th>Type</th><th>Method</th><th>Amount</th></tr></thead><tbody>
+{% for tx in transactions %}
+<tr><td>{{ tx.created|date:"j M Y H:i" }}</td><td><a href="{% url 'bookings:reservation_payments' tx.reservation.code %}">{{ tx.reservation.name }}</a></td><td>{{ tx.get_kind_display }}</td><td>{{ tx.get_method_display }}</td><td>{% if tx.kind == 'refund' %}−{% endif %}{{ tx.amount|floatformat:2 }} {{ currency }}</td></tr>
+{% empty %}<tr><td colspan="5">No transactions recorded this month.</td></tr>{% endfor %}
+</tbody></table></div>
+</section>
+{% endblock %}

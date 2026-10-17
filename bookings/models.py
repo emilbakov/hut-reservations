@@ -1,6 +1,9 @@
 
 import secrets
 
+from django.conf import settings
+
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import F, Q
@@ -25,6 +28,10 @@ class Hut(models.Model):
         null=True,
     )
     is_active = models.BooleanField(default=True)
+    managers = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, blank=True, related_name="managed_huts",
+        help_text="Staff accounts allowed to view this hut dashboard.",
+    )
 
     class Meta:
         ordering = ["name"]
@@ -107,7 +114,7 @@ class Reservation(models.Model):
     )
 
     name = models.CharField(max_length=100)
-    email = models.EmailField()
+    email = models.EmailField(blank=True)
     phone = models.CharField(max_length=30, blank=True)
     notes = models.TextField(blank=True)
 
@@ -222,3 +229,197 @@ class ReservationItem(models.Model):
             * self.price_per_night
             * self.reservation.nights
         )
+
+
+class GuestStay(models.Model):
+    """Actual arrival/departure events, separate from booking dates/status."""
+    reservation = models.OneToOneField(
+        Reservation, on_delete=models.CASCADE, related_name="guest_stay"
+    )
+    checked_in_at = models.DateTimeField(null=True, blank=True)
+    checked_out_at = models.DateTimeField(null=True, blank=True)
+    checked_in_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name="guest_checkins"
+    )
+    checked_out_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name="guest_checkouts"
+    )
+
+    def __str__(self):
+        return f"Stay for {self.reservation.code}"
+
+
+class Bed(models.Model):
+    """A numbered physical bed. A room's capacity remains the booking limit."""
+    room = models.ForeignKey(Room, on_delete=models.PROTECT, related_name='individual_beds')
+    number = models.PositiveIntegerField()
+
+    class Meta:
+        ordering = ['room_id', 'number']
+        constraints = [models.UniqueConstraint(fields=['room', 'number'], name='unique_numbered_bed_per_room')]
+
+    def __str__(self):
+        return f'{self.room} / Bed {self.number}'
+
+
+class BedAssignment(models.Model):
+    """A bed assigned to one reservation item for the reservation's full stay."""
+    bed = models.ForeignKey(Bed, on_delete=models.PROTECT, related_name='assignments')
+    item = models.ForeignKey(ReservationItem, on_delete=models.CASCADE, related_name='bed_assignments')
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=['bed', 'item'], name='unique_bed_assignment_item')]
+
+
+class BedClosure(models.Model):
+    """Bed unavailable on nights in [start, end)."""
+    bed = models.ForeignKey(Bed, on_delete=models.PROTECT, related_name='closures')
+    start = models.DateField()
+    end = models.DateField()
+    reason = models.CharField(max_length=200, blank=True)
+
+    class Meta:
+        constraints = [models.CheckConstraint(condition=Q(end__gt=F('start')), name='bed_closure_end_after_start')]
+
+class PaymentTransaction(models.Model):
+    """Append-only manual ledger; positive amounts for receipts and refunds."""
+    class Kind(models.TextChoices):
+        PAYMENT = 'payment', 'Payment'
+        DEPOSIT = 'deposit', 'Deposit'
+        REFUND = 'refund', 'Refund'
+
+    class Method(models.TextChoices):
+        CASH = 'cash', 'Cash'
+        BANK = 'bank', 'Bank transfer'
+        CARD = 'card', 'Card (external)'
+        OTHER = 'other', 'Other'
+
+    reservation = models.ForeignKey(Reservation, on_delete=models.PROTECT, related_name='payment_transactions')
+    kind = models.CharField(max_length=12, choices=Kind.choices)
+    method = models.CharField(max_length=12, choices=Method.choices)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    note = models.CharField(max_length=500, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    recorded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='recorded_hut_payments')
+
+    class Meta:
+        ordering = ['-created', '-pk']
+        constraints = [models.CheckConstraint(condition=Q(amount__gt=0), name='payment_transaction_positive')]
+
+    def __str__(self):
+        return f'{self.kind} {self.amount} for {self.reservation.code}'
+
+class HutExpense(models.Model):
+    """Recorded operational expense, allocated to one hut and expense date."""
+    class Category(models.TextChoices):
+        FOOD = 'food', 'Food and supplies'
+        UTILITIES = 'utilities', 'Electricity and utilities'
+        HEATING = 'heating', 'Heating and fuel'
+        MAINTENANCE = 'maintenance', 'Maintenance'
+        STAFF = 'staff', 'Staff costs'
+        TRANSPORT = 'transport', 'Transport'
+        OTHER = 'other', 'Other'
+
+    hut = models.ForeignKey(Hut, on_delete=models.PROTECT, related_name='expenses')
+    category = models.CharField(max_length=20, choices=Category.choices)
+    expense_date = models.DateField()
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    description = models.CharField(max_length=250)
+    reference = models.CharField(max_length=100, blank=True)
+    recorded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='recorded_hut_expenses')
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-expense_date', '-pk']
+        constraints = [models.CheckConstraint(condition=Q(amount__gt=0), name='hut_expense_positive')]
+        indexes = [models.Index(fields=['hut', 'expense_date'])]
+
+    def __str__(self):
+        return f'{self.hut}: {self.amount} ({self.category})'
+
+class HutDepositPolicy(models.Model):
+    grace_days = models.PositiveSmallIntegerField(default=2)
+    auto_cancel_enabled = models.BooleanField(default=False)
+
+    """Per-hut deposit requirement and payment deadline."""
+    hut = models.OneToOneField(Hut, on_delete=models.CASCADE, related_name='deposit_policy')
+    percentage = models.PositiveSmallIntegerField(default=30)
+    due_days = models.PositiveSmallIntegerField(default=3)
+    reminders_enabled = models.BooleanField(default=True)
+
+    class Meta:
+        constraints = [models.CheckConstraint(condition=Q(percentage__lte=100), name='deposit_percentage_max_100')]
+
+    def clean(self):
+        if self.percentage > 100:
+            raise ValidationError({'percentage': 'Percentage cannot exceed 100.'})
+
+
+class DepositReminderLog(models.Model):
+    """One reminder per reservation and due date, to avoid repeated emails."""
+    reservation = models.ForeignKey(Reservation, on_delete=models.CASCADE, related_name='deposit_reminders')
+    due_date = models.DateField()
+    sent_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=['reservation', 'due_date'], name='unique_deposit_reminder_due_date')]
+
+
+class ReservationLifecycleEvent(models.Model):
+    """Audit trail for deposit deadline warnings and automated cancellations."""
+    reservation = models.ForeignKey(Reservation, on_delete=models.CASCADE, related_name="lifecycle_events")
+    event_type = models.CharField(max_length=30, choices=[
+        ("warning", "Warning issued"), ("cancelled", "Automatically cancelled"),
+    ])
+    due_date = models.DateField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    details = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        constraints = [
+            models.UniqueConstraint(fields=["reservation", "event_type", "due_date"],
+                                    name="unique_lifecycle_event_per_due_date")
+        ]
+
+class HutMessageTemplate(models.Model):
+    """Optional per-hut email text; blank means use built-in default."""
+    TYPES = [
+        ("confirmation", "Confirmation"),
+        ("deposit_due", "Deposit due"),
+        ("deposit_overdue", "Deposit overdue"),
+        ("prearrival", "Pre-arrival"),
+        ("cancellation", "Cancellation"),
+    ]
+    hut = models.ForeignKey(Hut, on_delete=models.CASCADE, related_name="message_templates")
+    message_type = models.CharField(max_length=25, choices=TYPES)
+    subject = models.CharField(max_length=200)
+    body = models.TextField()
+    enabled = models.BooleanField(default=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["hut", "message_type"], name="unique_hut_message_template")
+        ]
+
+
+class GuestMessageLog(models.Model):
+    """Delivery record, one message per reservation/type/relevant date."""
+    reservation = models.ForeignKey(Reservation, on_delete=models.CASCADE, related_name="guest_messages")
+    hut = models.ForeignKey(Hut, on_delete=models.PROTECT)
+    message_type = models.CharField(max_length=25, choices=HutMessageTemplate.TYPES)
+    event_date = models.DateField()
+    recipient = models.EmailField()
+    subject = models.CharField(max_length=200)
+    status = models.CharField(max_length=12, choices=[("sent", "Sent"), ("failed", "Failed")])
+    error = models.CharField(max_length=255, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        constraints = [
+            models.UniqueConstraint(fields=["reservation", "message_type", "event_date"],
+                                    name="unique_guest_message_event")
+        ]

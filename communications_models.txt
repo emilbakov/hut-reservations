@@ -1,0 +1,40 @@
+
+class HutMessageTemplate(models.Model):
+    """Optional per-hut email text; blank means use built-in default."""
+    TYPES = [
+        ("confirmation", "Confirmation"),
+        ("deposit_due", "Deposit due"),
+        ("deposit_overdue", "Deposit overdue"),
+        ("prearrival", "Pre-arrival"),
+        ("cancellation", "Cancellation"),
+    ]
+    hut = models.ForeignKey(Hut, on_delete=models.CASCADE, related_name="message_templates")
+    message_type = models.CharField(max_length=25, choices=TYPES)
+    subject = models.CharField(max_length=200)
+    body = models.TextField()
+    enabled = models.BooleanField(default=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["hut", "message_type"], name="unique_hut_message_template")
+        ]
+
+
+class GuestMessageLog(models.Model):
+    """Delivery record, one message per reservation/type/relevant date."""
+    reservation = models.ForeignKey(Reservation, on_delete=models.CASCADE, related_name="guest_messages")
+    hut = models.ForeignKey(Hut, on_delete=models.PROTECT)
+    message_type = models.CharField(max_length=25, choices=HutMessageTemplate.TYPES)
+    event_date = models.DateField()
+    recipient = models.EmailField()
+    subject = models.CharField(max_length=200)
+    status = models.CharField(max_length=12, choices=[("sent", "Sent"), ("failed", "Failed")])
+    error = models.CharField(max_length=255, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        constraints = [
+            models.UniqueConstraint(fields=["reservation", "message_type", "event_date"],
+                                    name="unique_guest_message_event")
+        ]

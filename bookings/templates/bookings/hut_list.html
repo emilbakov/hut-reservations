@@ -1,0 +1,62 @@
+
+{% extends "bookings/base.html" %}
+
+{% block content %}
+<section class="py-12">
+    <div class="mx-auto max-w-6xl px-4">
+
+        <div class="mb-10 text-center">
+            <h1 class="text-4xl font-bold">
+                Choose Your Mountain Hut
+            </h1>
+
+            <p class="mt-4 text-gray-600">
+                Explore our mountain huts and book your stay.
+            </p>
+        </div>
+
+        <div class="grid gap-6 md:grid-cols-3">
+
+            {% for hut in huts %}
+            <article class="overflow-hidden rounded-2xl border bg-white shadow-sm">
+
+                {% if hut.image %}
+                <img
+                    src="{{ hut.image.url }}"
+                    alt="{{ hut.name }}"
+                    class="h-52 w-full object-cover"
+                >
+                {% endif %}
+
+                <div class="p-6">
+                    <h2 class="text-2xl font-semibold">
+                        {{ hut.name }}
+                    </h2>
+
+                    {% if hut.location %}
+                    <p class="mt-2 text-sm text-gray-500">
+                        {{ hut.location }}
+                    </p>
+                    {% endif %}
+
+                    <p class="mt-4 text-gray-600">
+                        {{ hut.description|truncatewords:25 }}
+                    </p>
+
+                    <a
+                        href="{% url 'bookings:hut_detail' hut.slug %}"
+                        class="mt-6 inline-block rounded-lg bg-green-700 px-5 py-3 font-semibold text-white hover:bg-green-800"
+                    >
+                        View Rooms &amp; Book
+                    </a>
+                </div>
+            </article>
+
+            {% empty %}
+            <p>No mountain huts are available yet.</p>
+            {% endfor %}
+
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "bookings/base.html" %}
+{% block title %}Manage beds — {{ room.name }}{% endblock %}
+{% block content %}
+<p><a href="{% url 'bookings:room_calendar' %}?hut={{ room.hut.slug|urlencode }}">← Room calendar</a></p>
+<h1>Bed management — {{ room.hut.name }} / {{ room.name }}</h1>
+<p class="lead">Assign beds to reservations and schedule maintenance. Assignments cover the full stay; check-out is not an occupied night.</p>
+<form method="get" class="card"><label for="day">View night</label> <input type="date" name="day" id="day" value="{{ day|date:'Y-m-d' }}"> <button type="submit">Show</button></form>
+{% if message %}<p role="alert" class="card">{{ message }}</p>{% endif %}
+{% for bed in beds %}
+<section class="card">
+<h2>Bed {{ bed.number }}</h2>
+{% if bed.current_closure %}
+<p>Out of service: {{ bed.current_closure.start }} – {{ bed.current_closure.end }}. {{ bed.current_closure.reason }}</p>
+<form method="post">{% csrf_token %}<input type="hidden" name="action" value="reopen"><input type="hidden" name="bed_id" value="{{ bed.pk }}"><input type="hidden" name="closure_id" value="{{ bed.current_closure.pk }}"><button type="submit">Remove maintenance block</button></form>
+{% elif bed.current_assignment %}
+<p>Assigned to an existing reservation{% if bed.current_assignment.item.reservation in visible_reservations %}: {{ bed.current_assignment.item.reservation.name }}{% endif %}.</p>
+{% for item in reservations %}{% if item.pk == bed.current_assignment.item_id %}
+<form method="post">{% csrf_token %}<input type="hidden" name="action" value="unassign"><input type="hidden" name="bed_id" value="{{ bed.pk }}"><input type="hidden" name="assignment_id" value="{{ bed.current_assignment.pk }}"><button type="submit">Unassign</button></form>
+{% endif %}{% endfor %}
+{% else %}
+<p>Not assigned or blocked on this night.</p>
+{% if reservations %}<form method="post">{% csrf_token %}<input type="hidden" name="action" value="assign"><input type="hidden" name="bed_id" value="{{ bed.pk }}"><label for="item-{{ bed.pk }}">Assign reservation</label><select name="item_id" id="item-{{ bed.pk }}">{% for item in reservations %}<option value="{{ item.pk }}">{{ item.reservation.name }} — {{ item.beds }} beds ({{ item.reservation.code }})</option>{% endfor %}</select><button type="submit">Assign</button></form>{% endif %}
+{% endif %}
+{% if not bed.current_closure %}<details><summary>Schedule maintenance</summary><form method="post">{% csrf_token %}<input type="hidden" name="action" value="close"><input type="hidden" name="bed_id" value="{{ bed.pk }}"><label>Start <input type="date" name="start" value="{{ day|date:'Y-m-d' }}" required></label><label>End (exclusive) <input type="date" name="end" required></label><label>Reason <input type="text" name="reason" maxlength="200"></label><button type="submit">Block bed</button></form></details>{% endif %}
+</section>
+{% empty %}<p>No beds configured.</p>{% endfor %}
+{% endblock %}

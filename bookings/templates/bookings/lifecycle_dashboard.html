@@ -1,0 +1,51 @@
+{% extends "bookings/base.html" %}
+{% block title %}Reservation lifecycle{% endblock %}
+{% block content %}
+<div class="eyebrow">STAFF / DEPOSIT LIFECYCLE</div>
+<h1>Reservation lifecycle</h1>
+<p class="lead">Overdue deposits, grace periods, warnings and cancellation audit history.</p>
+<p><a href="{% url 'bookings:deposit_dashboard' %}">← Deposit dashboard</a> · <a href="{% url 'bookings:manager_reservations' %}">Reservations</a></p>
+<section class="card">
+<form method="get">
+<label for="hut">Hut</label><select id="hut" name="hut">
+{% if not manager_mode %}<option value="">All huts</option>{% endif %}
+{% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_slug == hut.slug %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}
+</select><button type="submit">Select</button>
+</form>
+{% if selected_hut %}
+<h2>Policy for {{ selected_hut.name }}</h2>
+<form method="post">{% csrf_token %}
+<input type="hidden" name="hut_id" value="{{ selected_hut.pk }}">
+<label for="grace_days">Grace period after deposit deadline (days)</label>
+<input id="grace_days" type="number" min="0" max="365" name="grace_days" value="{% if policy %}{{ policy.grace_days }}{% else %}2{% endif %}" required>
+{% if request.user.is_superuser %}
+<p><label><input type="checkbox" name="auto_cancel_enabled" {% if policy.auto_cancel_enabled %}checked{% endif %}> Enable automatic cancellation for this hut</label></p>
+<label for="confirm_enable">To enable, type ENABLE AUTO CANCEL</label>
+<input id="confirm_enable" name="confirm_enable" type="text" autocomplete="off">
+{% else %}
+<p>Automatic cancellation: {% if policy.auto_cancel_enabled %}enabled by administrator{% else %}disabled{% endif %}. Only administrators can change this setting.</p>
+{% endif %}
+<button type="submit">Save policy</button>
+</form>
+{% else %}
+<p>Select a hut to change its lifecycle policy.</p>
+{% endif %}
+</section>
+<section class="card">
+<h2>Reservations awaiting deposits</h2>
+<p><strong>{{ overdue_count }}</strong> overdue deposits. Warnings are recorded by the daily command; they do not send email themselves.</p>
+<div class="table-wrap"><table><thead><tr><th>Guest</th><th>Deposit remaining</th><th>Due</th><th>Grace ends</th><th>State</th></tr></thead><tbody>
+{% for row in rows %}
+<tr><td>{{ row.reservation.name }}<div><small>{{ row.reservation.code }}</small></div></td>
+<td>{{ row.remaining|floatformat:2 }} {{ currency }}</td>
+<td>{{ row.due_date }}</td><td>{{ row.cancellation_date }}</td>
+<td>{% if row.eligible %}Past grace period{% elif row.overdue %}Overdue{% else %}Not yet overdue{% endif %}</td></tr>
+{% empty %}<tr><td colspan="5">No unpaid deposits.</td></tr>{% endfor %}
+</tbody></table></div>
+</section>
+<section class="card"><h2>Recent audit events</h2>
+<div class="table-wrap"><table><thead><tr><th>When</th><th>Reservation</th><th>Event</th><th>Details</th></tr></thead><tbody>
+{% for event in events %}<tr><td>{{ event.created_at|date:"j M Y H:i" }}</td><td>{{ event.reservation.code }}</td><td>{{ event.get_event_type_display }}</td><td>{{ event.details }}</td></tr>
+{% empty %}<tr><td colspan="4">No lifecycle events yet.</td></tr>{% endfor %}
+</tbody></table></div></section>
+{% endblock %}
