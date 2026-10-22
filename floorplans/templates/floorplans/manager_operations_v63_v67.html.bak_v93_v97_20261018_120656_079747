@@ -1,0 +1,164 @@
+{% load summitdesk_nav %}
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SummitDesk | {{ hut.name }} Manager Operations</title>
+<style>
+:root{font-family:system-ui,-apple-system,sans-serif;color:#173d33;background:#f4f7f3}*{box-sizing:border-box}body{margin:0}
+main{max-width:1200px;margin:auto;padding:18px}.hero{background:#153f34;color:white;padding:22px;border-radius:18px}
+.hero a{color:#e2f1ce}.panel{background:white;border:1px solid #dce7dc;border-radius:14px;padding:18px;margin-top:16px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px}.number{font-size:28px;font-weight:750}
+.muted{color:#60736b;font-size:14px}.scroll{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:730px}
+th,td{text-align:left;padding:10px;border-bottom:1px solid #e4ebe3;vertical-align:top}th{background:#f1f5ee}
+.pill{display:inline-block;border-radius:8px;padding:4px 8px;font-size:12px;background:#e6f1dd}
+.over,.closed{background:#ffe2de}.full{background:#fce9c7}.limited{background:#fff4db}.available{background:#e5f2e6}
+ul{padding-left:20px}li{padding:8px 0;border-bottom:1px solid #edf0eb}li:last-child{border:0}
+input,button,select{font:inherit;padding:9px;border-radius:8px;border:1px solid #b6c8b6}button{background:#164537;color:white;cursor:pointer}
+a:focus-visible,button:focus-visible{outline:3px solid #91b951;outline-offset:2px}
+@media(max-width:550px){main{padding:10px}.panel{padding:12px}}
+</style><style media="print">
+@page { size: A4; margin: 12mm; }
+body { background:white!important;color:black!important;font-size:10pt; }
+.hero {background:white!important;color:black!important;padding:0!important;}
+.hero a, nav, form, button, #report-exports, #issue-filters, #print-operations,
+.quick-links, a[href*="operations_export"], a[href*="daily_export"] {display:none!important;}
+main {max-width:none!important;padding:0!important;}
+.panel {border:0!important;break-inside:avoid;box-shadow:none!important;padding:8px 0!important;margin:4px 0!important;}
+.scroll {overflow:visible!important;} table {min-width:0!important;font-size:8pt;}
+th,td {padding:4px!important;} h2 {break-after:avoid;}
+</style>\n</head><body>{% summitdesk_nav %}<main>
+<header class="hero"><div>SUMMITDESK · MANAGER OPERATIONS</div><h1>{{ hut.name }}</h1>
+<a href="{% url 'floorplans:staff_hub' hut.pk %}">← Back to Staff Hub</a></header>
+<section class="panel"><h2>Seven-day operations window</h2>
+<form method="get"><input type="hidden" name="operations" value="1"><label for="forecast_start">Start date</label>
+<input id="forecast_start" type="date" name="forecast_start" value="{{ forecast_start|date:'Y-m-d' }}" min="{{ today|date:'Y-m-d' }}" max="{{ forecast_max|date:'Y-m-d' }}">
+<button type="submit">Update</button></form>
+<p class="muted">Read-only planning information. Check individual reservations before taking action. Check-out dates are not occupied nights.</p></section>
+<section class="cards" aria-label="Operations summary">
+<div class="panel"><div class="muted">Active rooms</div><div class="number">{{ ops.room_count }}</div></div>
+<div class="panel"><div class="muted">Conflict warnings</div><div class="number">{{ ops.conflict_count }}</div></div>
+<div class="panel"><div class="muted">Arrival groups</div><div class="number">{{ ops.arrival_count }}</div></div>
+<div class="panel"><div class="muted">Action items</div><div class="number">{{ ops.action_count }}</div></div>
+</section>
+<section class="panel"><h2>Reservation conflict dashboard</h2><p><a href="?operations=1&amp;forecast_start={{ forecast_start|date:'Y-m-d' }}&amp;action_level={{ action_level }}&amp;operations_export=conflicts">Export conflicts CSV</a></p>
+{% for w in ops.conflicts %}<p><strong>{{ w.day|date:"d M Y" }} · {{ w.room }} · {{ w.kind }}</strong><span class="muted"> — {{ w.detail }}</span></p>
+{% empty %}<p class="muted">No detected room-capacity or numbered-bed conflicts in this window.</p>{% endfor %}
+<p class="muted">Only assigned numbered beds can be checked for individual-bed overlaps; unassigned reservations are included in room-capacity checks.</p></section>
+<section class="panel"><h2>Room availability calendar</h2><p><a href="?operations=1&amp;forecast_start={{ forecast_start|date:'Y-m-d' }}&amp;action_level={{ action_level }}&amp;operations_export=availability">Export availability CSV</a></p><div class="scroll"><table>
+<thead><tr><th>Room</th>{% for d in ops.dates %}<th>{{ d|date:"D d M" }}</th>{% endfor %}</tr></thead><tbody>
+{% for r in ops.calendar %}<tr><th>{{ r.room }}<div class="muted">Numbered beds: {{ r.numbered_beds|join:", "|default:"None configured" }}</div></th>
+{% for n in r.nights %}<td class="{{ n.status }}"><strong>{{ n.free }} free</strong><div class="muted">{{ n.confirmed }} confirmed · {{ n.pending }} pending</div><div class="muted">{{ n.closed }} closed · {{ n.usable }} usable</div></td>{% endfor %}</tr>
+{% empty %}<tr><td colspan="8">No active rooms.</td></tr>{% endfor %}
+</tbody></table></div><p class="muted">Room-level counts; not a claim that specific numbered beds are available.</p></section>
+<section class="panel"><h2>Arrival preparation board</h2><p><a href="?operations=1&amp;forecast_start={{ forecast_start|date:'Y-m-d' }}&amp;action_level={{ action_level }}&amp;operations_export=arrivals">Export arrivals CSV</a></p>
+{% for a in ops.arrivals %}<p><strong>{{ a.day|date:"d M Y" }} · {{ a.room }}</strong><span class="muted"> — {{ a.beds }} arriving bed places · {{ a.unassigned }} unassigned · {{ a.open_tasks }} unfinished cleaning tasks</span></p>
+{% empty %}<p class="muted">No confirmed arrivals in this window.</p>{% endfor %}
+<p class="muted">Cleaning counts include tasks scheduled for the arrival day; absence of a task does not certify readiness.</p></section>
+<section class="panel"><h2>Manager action center</h2>
+<!-- V73_V77_ACTION_TOOLS -->
+<div class="panel" aria-label="Action search and summary">
+<h3>Find and prioritize actions</h3>
+<form method="get">
+<input type="hidden" name="operations" value="1">
+<input type="hidden" name="forecast_start" value="{{ forecast_start|date:'Y-m-d' }}">
+<label for="action_level">Priority</label>
+<select id="action_level" name="action_level">
+<option value="all" {% if action_level == 'all' %}selected{% endif %}>All</option>
+<option value="conflicts" {% if action_level == 'conflicts' %}selected{% endif %}>Conflicts</option>
+<option value="assignments" {% if action_level == 'assignments' %}selected{% endif %}>Bed assignments</option>
+<option value="cleaning" {% if action_level == 'cleaning' %}selected{% endif %}>Cleaning</option>
+</select>
+<label for="action_q">Search</label>
+<input id="action_q" type="search" name="action_q" value="{{ action_q }}" maxlength="100" placeholder="Room or action">
+<label for="action_day">Day</label>
+<select id="action_day" name="action_day"><option value="">All 7 days</option>
+{% for d in ops.dates %}<option value="{{ d|date:'Y-m-d' }}" {% if action_day == d|date:'Y-m-d' %}selected{% endif %}>{{ d|date:'D d M' }}</option>{% endfor %}
+</select>
+<label for="action_sort">Order</label>
+<select id="action_sort" name="action_sort">
+<option value="priority" {% if action_sort == 'priority' %}selected{% endif %}>Urgent first</option>
+<option value="date" {% if action_sort == 'date' %}selected{% endif %}>Earliest date first</option>
+</select>
+<button type="submit">Apply filters</button>
+</form>
+<p class="muted">Showing {{ action_summary.total }} matching actions: {{ action_summary.conflicts }} conflicts, {{ action_summary.assignments }} assignments, {{ action_summary.cleaning }} cleaning.</p>
+<p><a href="?operations=1&amp;forecast_start={{ forecast_start|date:'Y-m-d' }}">Clear action filters</a></p>
+<p><a href="?operations=1&amp;forecast_start={{ forecast_start|date:'Y-m-d' }}&amp;action_level={{ action_level|urlencode }}&amp;action_q={{ action_q|urlencode }}&amp;action_day={{ action_day|urlencode }}&amp;action_sort={{ action_sort|urlencode }}&amp;operations_export=actions">Export matching actions CSV</a></p>
+</div>
+
+<!-- V68_V72_EXPORTS -->
+
+<p class="muted">Showing {{ displayed_actions|length }} of {{ ops.action_count }} actions.</p>
+<p><a href="?operations=1&amp;forecast_start={{ forecast_start|date:'Y-m-d' }}&amp;action_level={{ action_level }}&amp;operations_export=actions">Export displayed actions CSV</a></p>
+<ol>{% for a in displayed_actions %}<li><strong>{{ a.day|date:"d M Y" }} · {{ a.label }}</strong><div class="muted">{{ a.detail }}</div></li>
+{% empty %}<li>No detected action items for this window.</li>{% endfor %}</ol>
+<p class="muted">Prioritized by conflicts, bed assignment, then cleaning. No reservation changes are made automatically.</p></section>
+<section class="panel"><h2>Manager workspace</h2>
+<p>Use this dedicated, mobile-friendly operations page for the detailed forecast. Your original Staff Hub and analytics remain available.</p>
+<a href="{% url 'floorplans:staff_hub' hut.pk %}">Return to Staff Hub</a></section>
+<!-- DAILY_WORKSPACE_START -->
+<section class="panel" id="operations-overview"><h2>Operations overview</h2>
+<div class="cards"><div class="panel"><div class="muted">Issues needing review</div><div class="number">{{ daily.urgent_count }}</div></div>
+<div class="panel"><div class="muted">Numbered beds</div><div class="number">{{ daily.beds_count }}</div></div>
+<div class="panel"><div class="muted">Arrival groups</div><div class="number">{{ ops.arrival_count }}</div></div></div>
+<nav class="quick-links" aria-label="Operations sections"><a href="#critical-issues">Critical issues</a> · <a href="#arrival-timeline">Arrivals</a> · <a href="#bed-details">Bed details</a> · <a href="#daily-checklist">Daily checklist</a></nav>
+</section>
+<section class="panel" id="critical-issues"><h2>Critical issues</h2>
+{% for issue in daily.urgent %}<p><strong>{{ issue.day|date:"D d M" }} · {{ issue.title }}</strong> <span class="muted">{{ issue.detail }}</span></p>
+{% empty %}<p class="muted">No detected conflicts or arrival preparation issues in this period.</p>{% endfor %}</section>
+<section class="panel" id="arrival-timeline"><h2>Upcoming arrivals</h2>
+{% for group in daily.timeline %}<h3>{{ group.day|date:"D d M Y" }}</h3>
+{% for a in group.arrivals %}<p><strong>{{ a.room }}</strong> · {{ a.beds }} arriving bed places · {{ a.unassigned }} unassigned · {{ a.open_tasks }} cleaning tasks unfinished</p>
+{% empty %}<p class="muted">No confirmed arrivals.</p>{% endfor %}{% endfor %}</section>
+<section class="panel" id="bed-details"><h2>Numbered bed details</h2>
+<p class="muted">Assigned = confirmed reservation assigned to this bed; Held = pending assignment; Closed = bed closure; Conflict = overlapping assignments or assigned bed closed. Unassigned means no explicit assignment, not guaranteed availability. Room totals remain authoritative for capacity.</p>
+<div class="scroll"><table><thead><tr><th>Room / Bed</th>{% for d in daily.days %}<th>{{ d|date:"D d M" }}</th>{% endfor %}</tr></thead><tbody>
+{% for b in daily.bed_rows %}<tr><th>{{ b.room }} / {{ b.number }}</th>{% for n in b.nights %}<td class="{{ n.status }}">{{ n.label }}</td>{% endfor %}</tr>
+{% empty %}<tr><td colspan="8">No numbered beds configured.</td></tr>{% endfor %}</tbody></table></div></section>
+<section class="panel" id="daily-checklist"><h2>Daily operations checklist</h2>
+<p class="muted">Automatically calculated review items; not a saved or completed checklist.</p>
+{% for c in daily.checklist %}<div class="checkline"><strong>{{ c.day|date:"D d M" }}</strong> · {% if c.clear %}No detected outstanding items{% else %}{{ c.conflicts }} conflicts · {{ c.unassigned }} unassigned places · {{ c.cleaning }} unfinished cleaning tasks{% endif %}</div>{% endfor %}</section>
+<!-- DAILY_WORKSPACE_END -->\n<!-- DAILY_TOOLS_V88_V92 -->
+<nav class="panel quick-links" aria-label="Operations sections"><strong>Jump to:</strong>
+<a href="#issue-filters">Critical issues</a> · <a href="#readiness-summary">Arrival readiness</a> ·
+<a href="#report-exports">Reports</a> · <a href="#print-operations">Print summary</a></nav>
+\n<!-- DAILY_REPORTS_V83_V87 -->
+<section class="panel" id="issue-filters"><h2>Review critical issues</h2>
+<form method="get" aria-label="Filter critical issues">
+<input type="hidden" name="operations" value="1">
+<input type="hidden" name="forecast_start" value="{{ forecast_start|date:'Y-m-d' }}">
+<label for="issue_kind">Issue type</label>
+<select id="issue_kind" name="issue_kind">
+<option value="all" {% if issue_kind == 'all' %}selected{% endif %}>All issues</option>
+<option value="Conflict" {% if issue_kind == 'Conflict' %}selected{% endif %}>Reservation conflicts</option>
+<option value="Arrival" {% if issue_kind == 'Arrival' %}selected{% endif %}>Arrival preparation</option>
+</select><label for="issue_q">Search issues</label>
+<input id="issue_q" name="issue_q" maxlength="100" value="{{ issue_q }}" placeholder="Room or issue">
+<button type="submit">Filter issues</button></form>
+<p><a href="?operations=1&amp;forecast_start={{ forecast_start|date:'Y-m-d' }}&amp;issue_kind={{ issue_kind|urlencode }}&amp;issue_q={{ issue_q|urlencode }}&amp;daily_tools_export=issues">Export matching issues CSV</a></p>
+<p class="muted">Showing {{ visible_issues|length }} of {{ daily.urgent_count }} detected issues.</p>
+{% for issue in visible_issues %}<p><strong>{{ issue.day|date:'D d M' }} · {{ issue.title }}</strong> <span class="muted">{{ issue.detail }}</span></p>
+{% empty %}<p class="muted">No matching issues for this period.</p>{% endfor %}
+</section>
+<section class="panel" id="readiness-summary"><h2>Arrival readiness summary</h2>
+<form method="get" aria-label="Filter arrival readiness">
+<input type="hidden" name="operations" value="1">
+<input type="hidden" name="forecast_start" value="{{ forecast_start|date:'Y-m-d' }}">
+<label for="readiness_mode">Show days</label><select id="readiness_mode" name="readiness_mode">
+<option value="all" {% if readiness_mode == 'all' %}selected{% endif %}>All days</option>
+<option value="review" {% if readiness_mode == 'review' %}selected{% endif %}>Days needing review</option>
+</select><button type="submit">Apply</button></form>
+<p>Showing {{ readiness|length }} days. <a href="?operations=1&amp;forecast_start={{ forecast_start|date:'Y-m-d' }}&amp;readiness_mode={{ readiness_mode|urlencode }}&amp;daily_tools_export=readiness">Export matching readiness CSV</a></p>
+<p class="muted">A review aid, not a guarantee that a room or bed is ready. Counts are based on recorded assignments and scheduled cleaning tasks.</p>
+<div class="scroll"><table><thead><tr><th>Date</th><th>Arrival groups</th><th>Bed places</th><th>Unassigned</th><th>Cleaning tasks</th><th>Review</th></tr></thead><tbody>
+{% for row in readiness %}<tr><td>{{ row.day|date:'D d M' }}</td><td>{{ row.groups }}</td><td>{{ row.bed_places }}</td><td>{{ row.unassigned }}</td><td>{{ row.cleaning }}</td><td>{% if row.needs_review %}Needs review{% else %}No detected issues{% endif %}</td></tr>{% endfor %}
+</tbody></table></div></section>
+<section class="panel" id="report-exports"><h2>Operations reports</h2>
+<p><a href="?operations=1&amp;forecast_start={{ forecast_start|date:'Y-m-d' }}&amp;daily_export=beds">Export numbered-bed details CSV</a></p>
+<p><a href="?operations=1&amp;forecast_start={{ forecast_start|date:'Y-m-d' }}&amp;daily_export=checklist">Export daily checklist CSV</a></p>
+<p class="muted">Exports include the full selected seven-day period and are available only to hut managers. No reservations are modified.</p></section>
+<section class="panel" id="print-operations"><h2>Printable operations summary</h2>
+<p>Use your browser’s Print command to print or save this manager report as PDF. The print layout hides navigation, forms and export links.</p>
+<p class="muted">Period: {{ forecast_start|date:'d M Y' }} – {{ daily.days.6|date:'d M Y' }}. Detected issues: {{ daily.urgent_count }}. Numbered beds: {{ daily.beds_count }}.</p>
+</section>
+
+
+</main></body></html>

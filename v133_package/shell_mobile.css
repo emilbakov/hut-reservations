@@ -1,0 +1,19 @@
+/* v133: improved mobile staff shell, safe areas and reachable touch targets. */
+@media (max-width: 900px) {
+  body.sd116-active.sd116-menu-open { overflow: hidden !important; }
+  body.sd116-active .sd116-sidebar { width: min(320px, 88vw) !important; max-width: calc(100vw - 36px) !important; overscroll-behavior: contain; padding-bottom: env(safe-area-inset-bottom, 0px) !important; }
+  .sd116-topbar { min-width: 0 !important; }
+  .sd116-top-left { flex: 1 1 auto; }
+  .sd116-top-actions { flex: 0 0 auto; }
+  .sd116-menu-button, .sd116-close { min-width: 44px; min-height: 44px; }
+  .sd116-nav-link { min-height: 44px; }
+  .sd116-backdrop:not([hidden]) { touch-action: none; }
+}
+@media (max-width: 600px) {
+  .sd116-topbar { padding: 0 11px !important; }
+  .sd116-top-title { min-width: 0; }
+  .sd116-top-title span, .sd116-top-title strong { display: block; max-width: min(38vw, 210px); text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+  .sd116-create { min-height: 44px; min-width: 44px; }
+  .sd116-avatar { display: none; }
+  body.sd116-active #main-content.shell { overflow-wrap: anywhere; }
+}

@@ -1,0 +1,38 @@
+[
+  {
+    "path": "bookings/urls.py",
+    "existed": true
+  },
+  {
+    "path": "bookings/public_site_v124.py",
+    "existed": false
+  },
+  {
+    "path": "bookings/templates/bookings/public_base_v124.html",
+    "existed": false
+  },
+  {
+    "path": "bookings/templates/bookings/public_home_v124.html",
+    "existed": false
+  },
+  {
+    "path": "bookings/templates/bookings/public_directory_v124.html",
+    "existed": false
+  },
+  {
+    "path": "bookings/templates/bookings/public_search_v124.html",
+    "existed": false
+  },
+  {
+    "path": "bookings/templates/bookings/public_cards_v124.html",
+    "existed": false
+  },
+  {
+    "path": "bookings/static/bookings/public_v124.css",
+    "existed": false
+  },
+  {
+    "path": "bookings/test_public_site_v124.py",
+    "existed": false
+  }
+]

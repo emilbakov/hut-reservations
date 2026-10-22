@@ -1,0 +1,80 @@
+{
+  "bookings/models.py": [
+    {
+      "before": "    updated_at = models.DateTimeField(auto_now=True)\n",
+      "after": "    updated_at = models.DateTimeField(auto_now=True)\n\n\nclass HutQuickReply(models.Model):\n    \"\"\"Reusable, manager-editable reply for a single hut (v134).\"\"\"\n    hut = models.ForeignKey(Hut, on_delete=models.CASCADE, related_name='quick_replies')\n    title = models.CharField(max_length=80)\n    subject = models.CharField(max_length=200)\n    body = models.TextField()\n    enabled = models.BooleanField(default=True)\n    updated_at = models.DateTimeField(auto_now=True)\n\n    class Meta:\n        ordering = ['title', 'pk']\n        constraints = [models.UniqueConstraint(fields=['hut', 'title'], name='unique_hut_quick_reply')]\n\n    def __str__(self):\n        return f'{self.hut}: {self.title}'\n\n\nclass GuestConversationMessage(models.Model):\n    \"\"\"Reservation-scoped guest/manager conversation, independent of email replies.\"\"\"\n    class Sender(models.TextChoices):\n        GUEST = 'guest', 'Guest'\n        MANAGER = 'manager', 'Manager'\n\n    class Delivery(models.TextChoices):\n        RECEIVED = 'received', 'Received in SummitDesk'\n        IN_APP = 'in_app', 'In-app only'\n        SENDING = 'sending', 'Email sending'\n        SENT = 'sent', 'Email submitted'\n        FAILED = 'failed', 'Email failed (in-app delivered)'\n\n    reservation = models.ForeignKey(\n        Reservation, on_delete=models.CASCADE, related_name='conversation_messages')\n    hut = models.ForeignKey(Hut, on_delete=models.PROTECT, related_name='conversation_messages')\n    sender = models.CharField(max_length=10, choices=Sender.choices)\n    sent_by = models.ForeignKey(\n        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,\n        related_name='sent_guest_conversation_messages')\n    subject = models.CharField(max_length=200, blank=True)\n    body = models.TextField()\n    recipient = models.EmailField(blank=True)\n    delivery = models.CharField(max_length=12, choices=Delivery.choices)\n    error = models.CharField(max_length=120, blank=True)\n    created_at = models.DateTimeField(auto_now_add=True)\n\n    class Meta:\n        ordering = ['created_at', 'pk']\n        indexes = [models.Index(fields=['reservation', 'created_at'], name='guest_conversation_idx')]\n"
+    }
+  ],
+  "bookings/urls.py": [
+    {
+      "before": "from .communications import communications_dashboard\n",
+      "after": "from . import conversations_v134\nfrom .communications import communications_dashboard\n"
+    },
+    {
+      "before": "    path('staff/communications/', communications_dashboard, name='communications_dashboard'),\n",
+      "after": "    path('staff/communications/', communications_dashboard, name='communications_dashboard'),\n    path('staff/communications/inbox/', conversations_v134.conversation_inbox, name='conversation_inbox'),\n    path('staff/communications/quick-replies/', conversations_v134.quick_replies, name='quick_replies'),\n    path('staff/communications/reservations/<str:code>/', conversations_v134.conversation_thread, name='conversation_thread'),\n"
+    },
+    {
+      "before": "    path('staff/guest-requests/', guest_requests_dashboard, name='guest_requests_dashboard'),\n",
+      "after": "    path('guest/manage/<str:token>/messages/', conversations_v134.guest_send_message, name='guest_send_message'),\n    path('staff/guest-requests/', guest_requests_dashboard, name='guest_requests_dashboard'),\n"
+    }
+  ],
+  "bookings/self_service.py": [
+    {
+      "before": "from datetime import date\n",
+      "after": "from datetime import date, timedelta\n"
+    },
+    {
+      "before": "from .deposits import deposit_summary, single_hut_id\n",
+      "after": "from django.views.decorators.cache import never_cache\nfrom .deposits import deposit_summary, single_hut_id\n"
+    },
+    {
+      "before": "from .models import GuestAccessLink, GuestChangeRequest, Hut, Reservation\n",
+      "after": "from .models import GuestAccessLink, GuestChangeRequest, GuestConversationMessage, Hut, Reservation\n"
+    },
+    {
+      "before": "        token=token, revoked_at__isnull=True)\n    return access.reservation\n\n@require_http_methods([\"GET\", \"POST\"])\n",
+      "after": "        token=token, revoked_at__isnull=True)\n    return access.reservation\n\n@never_cache\n@require_http_methods([\"GET\", \"POST\"])\n"
+    },
+    {
+      "before": "        \"can_request\": reservation.status in Reservation.HOLDING and reservation.check_in > timezone.localdate(),\n",
+      "after": "        \"conversation_messages\": list(reversed(list(\n            GuestConversationMessage.objects.filter(reservation=reservation, hut=hut)\n            .order_by(\"-created_at\")[:100]))),\n        \"can_message\": reservation.check_out >= timezone.localdate() - timedelta(days=7),\n        \"guest_token\": token,\n        \"can_request\": reservation.status in Reservation.HOLDING and reservation.check_in > timezone.localdate(),\n"
+    }
+  ],
+  "bookings/templates/bookings/guest_self_service.html": [
+    {
+      "before": "</style>\n",
+      "after": "/* v134: mobile-friendly private conversation */\n.gss-page .v134-thread{display:flex;flex-direction:column;gap:12px;margin:20px 0}\n.gss-page .v134-bubble{width:min(92%,690px);border:1px solid #dce7df;border-radius:15px;background:#f3f8f1;padding:14px 16px;overflow-wrap:anywhere}\n.gss-page .v134-bubble.team{align-self:flex-end;background:#e7f4e2}\n.gss-page .v134-bubble .v134-meta{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:.84rem;color:#63756d}\n.gss-page .v134-bubble p{white-space:pre-wrap;margin:10px 0 0}\n.gss-page .v134-message-note{font-size:.86rem;color:#63756d}\n@media(max-width:500px){.gss-page .v134-bubble{width:100%}}\n</style>\n"
+    },
+    {
+      "before": "  <aside class=\"gss-privacy\"><span class=\"gss-privacy-symbol\" aria-hidden=\"true\">🔒</span><p><strong>Keep this link private.</strong> Anyone with this link can view your reservation and submit requests on your behalf.</p></aside>\n",
+      "after": "  <section class=\"gss-card\" id=\"guest-conversation\" aria-labelledby=\"gss-conversation-title\">\n    <h2 id=\"gss-conversation-title\">Messages with the hut team</h2>\n    <p class=\"gss-subtitle\">You can send messages here and read replies from the hut team. Refresh the page to see new replies. Email replies are not imported into this conversation.</p>\n    <div class=\"v134-thread\" role=\"log\" aria-label=\"Conversation messages\">\n      {% for entry in conversation_messages %}\n      <article class=\"v134-bubble {% if entry.sender == 'manager' %}team{% endif %}\"><div class=\"v134-meta\"><strong>{% if entry.sender == 'manager' %}Hut team{% else %}You{% endif %}</strong><time>{{ entry.created_at|date:\"j M Y, H:i\" }}</time></div>{% if entry.subject %}<strong>{{ entry.subject }}</strong>{% endif %}<p>{{ entry.body }}</p></article>\n      {% empty %}<div class=\"gss-empty\">No messages yet.</div>{% endfor %}\n    </div>\n    {% if can_message %}<form method=\"post\" action=\"{% url 'bookings:guest_send_message' guest_token %}\">{% csrf_token %}<div class=\"gss-field\"><label for=\"gss-message\">Your message</label><textarea id=\"gss-message\" name=\"body\" maxlength=\"2000\" required placeholder=\"Ask a question about your stay...\"></textarea></div><button class=\"gss-btn\" type=\"submit\">Send message →</button></form><p class=\"v134-message-note\">This sends a message inside SummitDesk, not an email. For urgent matters, contact the hut directly.</p>{% else %}<p class=\"v134-message-note\">Messaging for this stay is closed.</p>{% endif %}\n  </section>\n  <aside class=\"gss-privacy\"><span class=\"gss-privacy-symbol\" aria-hidden=\"true\">🔒</span><p><strong>Keep this link private.</strong> Anyone with this link can view your reservation and submit requests on your behalf.</p></aside>\n"
+    }
+  ],
+  "bookings/templates/bookings/manager_reservations.html": [
+    {
+      "before": "              {% if reservation.status == 'pending' %}\n",
+      "after": "              <a href=\"{% url 'bookings:conversation_thread' reservation.code %}\">Messages</a>\n              {% if reservation.status == 'pending' %}\n"
+    }
+  ],
+  "bookings/templates/bookings/communications_dashboard.html": [
+    {
+      "before": "  <section class=\"panel\" aria-labelledby=\"hut-heading\">\n",
+      "after": "  <section class=\"panel\"><div class=\"panel-head\"><div><h2>Direct guest messaging</h2><p>Send a personal email, use quick replies, and read in-app guest messages.</p></div></div><div class=\"toolbar\"><a class=\"button\" href=\"{% url 'bookings:conversation_inbox' %}\">Open guest inbox →</a><a class=\"button\" href=\"{% url 'bookings:quick_replies' %}\">Manage quick replies →</a></div></section>\n  <section class=\"panel\" aria-labelledby=\"hut-heading\">\n"
+    }
+  ],
+  "floorplans/templatetags/summitdesk_nav.py": [
+    {
+      "before": "    'guest_requests_dashboard', 'guest_link_controls',\n",
+      "after": "    'conversation_inbox', 'conversation_thread', 'quick_replies',\n    'guest_requests_dashboard', 'guest_link_controls',\n"
+    },
+    {
+      "before": "    'guest_link_controls': 'guests',\n",
+      "after": "    'conversation_inbox': 'guests', 'conversation_thread': 'guests',\n    'quick_replies': 'guests',\n    'guest_link_controls': 'guests',\n"
+    },
+    {
+      "before": "            b('approval_dashboard', 'Guest approvals', 'clipboard-list', 'approvals'),\n",
+      "after": "            b('conversation_inbox', 'Guest inbox', 'mail', 'guests'),\n            b('approval_dashboard', 'Guest approvals', 'clipboard-list', 'approvals'),\n"
+    }
+  ]
+}

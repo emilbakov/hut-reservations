@@ -1,0 +1,19 @@
+SummitDesk v129 — isolated verification against uploaded v126 + installed v127/v128
+================================================================================
+Python 3.13 / Django 6.1.2 / SQLite isolated test database.
+
+- Installer preflight: PASS
+- Django system check: PASS (0 issues)
+- Migration 0014 applied: PASS
+- makemigrations --check --dry-run: PASS (no changes)
+- v129 focused tests: PASS (20 tests)
+- v129 + v128 + v127 + v126 regression tests: PASS (51 tests)
+- Full Django suite: PASS (315 tests, 3 skipped: PostgreSQL-only concurrency tests)
+- Installer refuses a second install: PASS
+- Code rollback restored original file hashes and removed new files: PASS
+- systemd timer expression: validated by systemd-analyze calendar
+
+Full suite and targeted tests were run on an isolated SQLite checkout, not
+against the live PostgreSQL server. Production PostgreSQL tests and real SMTP
+transport must still be verified on the deployment server. The service/timer
+was not activated in this test environment.

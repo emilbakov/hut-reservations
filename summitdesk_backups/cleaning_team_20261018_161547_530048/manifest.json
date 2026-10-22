@@ -1,0 +1,34 @@
+[
+  {
+    "path": "floorplans/staff_tasks.py",
+    "existed": true
+  },
+  {
+    "path": "floorplans/hut_staff.py",
+    "existed": true
+  },
+  {
+    "path": "floorplans/housekeeping_tasks.py",
+    "existed": true
+  },
+  {
+    "path": "floorplans/models.py",
+    "existed": true
+  },
+  {
+    "path": "floorplans/templates/floorplans/cleaner_team.html",
+    "existed": true
+  },
+  {
+    "path": "floorplans/templates/floorplans/staff_tasks.html",
+    "existed": true
+  },
+  {
+    "path": "floorplans/migrations/0012_offline_cleaners.py",
+    "existed": false
+  },
+  {
+    "path": "floorplans/test_cleaning_team_v123.py",
+    "existed": false
+  }
+]

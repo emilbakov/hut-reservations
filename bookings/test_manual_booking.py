@@ -65,4 +65,5 @@ class ManualBookingTests(TestCase):
     def test_nonstaff_denied(self):
         user = get_user_model().objects.create_user(username="regular-manual", password="test")
         self.client.force_login(user)
-        self.assertEqual(self.client.post(self.url, self.data).status_code, 302)
+        self.assertEqual(self.client.post(self.url, self.data).status_code, 403)
+        self.assertEqual(Reservation.objects.count(), 0)

@@ -1,0 +1,269 @@
+{% load summitdesk_nav %}
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SummitDesk | {{ hut.name }} Manager Operations</title>
+<style>
+:root{font-family:system-ui,-apple-system,sans-serif;color:#173d33;background:#f4f7f3}*{box-sizing:border-box}body{margin:0}
+main{max-width:1200px;margin:auto;padding:18px}.hero{background:#153f34;color:white;padding:22px;border-radius:18px}
+.hero a{color:#e2f1ce}.panel{background:white;border:1px solid #dce7dc;border-radius:14px;padding:18px;margin-top:16px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px}.number{font-size:28px;font-weight:750}
+.muted{color:#60736b;font-size:14px}.scroll{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:730px}
+th,td{text-align:left;padding:10px;border-bottom:1px solid #e4ebe3;vertical-align:top}th{background:#f1f5ee}
+.pill{display:inline-block;border-radius:8px;padding:4px 8px;font-size:12px;background:#e6f1dd}
+.over,.closed{background:#ffe2de}.full{background:#fce9c7}.limited{background:#fff4db}.available{background:#e5f2e6}
+ul{padding-left:20px}li{padding:8px 0;border-bottom:1px solid #edf0eb}li:last-child{border:0}
+input,button,select{font:inherit;padding:9px;border-radius:8px;border:1px solid #b6c8b6}button{background:#164537;color:white;cursor:pointer}
+a:focus-visible,button:focus-visible{outline:3px solid #91b951;outline-offset:2px}
+@media(max-width:550px){main{padding:10px}.panel{padding:12px}}
+</style><style media="print">
+@page { size: A4; margin: 12mm; }
+body { background:white!important;color:black!important;font-size:10pt; }
+.hero {background:white!important;color:black!important;padding:0!important;}
+.hero a, nav, form, button, #report-exports, #issue-filters, #print-operations,
+.quick-links, a[href*="operations_export"], a[href*="daily_export"] {display:none!important;}
+main {max-width:none!important;padding:0!important;}
+.panel {border:0!important;break-inside:avoid;box-shadow:none!important;padding:8px 0!important;margin:4px 0!important;}
+.scroll {overflow:visible!important;} table {min-width:0!important;font-size:8pt;}
+th,td {padding:4px!important;} h2 {break-after:avoid;}
+</style>\n<style id="SUMMITDESK_UI_V98_V102">
+/* SummitDesk manager workspace: presentation only, no business logic changes. */
+:root{--sd-ink:#193c35;--sd-accent:#176348;--sd-bg:#f4f7f6;--sd-line:#e1eae6;--sd-muted:#61746d}
+html{scroll-behavior:smooth}body{background:var(--sd-bg);color:var(--sd-ink)}
+body.sd-ready{min-height:100vh}body.sd-ready main{max-width:1600px;margin:0 0 0 246px;padding:24px clamp(14px,2.5vw,40px)}
+body.sd-ready .hero{border-radius:18px;background:linear-gradient(115deg,#143e33,#236b52);padding:24px}
+body.sd-ready .hero h1{font-size:clamp(24px,3vw,34px);margin:8px 0 12px}
+body.sd-ready .panel{border:1px solid var(--sd-line);box-shadow:0 3px 18px rgba(18,49,37,.035);border-radius:16px}
+body.sd-ready .panel h2{font-size:1.13rem;margin:0 0 14px}body.sd-ready .cards{gap:12px}
+body.sd-ready .cards>.panel{margin-top:0}body.sd-ready .number{font-size:clamp(25px,3vw,32px)}
+body.sd-ready .sd-sidebar{position:fixed;inset:0 auto 0 0;width:246px;background:#fff;border-right:1px solid var(--sd-line);z-index:100;display:flex;flex-direction:column;padding:20px 12px;overflow:auto}
+body.sd-ready .sd-brand{display:flex;gap:10px;align-items:center;padding:9px 12px 22px;font-size:20px;font-weight:750;letter-spacing:-.5px}
+body.sd-ready .sd-brand-mark{display:grid;place-items:center;width:36px;height:36px;border-radius:11px;background:#1a6048;color:#fff;font-size:19px}
+body.sd-ready .sd-side-link{display:flex;align-items:center;gap:10px;padding:12px 13px;margin:3px 0;color:#35584b;text-decoration:none;border-radius:10px;font-size:14px;font-weight:600;min-height:44px}
+body.sd-ready .sd-side-link:hover,body.sd-ready .sd-side-link:focus-visible{background:#edf5f0}
+body.sd-ready .sd-side-link[aria-current="page"]{background:#e4f2e9;color:#12583d}
+body.sd-ready .sd-sidebar-bottom{margin-top:auto;border-top:1px solid var(--sd-line);padding-top:12px}
+body.sd-ready .sd-mobile-top{display:none}body.sd-ready .sd-view[hidden]{display:none!important}
+body.sd-ready input,body.sd-ready select,body.sd-ready button{min-height:42px;max-width:100%;border-radius:9px}
+body.sd-ready a{overflow-wrap:anywhere}body.sd-ready .scroll{max-width:100%;overscroll-behavior-x:contain}
+body.sd-ready .scroll table{font-size:13px}body.sd-ready .scroll th,body.sd-ready .scroll td{padding:10px 8px}
+body.sd-ready .scroll th:first-child{position:sticky;left:0;background:#f5f8f5;z-index:1}
+body.sd-ready .sd-intro{color:var(--sd-muted);font-size:14px;margin:0 0 18px}
+body.sd-ready .sd-overview-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
+body.sd-ready .sd-overview-actions button{background:#fff;color:#185740;border:1px solid #b6d4c2}
+body.sd-ready .sd-overview-actions button:hover{background:#e9f5ed}
+body.sd-ready .sd-mobile-shade{display:none}
+@media(max-width:850px){body.sd-ready main{margin-left:0;padding:12px}body.sd-ready .sd-sidebar{transform:translateX(-102%);transition:transform .18s ease;box-shadow:0 14px 30px rgba(0,0,0,.12)}body.sd-ready.sd-menu-open .sd-sidebar{transform:translateX(0)}body.sd-ready .sd-mobile-top{display:flex;align-items:center;gap:12px;padding:10px 4px 15px}body.sd-ready .sd-mobile-top button{background:#fff;color:#174c3a;border:1px solid #cadcd0;min-width:44px}body.sd-ready.sd-menu-open .sd-mobile-shade{display:block;position:fixed;inset:0;background:rgba(8,31,22,.42);z-index:99}}
+@media(max-width:540px){body.sd-ready .hero{padding:17px}body.sd-ready .cards{grid-template-columns:repeat(2,minmax(0,1fr))}body.sd-ready .panel{padding:14px}body.sd-ready .cards .panel{padding:13px}body.sd-ready .muted{font-size:12px}body.sd-ready form{display:flex;gap:8px;flex-wrap:wrap;align-items:center}body.sd-ready .scroll{margin:0 -8px;padding:0 8px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}body.sd-ready .sd-sidebar{transition:none}}
+@media print{body.sd-ready main{margin:0;padding:0}body.sd-ready .sd-sidebar,body.sd-ready .sd-mobile-top,body.sd-ready .sd-mobile-shade,body.sd-ready .sd-overview-actions{display:none!important}body.sd-ready .sd-view[hidden]{display:block!important}body.sd-ready .panel{break-inside:avoid;box-shadow:none}}
+
+</style></head><body>{% summitdesk_nav %}<main>
+<header class="hero"><div>SUMMITDESK · MANAGER OPERATIONS</div><h1>{{ hut.name }}</h1>
+<a href="{% url 'floorplans:staff_hub' hut.pk %}">← Back to Staff Hub</a></header>
+<section class="panel"><h2>Seven-day operations window</h2>
+<form method="get"><input type="hidden" name="operations" value="1"><label for="forecast_start">Start date</label>
+<input id="forecast_start" type="date" name="forecast_start" value="{{ forecast_start|date:'Y-m-d' }}" min="{{ today|date:'Y-m-d' }}" max="{{ forecast_max|date:'Y-m-d' }}">
+<button type="submit">Update</button></form>
+<p class="muted">Read-only planning information. Check individual reservations before taking action. Check-out dates are not occupied nights.</p></section>
+<section class="cards" aria-label="Operations summary">
+<div class="panel"><div class="muted">Active rooms</div><div class="number">{{ ops.room_count }}</div></div>
+<div class="panel"><div class="muted">Conflict warnings</div><div class="number">{{ ops.conflict_count }}</div></div>
+<div class="panel"><div class="muted">Arrival groups</div><div class="number">{{ ops.arrival_count }}</div></div>
+<div class="panel"><div class="muted">Action items</div><div class="number">{{ ops.action_count }}</div></div>
+</section>
+<section class="panel"><h2>Reservation conflict dashboard</h2><p><a href="?operations=1&amp;forecast_start={{ forecast_start|date:'Y-m-d' }}&amp;action_level={{ action_level }}&amp;operations_export=conflicts">Export conflicts CSV</a></p>
+{% for w in ops.conflicts %}<p><strong>{{ w.day|date:"d M Y" }} · {{ w.room }} · {{ w.kind }}</strong><span class="muted"> — {{ w.detail }}</span></p>
+{% empty %}<p class="muted">No detected room-capacity or numbered-bed conflicts in this window.</p>{% endfor %}
+<p class="muted">Only assigned numbered beds can be checked for individual-bed overlaps; unassigned reservations are included in room-capacity checks.</p></section>
+<section class="panel"><h2>Room availability calendar</h2><p><a href="?operations=1&amp;forecast_start={{ forecast_start|date:'Y-m-d' }}&amp;action_level={{ action_level }}&amp;operations_export=availability">Export availability CSV</a></p><div class="scroll"><table>
+<thead><tr><th>Room</th>{% for d in ops.dates %}<th>{{ d|date:"D d M" }}</th>{% endfor %}</tr></thead><tbody>
+{% for r in ops.calendar %}<tr><th>{{ r.room }}<div class="muted">Numbered beds: {{ r.numbered_beds|join:", "|default:"None configured" }}</div></th>
+{% for n in r.nights %}<td class="{{ n.status }}"><strong>{{ n.free }} free</strong><div class="muted">{{ n.confirmed }} confirmed · {{ n.pending }} pending</div><div class="muted">{{ n.closed }} closed · {{ n.usable }} usable</div></td>{% endfor %}</tr>
+{% empty %}<tr><td colspan="8">No active rooms.</td></tr>{% endfor %}
+</tbody></table></div><p class="muted">Room-level counts; not a claim that specific numbered beds are available.</p></section>
+<section class="panel"><h2>Arrival preparation board</h2><p><a href="?operations=1&amp;forecast_start={{ forecast_start|date:'Y-m-d' }}&amp;action_level={{ action_level }}&amp;operations_export=arrivals">Export arrivals CSV</a></p>
+{% for a in ops.arrivals %}<p><strong>{{ a.day|date:"d M Y" }} · {{ a.room }}</strong><span class="muted"> — {{ a.beds }} arriving bed places · {{ a.unassigned }} unassigned · {{ a.open_tasks }} unfinished cleaning tasks</span></p>
+{% empty %}<p class="muted">No confirmed arrivals in this window.</p>{% endfor %}
+<p class="muted">Cleaning counts include tasks scheduled for the arrival day; absence of a task does not certify readiness.</p></section>
+<section class="panel"><h2>Manager action center</h2>
+<!-- V73_V77_ACTION_TOOLS -->
+<div class="panel" aria-label="Action search and summary">
+<h3>Find and prioritize actions</h3>
+<form method="get">
+<input type="hidden" name="operations" value="1">
+<input type="hidden" name="forecast_start" value="{{ forecast_start|date:'Y-m-d' }}">
+<label for="action_level">Priority</label>
+<select id="action_level" name="action_level">
+<option value="all" {% if action_level == 'all' %}selected{% endif %}>All</option>
+<option value="conflicts" {% if action_level == 'conflicts' %}selected{% endif %}>Conflicts</option>
+<option value="assignments" {% if action_level == 'assignments' %}selected{% endif %}>Bed assignments</option>
+<option value="cleaning" {% if action_level == 'cleaning' %}selected{% endif %}>Cleaning</option>
+</select>
+<label for="action_q">Search</label>
+<input id="action_q" type="search" name="action_q" value="{{ action_q }}" maxlength="100" placeholder="Room or action">
+<label for="action_day">Day</label>
+<select id="action_day" name="action_day"><option value="">All 7 days</option>
+{% for d in ops.dates %}<option value="{{ d|date:'Y-m-d' }}" {% if action_day == d|date:'Y-m-d' %}selected{% endif %}>{{ d|date:'D d M' }}</option>{% endfor %}
+</select>
+<label for="action_sort">Order</label>
+<select id="action_sort" name="action_sort">
+<option value="priority" {% if action_sort == 'priority' %}selected{% endif %}>Urgent first</option>
+<option value="date" {% if action_sort == 'date' %}selected{% endif %}>Earliest date first</option>
+</select>
+<button type="submit">Apply filters</button>
+</form>
+<p class="muted">Showing {{ action_summary.total }} matching actions: {{ action_summary.conflicts }} conflicts, {{ action_summary.assignments }} assignments, {{ action_summary.cleaning }} cleaning.</p>
+<p><a href="?operations=1&amp;forecast_start={{ forecast_start|date:'Y-m-d' }}">Clear action filters</a></p>
+<p><a href="?operations=1&amp;forecast_start={{ forecast_start|date:'Y-m-d' }}&amp;action_level={{ action_level|urlencode }}&amp;action_q={{ action_q|urlencode }}&amp;action_day={{ action_day|urlencode }}&amp;action_sort={{ action_sort|urlencode }}&amp;operations_export=actions">Export matching actions CSV</a></p>
+</div>
+
+<!-- V68_V72_EXPORTS -->
+
+<p class="muted">Showing {{ displayed_actions|length }} of {{ ops.action_count }} actions.</p>
+<p><a href="?operations=1&amp;forecast_start={{ forecast_start|date:'Y-m-d' }}&amp;action_level={{ action_level }}&amp;operations_export=actions">Export displayed actions CSV</a></p>
+<ol>{% for a in displayed_actions %}<li><strong>{{ a.day|date:"d M Y" }} · {{ a.label }}</strong><div class="muted">{{ a.detail }}</div></li>
+{% empty %}<li>No detected action items for this window.</li>{% endfor %}</ol>
+<p class="muted">Prioritized by conflicts, bed assignment, then cleaning. No reservation changes are made automatically.</p></section>
+<section class="panel"><h2>Manager workspace</h2>
+<p>Use this dedicated, mobile-friendly operations page for the detailed forecast. Your original Staff Hub and analytics remain available.</p>
+<a href="{% url 'floorplans:staff_hub' hut.pk %}">Return to Staff Hub</a></section>
+<!-- DAILY_WORKSPACE_START -->
+<section class="panel" id="operations-overview"><h2>Operations overview</h2>
+<div class="cards"><div class="panel"><div class="muted">Issues needing review</div><div class="number">{{ daily.urgent_count }}</div></div>
+<div class="panel"><div class="muted">Numbered beds</div><div class="number">{{ daily.beds_count }}</div></div>
+<div class="panel"><div class="muted">Arrival groups</div><div class="number">{{ ops.arrival_count }}</div></div></div>
+<nav class="quick-links" aria-label="Operations sections"><a href="#critical-issues">Critical issues</a> · <a href="#arrival-timeline">Arrivals</a> · <a href="#bed-details">Bed details</a> · <a href="#daily-checklist">Daily checklist</a></nav>
+</section>
+<section class="panel" id="critical-issues"><h2>Critical issues</h2>
+{% for issue in daily.urgent %}<p><strong>{{ issue.day|date:"D d M" }} · {{ issue.title }}</strong> <span class="muted">{{ issue.detail }}</span></p>
+{% empty %}<p class="muted">No detected conflicts or arrival preparation issues in this period.</p>{% endfor %}</section>
+<section class="panel" id="arrival-timeline"><h2>Upcoming arrivals</h2>
+{% for group in daily.timeline %}<h3>{{ group.day|date:"D d M Y" }}</h3>
+{% for a in group.arrivals %}<p><strong>{{ a.room }}</strong> · {{ a.beds }} arriving bed places · {{ a.unassigned }} unassigned · {{ a.open_tasks }} cleaning tasks unfinished</p>
+{% empty %}<p class="muted">No confirmed arrivals.</p>{% endfor %}{% endfor %}</section>
+<section class="panel" id="bed-details"><h2>Numbered bed details</h2>
+<p class="muted">Assigned = confirmed reservation assigned to this bed; Held = pending assignment; Closed = bed closure; Conflict = overlapping assignments or assigned bed closed. Unassigned means no explicit assignment, not guaranteed availability. Room totals remain authoritative for capacity.</p>
+<div class="scroll"><table><thead><tr><th>Room / Bed</th>{% for d in daily.days %}<th>{{ d|date:"D d M" }}</th>{% endfor %}</tr></thead><tbody>
+{% for b in daily.bed_rows %}<tr><th>{{ b.room }} / {{ b.number }}</th>{% for n in b.nights %}<td class="{{ n.status }}">{{ n.label }}</td>{% endfor %}</tr>
+{% empty %}<tr><td colspan="8">No numbered beds configured.</td></tr>{% endfor %}</tbody></table></div></section>
+<section class="panel" id="daily-checklist"><h2>Daily operations checklist</h2>
+<p class="muted">Automatically calculated review items; not a saved or completed checklist.</p>
+{% for c in daily.checklist %}<div class="checkline"><strong>{{ c.day|date:"D d M" }}</strong> · {% if c.clear %}No detected outstanding items{% else %}{{ c.conflicts }} conflicts · {{ c.unassigned }} unassigned places · {{ c.cleaning }} unfinished cleaning tasks{% endif %}</div>{% endfor %}</section>
+<!-- DAILY_WORKSPACE_END -->\n<!-- OPERATIONS_SUMMARY_V93_V97 -->
+<section class="panel" id="attention-overview"><h2>Attention overview</h2>
+<p><strong>{{ attention.issues }}</strong> matching issues; <strong>{{ attention.review_days }}</strong> arrival days needing review; <strong>{{ attention.unassigned }}</strong> unassigned bed places; <strong>{{ attention.cleaning }}</strong> unfinished cleaning tasks.</p>
+<p><a href="?operations=1&amp;forecast_start={{ forecast_start|date:'Y-m-d' }}&amp;issue_kind={{ issue_kind|urlencode }}&amp;issue_q={{ issue_q|urlencode }}&amp;issue_order={{ issue_order|urlencode }}&amp;readiness_mode={{ readiness_mode|urlencode }}&amp;readiness_order={{ readiness_order|urlencode }}&amp;daily_tools_export=summary">Export combined summary CSV</a></p>
+<p><a href="?operations=1&amp;forecast_start={{ forecast_start|date:'Y-m-d' }}">Reset filters</a></p></section>
+
+<!-- DAILY_TOOLS_V88_V92 -->
+<nav class="panel quick-links" aria-label="Operations sections"><strong>Jump to:</strong>
+<a href="#issue-filters">Critical issues</a> · <a href="#readiness-summary">Arrival readiness</a> ·
+<a href="#report-exports">Reports</a> · <a href="#print-operations">Print summary</a></nav>
+\n<!-- DAILY_REPORTS_V83_V87 -->
+<section class="panel" id="issue-filters"><h2>Review critical issues</h2>
+<form method="get" aria-label="Filter critical issues">
+<input type="hidden" name="operations" value="1">
+<input type="hidden" name="forecast_start" value="{{ forecast_start|date:'Y-m-d' }}">
+<label for="issue_kind">Issue type</label>
+<select id="issue_kind" name="issue_kind">
+<option value="all" {% if issue_kind == 'all' %}selected{% endif %}>All issues</option>
+<option value="Conflict" {% if issue_kind == 'Conflict' %}selected{% endif %}>Reservation conflicts</option>
+<option value="Arrival" {% if issue_kind == 'Arrival' %}selected{% endif %}>Arrival preparation</option>
+</select><label for="issue_q">Search issues</label>
+<input id="issue_q" name="issue_q" maxlength="100" value="{{ issue_q }}" placeholder="Room or issue">
+<label for="issue_order">Sort issues</label><select id="issue_order" name="issue_order"><option value="earliest">Earliest first</option><option value="latest" {% if issue_order == 'latest' %}selected{% endif %}>Latest first</option><option value="title" {% if issue_order == 'title' %}selected{% endif %}>By title</option></select><button type="submit">Filter issues</button></form>
+<p><a href="?operations=1&amp;forecast_start={{ forecast_start|date:'Y-m-d' }}&amp;issue_kind={{ issue_kind|urlencode }}&amp;issue_q={{ issue_q|urlencode }}&amp;daily_tools_export=issues">Export matching issues CSV</a></p>
+<p class="muted">Showing {{ visible_issues|length }} of {{ daily.urgent_count }} detected issues.</p>
+{% for issue in visible_issues %}<p><strong>{{ issue.day|date:'D d M' }} · {{ issue.title }}</strong> <span class="muted">{{ issue.detail }}</span></p>
+{% empty %}<p class="muted">No matching issues for this period.</p>{% endfor %}
+</section>
+<section class="panel" id="readiness-summary"><h2>Arrival readiness summary</h2>
+<form method="get" aria-label="Filter arrival readiness">
+<input type="hidden" name="operations" value="1">
+<input type="hidden" name="forecast_start" value="{{ forecast_start|date:'Y-m-d' }}">
+<label for="readiness_mode">Show days</label><select id="readiness_mode" name="readiness_mode">
+<option value="all" {% if readiness_mode == 'all' %}selected{% endif %}>All days</option>
+<option value="review" {% if readiness_mode == 'review' %}selected{% endif %}>Days needing review</option>
+</select><label for="readiness_order">Sort readiness</label><select id="readiness_order" name="readiness_order"><option value="earliest">Earliest first</option><option value="latest" {% if readiness_order == 'latest' %}selected{% endif %}>Latest first</option><option value="most_work" {% if readiness_order == 'most_work' %}selected{% endif %}>Most work first</option></select><button type="submit">Apply</button></form>
+<p>Showing {{ readiness|length }} days. <a href="?operations=1&amp;forecast_start={{ forecast_start|date:'Y-m-d' }}&amp;readiness_mode={{ readiness_mode|urlencode }}&amp;daily_tools_export=readiness">Export matching readiness CSV</a></p>
+<p class="muted">A review aid, not a guarantee that a room or bed is ready. Counts are based on recorded assignments and scheduled cleaning tasks.</p>
+<div class="scroll"><table><thead><tr><th>Date</th><th>Arrival groups</th><th>Bed places</th><th>Unassigned</th><th>Cleaning tasks</th><th>Review</th></tr></thead><tbody>
+{% for row in readiness %}<tr><td>{{ row.day|date:'D d M' }}</td><td>{{ row.groups }}</td><td>{{ row.bed_places }}</td><td>{{ row.unassigned }}</td><td>{{ row.cleaning }}</td><td>{% if row.needs_review %}Needs review{% else %}No detected issues{% endif %}</td></tr>{% endfor %}
+</tbody></table></div></section>
+<section class="panel" id="report-exports"><h2>Operations reports</h2>
+<p><a href="?operations=1&amp;forecast_start={{ forecast_start|date:'Y-m-d' }}&amp;daily_export=beds">Export numbered-bed details CSV</a></p>
+<p><a href="?operations=1&amp;forecast_start={{ forecast_start|date:'Y-m-d' }}&amp;daily_export=checklist">Export daily checklist CSV</a></p>
+<p class="muted">Exports include the full selected seven-day period and are available only to hut managers. No reservations are modified.</p></section>
+<section class="panel" id="print-operations"><h2>Printable operations summary</h2>
+<p>Use your browser’s Print command to print or save this manager report as PDF. The print layout hides navigation, forms and export links.</p>
+<p class="muted">Period: {{ forecast_start|date:'d M Y' }} – {{ daily.days.6|date:'d M Y' }}. Detected issues: {{ daily.urgent_count }}. Numbered beds: {{ daily.beds_count }}.</p>
+</section>
+
+
+</main><script>
+/* Progressive enhancement. Without JavaScript the original full page stays usable. */
+(function(){
+'use strict';
+var main=document.querySelector('main');if(!main)return;
+var panels=Array.from(main.querySelectorAll('section.panel'));
+var categories=[
+ {id:'overview',label:'Overview',match:/operations overview|attention overview|seven.day operations window|operations summary/i},
+ {id:'reservations',label:'Reservations',match:/conflict|critical issues|manager action|daily operations checklist/i},
+ {id:'availability',label:'Availability',match:/availability|numbered bed|bed details/i},
+ {id:'housekeeping',label:'Housekeeping',match:/arrival|readiness|cleaning/i},
+ {id:'reports',label:'Reports',match:/export|report|print/i}
+];
+var categoryMap=new Map();categories.forEach(function(c){categoryMap.set(c.id,[])});
+var uncategorized=[];
+panels.forEach(function(panel){
+ var heading=panel.querySelector('h2');var title=heading?heading.textContent.trim():'';
+ var category=categories.find(function(c){return c.match.test(title)});
+ if(category){categoryMap.get(category.id).push(panel);panel.dataset.sdCategory=category.id}
+ else{uncategorized.push(panel);panel.dataset.sdCategory='overview';categoryMap.get('overview').push(panel)}
+ panel.classList.add('sd-view');
+});
+// Keep the four KPI cards in Overview. Preserve all existing forms, anchors and IDs.
+var kpis=main.querySelector('section.cards');if(kpis){kpis.dataset.sdCategory='overview';kpis.classList.add('sd-view')}
+var hero=main.querySelector('.hero');
+var sidebar=document.createElement('aside');sidebar.className='sd-sidebar';sidebar.setAttribute('aria-label','Manager navigation');
+var brand=document.createElement('div');brand.className='sd-brand';
+var mark=document.createElement('span');mark.className='sd-brand-mark';mark.textContent='▲';
+var brandText=document.createElement('span');brandText.textContent='SummitDesk';brand.append(mark,brandText);sidebar.append(brand);
+var nav=document.createElement('nav');nav.setAttribute('aria-label','Workspaces');sidebar.append(nav);
+var buttons=[];
+function button(label,id){var a=document.createElement('a');a.href='#'+id;a.className='sd-side-link';a.textContent=label;a.dataset.sdTab=id;nav.append(a);buttons.push(a);return a}
+categories.forEach(function(c){button(c.label,c.id)});
+var bottom=document.createElement('div');bottom.className='sd-sidebar-bottom';
+var back=hero&&hero.querySelector('a[href]');if(back){var b=document.createElement('a');b.className='sd-side-link';b.href=back.href;b.textContent='← Staff Hub';bottom.append(b)}sidebar.append(bottom);
+var mobile=document.createElement('div');mobile.className='sd-mobile-top';
+var menu=document.createElement('button');menu.type='button';menu.setAttribute('aria-label','Open navigation');menu.setAttribute('aria-expanded','false');menu.textContent='☰';
+var mobileBrand=document.createElement('strong');mobileBrand.textContent='SummitDesk';mobile.append(menu,mobileBrand);
+var shade=document.createElement('button');shade.type='button';shade.className='sd-mobile-shade';shade.setAttribute('aria-label','Close navigation');
+document.body.insertBefore(sidebar,document.body.firstChild);main.insertBefore(mobile,main.firstChild);document.body.append(shade);
+var intro=document.createElement('p');intro.className='sd-intro';intro.textContent='Everything you need for daily hut operations, organized by workspace.';
+if(hero)hero.insertAdjacentElement('afterend',intro);
+var actions=document.createElement('div');actions.className='sd-overview-actions';
+['Reservations','Availability','Housekeeping','Reports'].forEach(function(label){var b=document.createElement('button');b.type='button';b.textContent='Open '+label;b.addEventListener('click',function(){location.hash=label.toLowerCase()});actions.append(b)});
+if(kpis)kpis.insertAdjacentElement('afterend',actions);
+function show(tab,keepHash){if(!categoryMap.has(tab))tab='overview';
+ main.querySelectorAll('.sd-view').forEach(function(el){el.hidden=el.dataset.sdCategory!==tab});
+ if(actions)actions.hidden=tab!=='overview';
+ buttons.forEach(function(a){if(a.dataset.sdTab===tab)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
+ document.body.classList.remove('sd-menu-open');menu.setAttribute('aria-expanded','false');menu.setAttribute('aria-label','Open navigation');
+ if(!keepHash&&location.hash!=='#'+tab)history.replaceState(null,'','#'+tab);
+ window.scrollTo({top:0,behavior:'instant'});
+}
+function current(){var hash=decodeURIComponent(location.hash.slice(1));
+ if(categoryMap.has(hash))return hash;
+ if(hash){var el=document.getElementById(hash);if(el){var section=el.closest('section.panel');if(section&&section.dataset.sdCategory)return section.dataset.sdCategory}}
+ return 'overview'}
+function sync(){show(current(),true);var id=decodeURIComponent(location.hash.slice(1));if(!categoryMap.has(id)){var target=document.getElementById(id);if(target)target.scrollIntoView()}}
+window.addEventListener('hashchange',sync);
+menu.addEventListener('click',function(){var open=document.body.classList.toggle('sd-menu-open');menu.setAttribute('aria-expanded',String(open));menu.setAttribute('aria-label',open?'Close navigation':'Open navigation')});
+shade.addEventListener('click',function(){document.body.classList.remove('sd-menu-open');menu.setAttribute('aria-expanded','false')});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){document.body.classList.remove('sd-menu-open');menu.setAttribute('aria-expanded','false')}});
+// Original quick-jump links keep working by revealing their target section.
+Array.from(main.querySelectorAll('a[href^="#"]')).forEach(function(a){a.addEventListener('click',function(){var target=document.getElementById(a.hash.slice(1));if(target){var section=target.closest('section.panel');if(section&&section.dataset.sdCategory)show(section.dataset.sdCategory,true)}})});
+document.body.classList.add('sd-ready');sync();
+})();
+
+</script></body></html>

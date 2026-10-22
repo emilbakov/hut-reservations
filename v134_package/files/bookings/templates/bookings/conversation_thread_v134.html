@@ -1,0 +1,32 @@
+{% extends "bookings/base.html" %}
+{% block title %}Conversation · {{ reservation.code }}{% endblock %}
+{% block content %}
+<style>
+.v134{--pine:#153e32;--muted:#65796d;--line:#dbe6dd;max-width:1040px;margin:0 auto 50px;color:#19372b}.v134 *{box-sizing:border-box}.v134 .hero{background:linear-gradient(120deg,#102b24,#24634b);color:white;padding:clamp(22px,5vw,38px);border-radius:20px;margin:14px 0 22px}.v134 h1{font-size:clamp(1.8rem,5vw,2.8rem);color:white;margin:6px 0}.v134 h2{font-size:1.3rem;margin:0 0 12px}.v134 .hero p{color:#e0ede5;margin:0}.v134 .panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:clamp(16px,3vw,25px);margin-bottom:18px}.v134 .back{display:inline-block;color:#ccef9e;text-decoration:none;font-weight:800;margin-bottom:6px}.v134 .meta{color:var(--muted);font-size:.86rem}.v134 .thread{display:flex;flex-direction:column;gap:12px}.v134 .bubble{width:min(92%,750px);padding:15px 17px;border-radius:15px;background:#f3f8f1;border:1px solid #dce9da;overflow-wrap:anywhere}.v134 .bubble.manager{align-self:flex-end;background:#e7f4e2}.v134 .bubble.automated{background:#f8f8f4;border-style:dashed}.v134 .bubble .top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:.85rem;margin-bottom:8px}.v134 .bubble .body{white-space:pre-wrap;line-height:1.55;margin:7px 0 0}.v134 .bubble .status{font-size:.8rem;color:#55725b;margin-top:8px}.v134 .bubble .status.failed{color:#a72c2c;font-weight:800}.v134 .field{margin:14px 0}.v134 label{display:block;font-weight:750;font-size:.87rem;margin-bottom:7px}.v134 input[type=text],.v134 select,.v134 textarea{width:100%;min-height:46px;border:1px solid #cbd9ce;border-radius:10px;padding:10px 12px;font:inherit;min-width:0}.v134 textarea{min-height:165px;resize:vertical}.v134 .btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;border:0;border-radius:10px;background:var(--pine);color:white!important;padding:10px 18px;text-decoration:none;font:inherit;font-weight:800;cursor:pointer}.v134 .actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.v134 .checkbox{display:flex;align-items:center;gap:9px;font-weight:700}.v134 .checkbox input{width:20px;height:20px}.v134 .hint{color:var(--muted);font-size:.88rem;line-height:1.5}.v134 .empty{padding:20px;background:#f5f9f4;border-radius:13px;color:var(--muted)}@media(max-width:600px){.v134 .bubble{width:100%}.v134 .actions{align-items:stretch;flex-direction:column}.v134 .actions .btn{width:100%}}
+</style>
+<div class="v134">
+  <header class="hero"><a class="back" href="{% url 'bookings:conversation_inbox' %}?hut={{ hut.slug|urlencode }}">← Guest inbox</a><h1>{{ reservation.name }}</h1><p>{{ hut.name }} · {{ reservation.code }} · {{ reservation.check_in|date:"j M" }}–{{ reservation.check_out|date:"j M Y" }}</p></header>
+  <section class="panel"><h2>Communication timeline</h2><p class="hint">Guest and manager messages appear here, along with recorded automated email events. Email replies sent outside SummitDesk are not imported.</p><div class="thread" role="log" aria-label="Reservation messages">
+    {% for entry in timeline %}
+      {% if entry.kind == 'conversation' %}
+        <article class="bubble {% if entry.message.sender == 'manager' %}manager{% endif %}"><div class="top"><strong>{% if entry.message.sender == 'manager' %}Hut team{% else %}Guest{% endif %}</strong><time>{{ entry.created_at|date:"j M Y, H:i" }}</time></div>{% if entry.message.subject %}<strong>{{ entry.message.subject }}</strong>{% endif %}<p class="body">{{ entry.message.body }}</p><div class="status {% if entry.message.delivery == 'failed' %}failed{% endif %}">{{ entry.message.get_delivery_display }}{% if entry.message.error %} · {{ entry.message.error }}{% endif %}</div></article>
+      {% else %}
+        <article class="bubble automated"><div class="top"><strong>Automatic email · {{ entry.message.get_message_type_display }}</strong><time>{{ entry.created_at|date:"j M Y, H:i" }}</time></div><div>{{ entry.message.subject }}</div><div class="status">Recorded status: {{ entry.message.status }}</div></article>
+      {% endif %}
+    {% empty %}<p class="empty">No messages yet. Start the conversation below.</p>{% endfor %}
+  </div></section>
+  <section class="panel"><h2>Write to guest</h2><p class="hint">Messages always appear on the guest's private reservation page. Select “Send email copy” to also email the guest.</p>
+    <form method="post">{% csrf_token %}
+      <div class="field"><label for="v134-preset">Quick reply</label><select id="v134-preset"><option value="">Start with a blank message</option>{% for preset in presets %}<option value="{{ forloop.counter0 }}">{{ preset.title }}</option>{% endfor %}</select></div>
+      <div class="field"><label for="v134-subject">Subject</label><input id="v134-subject" type="text" name="subject" maxlength="200" required></div>
+      <div class="field"><label for="v134-body">Message</label><textarea id="v134-body" name="body" maxlength="4000" required></textarea></div>
+      <div class="actions"><label class="checkbox"><input type="checkbox" name="send_email" {% if reservation.email %}checked{% else %}disabled{% endif %}> Send email copy to {{ reservation.email|default:"(no guest email)" }}</label><button class="btn" type="submit">Send message →</button></div>
+      <p class="hint">Sending an email means it was submitted to your configured email backend, not guaranteed delivered. <a href="{% url 'bookings:quick_replies' %}?hut={{ hut.slug|urlencode }}">Edit quick replies</a>.</p>
+    </form>
+  </section>
+</div>
+{{ presets|json_script:"v134-replies-json" }}
+<script>
+(function(){var data=document.getElementById('v134-replies-json');var select=document.getElementById('v134-preset');if(!data||!select)return;var replies=JSON.parse(data.textContent);select.addEventListener('change',function(){if(!this.value)return;var p=replies[Number(this.value)];if(p){document.getElementById('v134-subject').value=p.subject;document.getElementById('v134-body').value=p.body;}});})();
+</script>
+{% endblock %}

@@ -1,57 +1,62 @@
 {% extends "bookings/base.html" %}
 {% block title %}Guest stay history{% endblock %}
 {% block content %}
-<div class="eyebrow">STAFF / REPORTS</div>
-<h1>Guest stay history</h1>
-<p class="lead">Actual guest arrivals and departures, plus booked occupancy estimates.</p>
-<p><a href="{% url 'bookings:dashboard' %}">← Dashboard</a> · <a href="{% url 'bookings:manager_stays' %}">Today's stays</a></p>
-<section class="card">
-<form method="get">
-<label for="hut">Hut</label>
-<select id="hut" name="hut">
-{% if not manager_mode %}<option value="">All huts</option>{% endif %}
-{% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_slug == hut.slug %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}
-</select>
-<label for="year">Year</label><input id="year" name="year" type="number" min="2000" max="2100" value="{{ year }}">
-<label for="month">Month</label><input id="month" name="month" type="number" min="1" max="12" value="{{ month_number }}">
-<label for="q">Guest, email or reference</label><input id="q" name="q" value="{{ q }}" maxlength="120">
-<button type="submit">Show report</button>
-</form>
-<p><a href="{% url 'bookings:stay_history_export' %}?hut={{ selected_slug|urlencode }}&amp;year={{ year }}&amp;month={{ month_number }}&amp;q={{ q|urlencode }}">Export filtered CSV ↓</a></p>
-</section>
-<div class="metrics">
-<div class="metric"><span>Actual check-ins this month</span><strong>{{ arrivals }}</strong></div>
-<div class="metric"><span>Actual check-outs this month</span><strong>{{ departures }}</strong></div>
-<div class="metric"><span>Booked bed-nights</span><strong>{{ booked_bed_nights }}</strong></div>
-<div class="metric"><span>Booked occupancy estimate</span><strong>{{ occupancy }}%</strong></div>
+<style>
+.sh-page{--forest:#143d32;--forest-deep:#0d2923;--lime:#c9ef68;--ink:#20332d;--muted:#687b72;--line:#dfe9e2;--paper:#f5f8f3;color:var(--ink);max-width:1320px;margin:0 auto;padding:clamp(12px,2vw,28px) 0 52px}
+.sh-page *{box-sizing:border-box}.sh-page a{color:#24684d}.sh-page .sh-hero{background:linear-gradient(120deg,#0d2923,#225543);border-radius:24px;padding:clamp(22px,4vw,42px);color:white;position:relative;overflow:hidden;margin-bottom:22px}.sh-page .sh-hero:after{content:"";position:absolute;width:230px;height:230px;border:40px solid rgba(201,239,104,.1);border-radius:50%;right:-90px;top:-105px;pointer-events:none}.sh-page .sh-eyebrow{font-size:.76rem;letter-spacing:.18em;text-transform:uppercase;font-weight:800;color:var(--lime);margin-bottom:12px}.sh-page h1{font-size:clamp(1.85rem,4vw,2.85rem);line-height:1.12;margin:0 0 12px;color:white}.sh-page .sh-hero p{color:#d5e5dc;max-width:700px;margin:0 0 22px}.sh-page .sh-nav{display:flex;flex-wrap:wrap;gap:10px}.sh-page .sh-nav a{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:white;border:1px solid rgba(255,255,255,.27);padding:10px 15px;border-radius:11px;font-weight:700;font-size:.88rem}.sh-page .sh-nav a:hover{background:rgba(255,255,255,.12)}.sh-page .sh-card{background:white;border:1px solid var(--line);border-radius:20px;padding:clamp(18px,2.4vw,28px);box-shadow:0 8px 28px rgba(14,47,34,.045);margin-bottom:20px}.sh-page .sh-card h2{margin:0;color:var(--forest);font-size:1.22rem}.sh-page .sh-card-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px}.sh-page .sh-kicker{color:var(--muted);font-size:.83rem;margin:5px 0 0}.sh-page .sh-filter-grid{display:grid;grid-template-columns:minmax(150px,1.1fr) minmax(100px,.65fr) minmax(100px,.65fr) minmax(200px,1.5fr) auto;gap:13px;align-items:end}.sh-page label{display:block;font-size:.8rem;font-weight:800;color:#476255;margin-bottom:7px}.sh-page input,.sh-page select{width:100%;min-width:0;border:1px solid #cfddd2;background:#fff;color:#20332d;border-radius:11px;padding:12px 13px;min-height:46px;font:inherit}.sh-page input:focus,.sh-page select:focus{outline:3px solid rgba(151,208,78,.25);border-color:#43895e}.sh-page button,.sh-page .sh-button{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border:0;border-radius:11px;background:var(--forest);color:white;font:inherit;font-weight:800;font-size:.88rem;padding:12px 19px;min-height:46px;cursor:pointer;white-space:nowrap}.sh-page button:hover,.sh-page .sh-button:hover{background:#245b46;color:white}.sh-page .sh-export{background:#eff7e7;color:#285e37;border:1px solid #d6e8ca}.sh-page .sh-export:hover{background:#e1efcf;color:#285e37}.sh-page .sh-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:14px}.sh-page .sh-metric{background:white;border:1px solid var(--line);border-radius:17px;padding:20px;min-width:0}.sh-page .sh-metric-label{display:block;color:var(--muted);font-size:.79rem;font-weight:750;line-height:1.45;min-height:2.6em}.sh-page .sh-metric-value{display:block;color:var(--forest);font-size:clamp(1.7rem,3vw,2.4rem);font-weight:850;letter-spacing:-.04em;margin-top:9px;overflow-wrap:anywhere}.sh-page .sh-metric:nth-child(4){background:var(--forest);border-color:var(--forest)}.sh-page .sh-metric:nth-child(4) .sh-metric-label{color:#d6e6d9}.sh-page .sh-metric:nth-child(4) .sh-metric-value{color:var(--lime)}.sh-page .sh-note{font-size:.84rem;color:var(--muted);line-height:1.6;margin:0 0 20px}.sh-page .sh-occupancy-number{font-size:2rem;font-weight:850;color:var(--forest);letter-spacing:-.035em}.sh-page .sh-progress{height:17px;border-radius:999px;background:#e6eee5;overflow:hidden;margin:14px 0 12px}.sh-page .sh-progress-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#5b9e67,#a4cf50)}.sh-page .sh-table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px}.sh-page table{width:100%;border-collapse:collapse;min-width:850px;margin:0;background:white}.sh-page thead{background:#f1f6f0}.sh-page th{text-align:left;color:#4e6659;font-size:.72rem;letter-spacing:.055em;text-transform:uppercase;padding:15px 16px;white-space:nowrap}.sh-page td{padding:16px;border-top:1px solid #e8eee9;vertical-align:top;font-size:.88rem}.sh-page tbody tr:hover{background:#fbfdf9}.sh-page .sh-guest{font-weight:800;color:var(--forest)}.sh-page .sh-code{font-size:.77rem;color:var(--muted);margin-top:5px}.sh-page .sh-date{white-space:nowrap}.sh-page .sh-empty{text-align:center;padding:36px 18px;color:var(--muted)}.sh-page .sh-pagination{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-top:18px}.sh-page .sh-page-links{display:flex;gap:8px;flex-wrap:wrap}.sh-page .sh-page-links a{display:inline-flex;text-decoration:none;border:1px solid #d3e3d5;border-radius:10px;padding:10px 15px;color:var(--forest);font-weight:750}.sh-page .sh-page-links a:hover{background:#eff6e8}.sh-page .sh-page-count{font-size:.85rem;color:var(--muted)}
+@media(max-width:980px){.sh-page .sh-filter-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.sh-page .sh-filter-grid .sh-search{grid-column:1 / -1}.sh-page .sh-filter-grid button{width:100%}.sh-page .sh-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:580px){.sh-page .sh-hero{border-radius:18px}.sh-page .sh-filter-grid{grid-template-columns:1fr 1fr}.sh-page .sh-hut,.sh-page .sh-search,.sh-page .sh-filter-grid button{grid-column:1 / -1}.sh-page .sh-metrics{gap:9px}.sh-page .sh-metric{padding:14px}.sh-page .sh-card{border-radius:16px}.sh-page .sh-pagination{align-items:stretch}.sh-page .sh-page-links a{flex:1;justify-content:center}}
+</style>
+<div class="sh-page">
+  <header class="sh-hero">
+    <div class="sh-eyebrow">Staff / Reports</div>
+    <h1>Guest stay history</h1>
+    <p>Review recorded guest arrivals and departures, monitor booked occupancy, and export your stay records.</p>
+    <nav class="sh-nav" aria-label="Staff navigation">
+      <a href="{% url 'bookings:dashboard' %}">← Dashboard</a>
+      <a href="{% url 'bookings:manager_stays' %}">Today's stays ↗</a>
+    </nav>
+  </header>
+
+  <section class="sh-card" aria-labelledby="sh-filters-heading">
+    <div class="sh-card-head"><div><h2 id="sh-filters-heading">Filter stay history</h2><p class="sh-kicker">Choose a hut and reporting period, or search for a specific guest.</p></div>
+      <a class="sh-button sh-export" href="{% url 'bookings:stay_history_export' %}?hut={{ selected_slug|urlencode }}&amp;year={{ year }}&amp;month={{ month_number }}&amp;q={{ q|urlencode }}">↓ Export filtered CSV</a>
+    </div>
+    <form method="get" class="sh-filter-grid">
+      <div class="sh-hut"><label for="sh-hut">Hut</label><select id="sh-hut" name="hut">{% if not manager_mode %}<option value="">All huts</option>{% endif %}{% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_slug == hut.slug %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}</select></div>
+      <div><label for="sh-year">Year</label><input id="sh-year" name="year" type="number" min="2000" max="2100" value="{{ year }}"></div>
+      <div><label for="sh-month">Month</label><input id="sh-month" name="month" type="number" min="1" max="12" value="{{ month_number }}"></div>
+      <div class="sh-search"><label for="sh-query">Guest, email or reference</label><input id="sh-query" name="q" value="{{ q }}" maxlength="120" placeholder="Search guest or reservation code"></div>
+      <button type="submit">Show report →</button>
+    </form>
+  </section>
+
+  <div class="sh-metrics" aria-label="Monthly stay metrics">
+    <div class="sh-metric"><span class="sh-metric-label">Actual check-ins this month</span><strong class="sh-metric-value">{{ arrivals }}</strong></div>
+    <div class="sh-metric"><span class="sh-metric-label">Actual check-outs this month</span><strong class="sh-metric-value">{{ departures }}</strong></div>
+    <div class="sh-metric"><span class="sh-metric-label">Booked bed-nights</span><strong class="sh-metric-value">{{ booked_bed_nights }}</strong></div>
+    <div class="sh-metric"><span class="sh-metric-label">Booked occupancy estimate</span><strong class="sh-metric-value">{{ occupancy }}%</strong></div>
+  </div>
+  <p class="sh-note">Monthly metrics ignore the guest text search. Occupancy is estimated using current active room capacity and confirmed booking dates, not actual overnight attendance.</p>
+
+  <section class="sh-card" aria-labelledby="sh-occupancy-heading">
+    <div class="sh-card-head"><div><h2 id="sh-occupancy-heading">Booked occupancy · {{ month|date:"F Y" }}</h2><p class="sh-kicker">Estimated share of available bed capacity booked during the month</p></div><strong class="sh-occupancy-number">{{ occupancy }}%</strong></div>
+    <div class="sh-progress" role="img" aria-label="Booked occupancy: {{ occupancy }} percent"><div class="sh-progress-fill" style="width:{% if occupancy > 100 %}100{% elif occupancy < 0 %}0{% else %}{{ occupancy }}{% endif %}%"></div></div>
+    <p class="sh-note" style="margin-bottom:0">This is a booking-based estimate, not measured overnight attendance. Historical periods use current room capacity.</p>
+  </section>
+
+  <section class="sh-card" aria-labelledby="sh-events-heading">
+    <div class="sh-card-head"><div><h2 id="sh-events-heading">Stay events · {{ month|date:"F Y" }}</h2><p class="sh-kicker">Recorded check-in and check-out activity</p></div></div>
+    <div class="sh-table-wrap"><table><thead><tr><th scope="col">Guest</th><th scope="col">Booked dates</th><th scope="col">Actual check-in</th><th scope="col">Recorded by</th><th scope="col">Actual check-out</th><th scope="col">Recorded by</th></tr></thead><tbody>
+      {% for stay in page %}<tr>
+        <td><div class="sh-guest">{{ stay.reservation.name }}</div><div class="sh-code">{{ stay.reservation.code }}</div></td>
+        <td class="sh-date">{{ stay.reservation.check_in|date:"j M Y" }} – {{ stay.reservation.check_out|date:"j M Y" }}</td>
+        <td class="sh-date">{{ stay.checked_in_at|date:"j M Y H:i"|default:"—" }}</td>
+        <td>{{ stay.checked_in_by.get_username|default:"—" }}</td>
+        <td class="sh-date">{{ stay.checked_out_at|date:"j M Y H:i"|default:"—" }}</td>
+        <td>{{ stay.checked_out_by.get_username|default:"—" }}</td>
+      </tr>{% empty %}<tr><td class="sh-empty" colspan="6">No recorded stay events match this period.</td></tr>{% endfor %}
+    </tbody></table></div>
+    <div class="sh-pagination"><span class="sh-page-count">Page {{ page.number }} of {{ page.paginator.num_pages }}</span><nav class="sh-page-links" aria-label="Stay history pages">{% if page.has_previous %}<a href="?hut={{ selected_slug|urlencode }}&amp;year={{ year }}&amp;month={{ month_number }}&amp;q={{ q|urlencode }}&amp;page={{ page.previous_page_number }}">← Previous</a>{% endif %}{% if page.has_next %}<a href="?hut={{ selected_slug|urlencode }}&amp;year={{ year }}&amp;month={{ month_number }}&amp;q={{ q|urlencode }}&amp;page={{ page.next_page_number }}">Next →</a>{% endif %}</nav></div>
+  </section>
 </div>
-<p class="dashboard-help">Monthly metrics ignore the text search. Occupancy uses currently active room capacity and confirmed booking dates; it is not a count of actual nights stayed.</p>
-<section class="card" aria-labelledby="occupancy-heading">
-<h2 id="occupancy-heading">Booked occupancy · {{ month|date:"F Y" }}</h2>
-<p><strong>{{ occupancy }}%</strong> of currently available bed capacity was booked for this month.</p>
-<div style="height:18px;background:#e5e7eb;border-radius:12px;overflow:hidden" role="img" aria-label="Booked occupancy: {{ occupancy }} percent">
-<div style="height:100%;width:{% if occupancy > 100 %}100{% elif occupancy < 0 %}0{% else %}{{ occupancy }}{% endif %}%;background:#166534"></div>
-</div>
-<p class="dashboard-help">This bar shows booked capacity, not measured overnight attendance. Current capacity is used for historical months.</p>
-</section>
-<section class="card">
-<h2>Stay events · {{ month|date:"F Y" }}</h2>
-<div class="table-wrap"><table>
-<thead><tr><th>Guest</th><th>Booked dates</th><th>Actual check-in</th><th>Recorded by</th><th>Actual check-out</th><th>Recorded by</th></tr></thead>
-<tbody>
-{% for stay in page %}
-<tr>
-<td>{{ stay.reservation.name }}<div><small>{{ stay.reservation.code }}</small></div></td>
-<td>{{ stay.reservation.check_in|date:"j M Y" }} – {{ stay.reservation.check_out|date:"j M Y" }}</td>
-<td>{{ stay.checked_in_at|date:"j M Y H:i"|default:"—" }}</td>
-<td>{{ stay.checked_in_by.get_username|default:"—" }}</td>
-<td>{{ stay.checked_out_at|date:"j M Y H:i"|default:"—" }}</td>
-<td>{{ stay.checked_out_by.get_username|default:"—" }}</td>
-</tr>
-{% empty %}<tr><td colspan="6">No recorded stay events match this period.</td></tr>{% endfor %}
-</tbody></table></div>
-<p>Page {{ page.number }} of {{ page.paginator.num_pages }}</p>
-{% if page.has_previous %}<a href="?hut={{ selected_slug|urlencode }}&amp;year={{ year }}&amp;month={{ month_number }}&amp;q={{ q|urlencode }}&amp;page={{ page.previous_page_number }}">← Previous</a>{% endif %}
-{% if page.has_next %}<a href="?hut={{ selected_slug|urlencode }}&amp;year={{ year }}&amp;month={{ month_number }}&amp;q={{ q|urlencode }}&amp;page={{ page.next_page_number }}">Next →</a>{% endif %}
-</section>
 {% endblock %}

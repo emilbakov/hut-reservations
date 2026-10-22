@@ -1,0 +1,77 @@
+[
+  {
+    "path": "bookings/models.py",
+    "existed": true,
+    "installed_sha256": "98189adbc1b2f847b1215bc1c3220ca83a49fe8a68e2d79713b29888e9f29e34"
+  },
+  {
+    "path": "bookings/services.py",
+    "existed": true,
+    "installed_sha256": "0581a0c1a384842864494b51f2bc297aa622d4ef4925a8398cd6f6f772304222"
+  },
+  {
+    "path": "bookings/lifecycle.py",
+    "existed": true,
+    "installed_sha256": "340f8fc1d95d2fb622b6b304b60d0c4d6069a9183a98898cac9bf9efcf3ae079"
+  },
+  {
+    "path": "floorplans/staff_reservation.py",
+    "existed": true,
+    "installed_sha256": "a31d3f99a316b8ce17d63edd3b42918d23c1bc0757ea3b657fcf4c7a0084de09"
+  },
+  {
+    "path": "bookings/views.py",
+    "existed": true,
+    "installed_sha256": "51f61df8d322808e699fcbddb857d129a048ca07a2fbd4786cce7f40063418ae"
+  },
+  {
+    "path": "bookings/templates/bookings/public_hut_v125.html",
+    "existed": true,
+    "installed_sha256": "18ca8569f52d9313d438b07568884633d1e5bea6c60a25d1288389ca99551337"
+  },
+  {
+    "path": "bookings/templates/bookings/reservation.html",
+    "existed": true,
+    "installed_sha256": "da0c5dea0837559245d03a591a7f487b6c14a3223b347073180f64b312d45e45"
+  },
+  {
+    "path": "bookings/templates/bookings/manager_reservations.html",
+    "existed": true,
+    "installed_sha256": "9d0b5fc6bd0ec1171d0aed936acab4a303e70c30adb557e90654ea321f12f5b3"
+  },
+  {
+    "path": "bookings/tests.py",
+    "existed": true,
+    "installed_sha256": "1d072dd2053be799ef846961c695fc2be5f7c59e4fe7653b6333a2649e1213d9"
+  },
+  {
+    "path": "bookings/test_public_hut_v125.py",
+    "existed": true,
+    "installed_sha256": "f5b3baa6c209f5a63a0058e76417df3048c81e8a0684952d5ddf1d8ebb901e66"
+  },
+  {
+    "path": "bookings/migrations/0013_reservation_guest_request.py",
+    "existed": false,
+    "installed_sha256": "f2c206914a598eb9a322be73b7f3a77aa2461fd9a02f5e34db8baf924eafdef1"
+  },
+  {
+    "path": "bookings/guest_requests_v126.py",
+    "existed": false,
+    "installed_sha256": "b57c8b1e32c8ce18e599cc9eedea94a51d9ea684de7fa9a14752489126afa40d"
+  },
+  {
+    "path": "bookings/templates/bookings/email_request_received_v126.txt",
+    "existed": false,
+    "installed_sha256": "9ae0191d23b965fadeda73df765d1158420d919383262e090f449e30f8233c73"
+  },
+  {
+    "path": "bookings/templates/bookings/email_request_declined_v126.txt",
+    "existed": false,
+    "installed_sha256": "8fb2aaf47887fdd6b06bd37f1b0706349dea61b61a087d24f47151afc8576903"
+  },
+  {
+    "path": "bookings/test_guest_approval_v126.py",
+    "existed": false,
+    "installed_sha256": "d96ccd07821da4593aae10dbf1f784d2907b53c3ac3c0beebcf7d2458158c510"
+  }
+]

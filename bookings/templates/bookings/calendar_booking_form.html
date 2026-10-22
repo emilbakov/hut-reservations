@@ -1,16 +1,87 @@
 {% extends "bookings/base.html" %}
-{% block title %}Calendar booking{% endblock %}
+{% block title %}{% if mode == 'edit' %}Edit reservation{% else %}New reservation{% endif %}{% endblock %}
 {% block content %}
-<h1>{% if mode == 'edit' %}Edit reservation {{ reservation.code }}{% else %}New reservation from calendar{% endif %}</h1>
-<p><a href="{% url 'bookings:availability_calendar' %}">← Availability calendar</a></p>
-<p>Availability is checked again under a database lock when saving. Departure does not occupy a bed.</p>
-{% if mode == 'edit' %}<p>Only dates, room and bed count can be changed here. Guest details shown below are read-only for edits; use existing reservation management for other actions.</p>{% endif %}
-{% if available is not None %}<p>Currently available beds across selected dates: {{ available }}</p>{% endif %}
-<form method="post">{% csrf_token %}
-{{ form.non_field_errors }}
-{% for field in form %}<p><label for="{{ field.id_for_label }}">{{ field.label }}</label><br>
-{% if mode == 'edit' and field.name == 'name' or mode == 'edit' and field.name == 'email' or mode == 'edit' and field.name == 'phone' or mode == 'edit' and field.name == 'notes' %}{{ field.value|default:'—' }}{% else %}{{ field }}{% endif %}
-{{ field.errors }}</p>{% endfor %}
-<button type="submit">{% if mode == 'edit' %}Save dates and beds{% else %}Create reservation{% endif %}</button>
-</form>
+<style>
+/* SummitDesk v137 — staff calendar reservation form; scoped to this page only. */
+.sd137{--ink:#19352a;--muted:#63786c;--line:#dce7de;--lime:#c9ef71;--forest:#17382c;--soft:#f4f8f2;max-width:1210px;margin:32px auto 76px;padding:0 18px;color:var(--ink);font-family:'DM Sans',system-ui,sans-serif}
+.sd137 *{box-sizing:border-box}.sd137 a{color:inherit}.sd137 .crumb{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:.85rem;color:#587264;font-weight:700;margin-bottom:20px}.sd137 .crumb a{text-decoration:none}.sd137 .crumb a:hover{text-decoration:underline}.sd137 .crumb .sep{color:#b3c4b7}
+.sd137 .hero{background:linear-gradient(120deg,#17382c,#244e3a 75%,#356343);color:#fff;border-radius:22px;padding:clamp(23px,4vw,42px);position:relative;overflow:hidden}.sd137 .hero:after{content:'';position:absolute;width:310px;height:310px;border:1px solid #ffffff18;border-radius:50%;right:-85px;top:-175px;box-shadow:0 0 0 55px #ffffff08,0 0 0 110px #ffffff05;pointer-events:none}.sd137 .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:.71rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#d4f3a4}.sd137 h1{font-family:Outfit,'DM Sans',sans-serif;font-size:clamp(2rem,4.2vw,3.1rem);line-height:1.08;letter-spacing:-.04em;margin:13px 0 12px;color:inherit}.sd137 .hero p{color:#d5e4d9;max-width:610px;line-height:1.6;margin:0;font-size:.97rem}.sd137 .hero-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}.sd137 .hero-chip{display:inline-flex;align-items:center;gap:8px;background:#ffffff16;border:1px solid #ffffff2b;padding:9px 12px;border-radius:9px;font-size:.8rem;font-weight:700}.sd137 .hero-chip strong{color:#d9f4a5}
+.sd137 .layout{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(275px,.85fr);gap:22px;align-items:start;margin-top:24px}.sd137 .main-col{min-width:0}.sd137 .panel,.sd137 .summary{background:#fff;border:1px solid var(--line);border-radius:19px;box-shadow:0 10px 30px rgba(27,60,40,.045)}.sd137 .panel{padding:clamp(20px,3vw,30px);margin-bottom:18px}.sd137 .panel-title{display:flex;align-items:center;gap:13px;margin-bottom:22px}.sd137 .number{width:37px;height:37px;flex:none;display:grid;place-items:center;background:#e8f5d8;color:#31552a;border-radius:11px;font-weight:900;font-size:.92rem}.sd137 h2{font-family:Outfit,'DM Sans',sans-serif;font-size:1.22rem;letter-spacing:-.02em;margin:0}.sd137 .sub{font-size:.84rem;color:var(--muted);margin:4px 0 0;line-height:1.5}
+.sd137 .fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.sd137 .field{min-width:0}.sd137 .field.wide{grid-column:1/-1}.sd137 label{display:block;font-weight:800;font-size:.85rem;margin-bottom:8px}.sd137 label .optional{font-weight:500;color:#83968a}.sd137 input:not([type=hidden]),.sd137 select,.sd137 textarea{display:block;width:100%;max-width:100%;border:1px solid #cbdad0;background:#fbfdfb;color:var(--ink);border-radius:11px;padding:13px 14px;font:inherit;font-size:.94rem;min-height:49px;box-shadow:none}.sd137 textarea{min-height:94px;resize:vertical}.sd137 input:focus-visible,.sd137 select:focus-visible,.sd137 textarea:focus-visible{outline:3px solid #c9ef71;outline-offset:1px;border-color:#638b53}.sd137 .help{font-size:.78rem;line-height:1.5;color:var(--muted);margin-top:8px}.sd137 .read-only{min-height:49px;padding:13px 14px;background:#f3f6f2;border:1px solid #e2e9e2;border-radius:11px;font-size:.93rem;overflow-wrap:anywhere}.sd137 .read-only-notice{border-left:3px solid #83aa60;background:#f4f9ef;padding:13px 16px;border-radius:0 9px 9px 0;color:#42624b;font-size:.84rem;line-height:1.6;margin:0 0 20px}
+.sd137 .errorlist{list-style:none;padding:0;margin:7px 0 0;color:#a33c31;font-size:.83rem;font-weight:650}.sd137 .errorlist li{margin:3px 0}.sd137 .alert{padding:14px 17px;background:#fff1ef;border:1px solid #eab8b1;color:#88372f;border-radius:11px;margin-bottom:18px;font-size:.9rem}.sd137 .alert .errorlist{color:inherit}.sd137 .available{display:flex;gap:10px;align-items:center;background:#edf7e6;border:1px solid #cfe6c3;color:#315c38;border-radius:11px;padding:13px 16px;margin-bottom:19px;font-size:.85rem;font-weight:750}
+.sd137 .actions{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:21px}.sd137 .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;text-decoration:none;border-radius:11px;border:1px solid transparent;padding:14px 20px;font:inherit;font-weight:850;font-size:.9rem;cursor:pointer;min-height:49px}.sd137 .btn.primary{background:var(--lime);color:#193629}.sd137 .btn.primary:hover{background:#b8e560}.sd137 .btn.secondary{background:#f2f6f1;color:#385744;border-color:#dfe9dc}.sd137 .btn.secondary:hover{background:#e9f1e6}.sd137 .btn:focus-visible{outline:3px solid #85a955;outline-offset:2px}.sd137 .fine{font-size:.76rem;color:var(--muted);line-height:1.5;margin-top:13px}
+.sd137 .side{position:sticky;top:24px}.sd137 .summary{overflow:hidden}.sd137 .summary-head{padding:21px 23px;background:#f3f8f0;border-bottom:1px solid #e1eadd}.sd137 .summary-head h2{font-size:1.15rem}.sd137 .summary-head p{margin:6px 0 0;color:#698071;font-size:.82rem}.sd137 .summary-body{padding:8px 23px 22px}.sd137 .summary-row{display:flex;justify-content:space-between;gap:15px;align-items:flex-start;padding:16px 0;border-bottom:1px solid #edf1ec;font-size:.87rem}.sd137 .summary-row:last-child{border-bottom:0}.sd137 .summary-row span{color:#708577}.sd137 .summary-row strong{text-align:right;max-width:65%;overflow-wrap:anywhere;font-weight:850}.sd137 .summary-note{background:#f4f8f2;border-radius:11px;margin:0 23px 23px;padding:14px 15px;color:#536c5b;font-size:.79rem;line-height:1.65}.sd137 .note-title{display:block;color:#284a35;font-weight:850;margin-bottom:4px}.sd137 .bottom-help{display:flex;gap:11px;align-items:flex-start;color:#718577;font-size:.8rem;line-height:1.55;margin:19px 2px 0}
+@media(max-width:850px){.sd137 .layout{grid-template-columns:minmax(0,1fr)}.sd137 .side{position:static}.sd137 .summary-body{display:grid;grid-template-columns:1fr 1fr;column-gap:18px}.sd137 .summary-note{margin-top:0}}
+@media(max-width:550px){.sd137{padding:0 12px;margin-top:17px}.sd137 .hero{border-radius:16px;padding:23px 20px}.sd137 .hero-chip{font-size:.76rem}.sd137 .layout{gap:15px;margin-top:15px}.sd137 .panel{padding:19px 17px;border-radius:15px}.sd137 .fields{grid-template-columns:1fr;gap:15px}.sd137 .field.wide{grid-column:auto}.sd137 .actions{flex-direction:column-reverse;align-items:stretch}.sd137 .btn{width:100%}.sd137 .summary-body{grid-template-columns:1fr}.sd137 .summary-head{padding:18px}.sd137 .summary-body{padding:4px 18px 14px}.sd137 .summary-note{margin:0 18px 18px}}
+@media(prefers-reduced-motion:reduce){.sd137 *{scroll-behavior:auto}}
+</style>
+<div class="sd137" id="sd137-reservation">
+  <nav class="crumb" aria-label="Breadcrumb"><a href="{% url 'bookings:dashboard' %}">Staff dashboard</a><span class="sep">/</span><a href="{% url 'bookings:availability_calendar' %}">Availability calendar</a><span class="sep">/</span><span>{% if mode == 'edit' %}Edit booking{% else %}New booking{% endif %}</span></nav>
+  <header class="hero">
+    <div class="eyebrow">✦ &nbsp; SUMMITDESK / RESERVATIONS</div>
+    <h1>{% if mode == 'edit' %}Edit reservation{% else %}Create a reservation{% endif %}</h1>
+    <p>{% if mode == 'edit' %}Adjust dates, room, or number of beds for this reservation. Guest details are protected here.{% else %}Turn a calendar selection into a reservation. Review the stay and guest details before saving.{% endif %}</p>
+    <div class="hero-meta"><span class="hero-chip">▦ &nbsp; From availability calendar</span>{% if selected_hut %}<span class="hero-chip">⌂ &nbsp; <strong>{{ selected_hut.name }}</strong></span>{% endif %}{% if mode == 'edit' %}<span class="hero-chip"># {{ reservation.code }}</span>{% endif %}</div>
+  </header>
+  <div class="layout">
+    <div class="main-col">
+      {% if form.non_field_errors %}<div class="alert" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+      {% if available is not None %}<div class="available" role="status">✓ &nbsp; {{ available }} bed{{ available|pluralize }} available for the selected dates (checked on submission).</div>{% endif %}
+      <form method="post" id="sd137-form" novalidate>
+        {% csrf_token %}
+        <section class="panel" aria-labelledby="sd137-stay-title">
+          <div class="panel-title"><span class="number">01</span><div><h2 id="sd137-stay-title">Stay details</h2><p class="sub">Choose the dates and room for this booking.</p></div></div>
+          <div class="fields">
+            <div class="field"><label for="{{ form.check_in.id_for_label }}">Check-in date</label>{{ form.check_in }}{{ form.check_in.errors }}</div>
+            <div class="field"><label for="{{ form.check_out.id_for_label }}">Check-out date</label>{{ form.check_out }}{{ form.check_out.errors }}</div>
+            <div class="field wide"><label for="{{ form.room.id_for_label }}">Room</label>{{ form.room }}{{ form.room.errors }}<div class="help">Only rooms you're permitted to manage are listed.</div></div>
+            <div class="field"><label for="{{ form.beds.id_for_label }}">Number of beds</label>{{ form.beds }}{{ form.beds.errors }}<div class="help">Availability is checked for every night of the stay when you save.</div></div>
+          </div>
+        </section>
+        <section class="panel" aria-labelledby="sd137-guest-title">
+          <div class="panel-title"><span class="number">02</span><div><h2 id="sd137-guest-title">Guest information</h2><p class="sub">Contact details for this reservation.</p></div></div>
+          {% if mode == 'edit' %}<p class="read-only-notice">Guest details are read-only here. To change contact information, use the existing reservation management tools.</p>{% endif %}
+          <div class="fields">
+            <div class="field wide"><label for="{{ form.name.id_for_label }}">Guest name</label>{% if mode == 'edit' %}<div class="read-only">{{ form.name.value|default:'—' }}</div>{% else %}{{ form.name }}{{ form.name.errors }}{% endif %}</div>
+            <div class="field"><label for="{{ form.email.id_for_label }}">Email</label>{% if mode == 'edit' %}<div class="read-only">{{ form.email.value|default:'—' }}</div>{% else %}{{ form.email }}{{ form.email.errors }}{% endif %}</div>
+            <div class="field"><label for="{{ form.phone.id_for_label }}">Phone <span class="optional">(optional)</span></label>{% if mode == 'edit' %}<div class="read-only">{{ form.phone.value|default:'—' }}</div>{% else %}{{ form.phone }}{{ form.phone.errors }}{% endif %}</div>
+            <div class="field wide"><label for="{{ form.notes.id_for_label }}">Notes <span class="optional">(optional)</span></label>{% if mode == 'edit' %}<div class="read-only">{{ form.notes.value|default:'—'|linebreaksbr }}</div>{% else %}{{ form.notes }}{{ form.notes.errors }}{% endif %}</div>
+          </div>
+        </section>
+        <div class="actions"><a class="btn secondary" href="{% url 'bookings:availability_calendar' %}">← Back to calendar</a><button class="btn primary" type="submit">{% if mode == 'edit' %}Save dates and beds{% else %}Create reservation{% endif %} <span aria-hidden="true">→</span></button></div>
+        <p class="fine">No reservation is changed until you submit this form. The server checks availability again before saving.</p>
+      </form>
+    </div>
+    <aside class="side" aria-label="Booking summary"><div class="summary"><div class="summary-head"><h2>Booking overview</h2><p>Review your selection</p></div><div class="summary-body">
+      <div class="summary-row"><span>Mountain hut</span><strong>{% if selected_hut %}{{ selected_hut.name }}{% else %}Selected room's hut{% endif %}</strong></div>
+      <div class="summary-row"><span>Check-in</span><strong id="sd137-preview-in">—</strong></div>
+      <div class="summary-row"><span>Check-out</span><strong id="sd137-preview-out">—</strong></div>
+      <div class="summary-row"><span>Length of stay</span><strong id="sd137-preview-nights">—</strong></div>
+      <div class="summary-row"><span>Room</span><strong id="sd137-preview-room">—</strong></div>
+      <div class="summary-row"><span>Beds</span><strong id="sd137-preview-beds">—</strong></div>
+    </div><div class="summary-note"><span class="note-title">✓ Availability protected</span>Final capacity is validated by SummitDesk when you submit. This summary is informational and does not hold beds.</div></div><div class="bottom-help"><span aria-hidden="true">ⓘ</span><span>Need multiple rooms? Use the existing staff reservation tool to allocate beds across rooms.</span></div></aside>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const root=document.getElementById('sd137-reservation');if(!root)return;
+  const form=root.querySelector('#sd137-form');if(!form)return;
+  const field=name=>form.querySelector('[name="'+name+'"]');
+  const put=(id,value)=>{const el=root.querySelector('#'+id);if(el)el.textContent=value||'—';};
+  const dateLabel=value=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(value||''))return '—';const [y,m,d]=value.split('-').map(Number);const dt=new Date(Date.UTC(y,m-1,d));if(dt.getUTCFullYear()!==y||dt.getUTCMonth()!==m-1||dt.getUTCDate()!==d)return '—';return dt.toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'});};
+  function update(){
+    const a=field('check_in')?.value||'',b=field('check_out')?.value||'',room=field('room'),beds=field('beds');
+    put('sd137-preview-in',dateLabel(a));put('sd137-preview-out',dateLabel(b));
+    if(/^\d{4}-\d{2}-\d{2}$/.test(a)&&/^\d{4}-\d{2}-\d{2}$/.test(b)){
+      const nights=(Date.parse(b+'T00:00:00Z')-Date.parse(a+'T00:00:00Z'))/86400000;
+      put('sd137-preview-nights',Number.isInteger(nights)&&nights>0?nights+' night'+(nights===1?'':'s'):'Check dates');
+    }else put('sd137-preview-nights','—');
+    put('sd137-preview-room',room?.selectedOptions?.[0]?.value?room.selectedOptions[0].textContent.trim():'Choose a room');
+    put('sd137-preview-beds',beds?.value?beds.value:'—');
+  }
+  ['check_in','check_out','room','beds'].forEach(name=>{const el=field(name);if(el){el.addEventListener('input',update);el.addEventListener('change',update);}});
+  update();
+})();
+</script>
 {% endblock %}

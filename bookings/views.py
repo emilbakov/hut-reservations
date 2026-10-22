@@ -2,13 +2,14 @@ import logging
 
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum
 from django.utils import timezone
 from datetime import timedelta
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404, redirect, render
-from django.http import JsonResponse
+from django.http import Http404, JsonResponse
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.views.decorators.http import require_GET
 from django.template.loader import render_to_string
@@ -19,6 +20,11 @@ from .models import GuestStay, Hut, Reservation, ReservationItem, Room
 from .services import NotAvailable, create_reservation, free_beds, modify_reservation
 
 logger = logging.getLogger(__name__)
+
+def role_landing(request):
+    """Public entry screen; staff use their existing authenticated dashboard."""
+    return render(request, "bookings/role_landing.html")
+
 
 def hut_list(request):
     """Homepage showing all active mountain huts."""
@@ -37,10 +43,10 @@ def hut_detail(request, slug):
         is_active=True,
     )
 
-    return book(request, hut=hut)
+    return book(request, hut=hut, template_name="bookings/public_hut_v125.html")
 
 
-def book(request, hut=None):
+def book(request, hut=None, *, template_name="bookings/book.html"):
     """Pick dates, see available beds and book a selected hut."""
 
     params = request.POST if request.method == "POST" else request.GET
@@ -51,6 +57,8 @@ def book(request, hut=None):
         "search": search,
         "hut": hut,
     }
+    if hut is not None:
+        context["public_rooms"] = Room.objects.filter(hut=hut, is_active=True).order_by("position", "name")
 
     if has_dates and search.is_valid():
         check_in = search.cleaned_data["check_in"]
@@ -83,6 +91,8 @@ def book(request, hut=None):
                     check_in=check_in,
                     check_out=check_out,
                     beds_by_room=booking.beds_by_room(),
+                    status=Reservation.Status.PENDING,
+                    guest_request=True,
                     **guest,
                 )
 
@@ -99,7 +109,8 @@ def book(request, hut=None):
                     )
 
             else:
-                send_confirmation(request, reservation)
+                from .guest_requests_v126 import send_guest_request_received
+                send_guest_request_received(request, reservation)
                 return redirect(reservation)
 
         context.update(
@@ -110,7 +121,7 @@ def book(request, hut=None):
             any_free=any(booking.free.values()),
         )
 
-    return render(request, "bookings/book.html", context)
+    return render(request, template_name, context)
 
 
 
@@ -473,8 +484,8 @@ def manageable_reservations(user):
     qs = Reservation.objects.all()
     if user.is_superuser:
         return qs
-    if not user.is_staff:
-        raise PermissionDenied("Staff access required.")
+    if not user.is_authenticated:
+        raise PermissionDenied("Manager login required.")
     allowed = Hut.objects.filter(managers=user)
     if not allowed.exists():
         raise PermissionDenied("No hut is assigned to your account.")
@@ -488,7 +499,31 @@ def manageable_reservations(user):
     ).filter(manager_total__gt=0, manager_total=F("manager_allowed")))
 
 
-@staff_member_required
+def get_locked_manageable_reservation(user, **lookup):
+    """Check manager scope and lock an ungrouped reservation row.
+
+    Caller must be inside transaction.atomic(). Never apply FOR UPDATE
+    to manageable_reservations(), which uses GROUP BY for staff users.
+    """
+    authorized_pk = (
+        manageable_reservations(user)
+        .filter(**lookup)
+        .values_list("pk", flat=True)
+        .first()
+    )
+    if authorized_pk is None:
+        raise Http404("No reservation matches the given query.")
+
+    reservation = get_object_or_404(
+        Reservation.objects.select_for_update(), pk=authorized_pk
+    )
+    # Revalidate scope after waiting for any concurrent reservation lock.
+    if not manageable_reservations(user).filter(pk=reservation.pk).exists():
+        raise Http404("No reservation matches the given query.")
+    return reservation
+
+
+@login_required
 def manager_reservations(request):
     """Searchable bookings scoped to the selected authorized hut."""
     huts, selected_hut, selected_slug = permitted_hut_selection(request)
@@ -519,7 +554,7 @@ def manager_reservations(request):
     })
 
 
-@staff_member_required
+@login_required
 @require_POST
 def manager_reservation_action(request, code):
     """Confirm/cancel only a booking wholly within the manager's huts."""
@@ -528,9 +563,7 @@ def manager_reservation_action(request, code):
         return JsonResponse({"error": "Unknown action"}, status=400)
 
     with transaction.atomic():
-        reservation = get_object_or_404(
-            manageable_reservations(request.user).select_for_update(), code=code
-        )
+        reservation = get_locked_manageable_reservation(request.user, code=code)
         # Never change bookings spanning multiple huts from this interface.
         hut_ids = set(reservation.items.values_list("room__hut_id", flat=True))
         if len(hut_ids) != 1 or None in hut_ids:
@@ -542,6 +575,10 @@ def manager_reservation_action(request, code):
             else:
                 reservation.status = Reservation.Status.CONFIRMED
                 reservation.save(update_fields=["status"])
+                if reservation.guest_request:
+                    transaction.on_commit(
+                        lambda reservation=reservation: send_confirmation(request, reservation)
+                    )
                 messages.success(request, "Reservation confirmed.")
         else:
             if reservation.status == Reservation.Status.CANCELLED:
@@ -549,9 +586,16 @@ def manager_reservation_action(request, code):
             else:
                 reservation.status = Reservation.Status.CANCELLED
                 reservation.save(update_fields=["status"])
+                if reservation.guest_request:
+                    from .guest_requests_v126 import send_guest_request_declined
+                    transaction.on_commit(
+                        lambda reservation=reservation: send_guest_request_declined(request, reservation)
+                    )
                 messages.success(request, "Reservation cancelled; beds are available again.")
 
-    # Fixed destination avoids untrusted redirect parameters.
+    # Only a fixed, known destination is allowed (never a user-supplied URL).
+    if request.POST.get("source") == "approvals":
+        return redirect("bookings:approval_dashboard")
     return redirect("bookings:manager_reservations")
 
 
@@ -599,9 +643,7 @@ def manager_stay_action(request, code):
         return JsonResponse({"error": "Unknown action"}, status=400)
 
     with transaction.atomic():
-        reservation = get_object_or_404(
-            manageable_reservations(request.user).select_for_update(), code=code
-        )
+        reservation = get_locked_manageable_reservation(request.user, code=code)
         hut_ids = set(reservation.items.values_list("room__hut_id", flat=True))
         if len(hut_ids) != 1 or None in hut_ids:
             raise PermissionDenied("This booking needs administrator review.")

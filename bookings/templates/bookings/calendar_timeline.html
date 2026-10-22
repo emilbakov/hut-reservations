@@ -1,40 +1,243 @@
 {% extends "bookings/base.html" %}
-{% block title %}Weekly reservation timeline{% endblock %}
+{% block title %}Reservation calendar{% endblock %}
 {% block content %}
 <style>
-.tl-wrap{overflow-x:auto}.tl-table{border-collapse:collapse;min-width:900px;width:100%}.tl-table th,.tl-table td{border:1px solid #d1d5db;padding:.5rem;vertical-align:top;min-width:115px}.tl-table th:first-child{min-width:170px;text-align:left}.tl-slot{min-height:80px}.tl-booking{display:block;margin:.25rem 0;padding:.4rem;border:1px solid #64748b;border-radius:6px;background:#e0f2fe;color:#0c4a6e;cursor:grab;font-size:.85rem}.tl-booking:focus{outline:2px solid #2563eb}.tl-drop{outline:3px dashed #2563eb;outline-offset:-4px}.tl-free{font-size:.75rem;color:#166534}.tl-over{color:#b91c1c}
+.sd-timeline{--ink:#173b30;--muted:#63786d;--line:#dce8df;--green:#195b42;--lime:#d7efbd;color:var(--ink);font-family:'DM Sans',system-ui,sans-serif;max-width:1500px;margin:0 auto;padding:12px 0 40px}
+.sd-head{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;margin:12px 0 22px}
+.sd-eyebrow{text-transform:uppercase;letter-spacing:.14em;font-size:11px;font-weight:800;color:#59816c;margin:0 0 6px}
+.sd-head h1{font-family:Outfit,sans-serif;font-size:clamp(1.7rem,3vw,2.6rem);margin:0;line-height:1.12}
+.sd-sub{color:var(--muted);font-size:14px;margin:9px 0 0;max-width:650px}
+.sd-actions{display:flex;gap:8px;flex-wrap:wrap}
+.sd-button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 16px;background:#fff;color:var(--ink);border:1px solid #bdd1c3;border-radius:11px;text-decoration:none;font-weight:750;font-size:13px;cursor:pointer}
+.sd-button.primary{background:var(--green);border-color:var(--green);color:#fff}
+.sd-button:hover{filter:brightness(.96)}.sd-button:focus-visible,.sd-booking:focus-visible{outline:3px solid #9ccf4e;outline-offset:3px}
+.sd-toolbar{background:#f7faf6;border:1px solid var(--line);border-radius:16px;padding:14px 16px;display:flex;gap:14px;align-items:end;flex-wrap:wrap;margin-bottom:16px}
+.sd-field{display:grid;gap:5px;font-size:12px;font-weight:750}.sd-field input,.sd-field select{height:44px;padding:9px 12px;border:1px solid #c5d7c9;border-radius:10px;background:#fff;color:var(--ink);font:inherit;min-width:160px}
+.sd-nav{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-left:auto}.sd-nav strong{font-size:13px;white-space:nowrap;padding:0 8px}
+.sd-legend{display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin:0 0 14px;color:var(--muted);font-size:12px}
+.sd-legend span{display:flex;align-items:center;gap:6px}.sd-dot{width:11px;height:11px;border-radius:4px;background:#b9e1c5}.sd-dot.pending{background:#ffe0a6}.sd-dot.over{background:#f2b1a7}
+.sd-board{border:1px solid var(--line);border-radius:16px;overflow:auto;background:#fff;box-shadow:0 9px 30px #143a2410}
+.sd-grid{min-width:900px;display:grid;grid-template-columns:185px repeat(7,minmax(98px,1fr));position:relative}
+.sd-corner{position:sticky;left:0;z-index:5;background:#edf4ed;padding:17px 14px;font-size:12px;font-weight:800;border-bottom:1px solid var(--line);border-right:1px solid var(--line)}
+.sd-dayhead{background:#edf4ed;border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:10px 5px;text-align:center;font-size:12px;color:#577064}.sd-dayhead strong{display:block;font-size:17px;color:var(--ink);margin-top:2px}.sd-dayhead.today{background:#e1efce}
+.sd-room{position:sticky;left:0;z-index:4;background:#fff;border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:15px 12px;display:flex;flex-direction:column;justify-content:center;gap:4px}
+.sd-room strong{font-size:14px}.sd-room small{font-size:12px;color:var(--muted)}.sd-room .hut{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#7b8c80}
+.sd-track{position:relative;grid-column:2 / 9;border-bottom:1px solid var(--line);min-height:74px;display:grid;grid-template-columns:repeat(7,minmax(98px,1fr));grid-auto-rows:42px;align-content:center;padding:10px 0;isolation:isolate}
+.sd-bg{grid-row:1/-1;min-height:100%;border-right:1px solid #edf1eb;background:#fff;z-index:0}
+.sd-bg.weekend{background:#fafbf8}.sd-bg.over{background:#fff1ed}
+.sd-free{font-size:10px;text-align:center;color:#6b7c70;padding-top:5px;white-space:nowrap;pointer-events:none}
+.sd-booking{position:relative;align-self:center;display:flex;align-items:center;gap:8px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding:9px 11px;height:34px;margin:3px 4px;background:#d9eddf;border:1px solid #b1d7be;border-left:4px solid #2d885c;border-radius:9px;color:#164a32;text-decoration:none;font-size:12px;font-weight:750;z-index:2;cursor:grab}
+.sd-booking.pending{background:#fff0d2;border-color:#edcb8a;border-left-color:#ca8729;color:#68450e}
+.sd-booking small{font-size:11px;font-weight:550;opacity:.8}.sd-booking:hover{filter:brightness(.96);box-shadow:0 3px 12px #1c513024}
+.sd-booking:active{cursor:grabbing}.sd-drop{outline:3px dashed #3c8d64;outline-offset:-4px}
+.sd-empty{padding:32px;color:var(--muted);grid-column:1/-1;text-align:center}
+.sd-help{font-size:12px;color:var(--muted);margin-top:13px;line-height:1.6}
+.sd-summary{margin:12px 0;color:#5c7766;font-size:12px;font-weight:650}
+@media(max-width:650px){.sd-toolbar{padding:12px}.sd-field{flex:1 1 100%}.sd-field input,.sd-field select{width:100%}.sd-nav{width:100%;justify-content:space-between}.sd-head{margin-top:6px}.sd-grid{grid-template-columns:132px repeat(7,minmax(104px,1fr))}.sd-corner,.sd-room{padding:12px 9px}.sd-booking small{display:none}}
+@media(prefers-reduced-motion:reduce){.sd-button,.sd-booking{transition:none}}
+
+/* Reservation quick view: isolated styles; does not alter the timeline grid. */
+.sd-booking{cursor:pointer}
+.sd-quickview:not([open]){display:none}
+.sd-quickview{box-sizing:border-box;position:fixed;inset:0 0 0 auto;margin:0 0 0 auto;padding:0;border:0;border-radius:22px 0 0 22px;background:#fff;color:#173b30;width:min(430px,100vw);max-width:100vw;height:100dvh;max-height:100dvh;box-shadow:-20px 0 75px rgba(10,42,26,.22);overflow:auto;font-family:'DM Sans',system-ui,sans-serif}
+.sd-quickview::backdrop{background:rgba(14,40,27,.27)}
+.sd-quick-inner{display:flex;flex-direction:column;min-height:100%;padding:28px 27px 25px;box-sizing:border-box}
+.sd-quick-head{display:flex;align-items:start;justify-content:space-between;gap:16px}
+.sd-quick-eyebrow{margin:0 0 7px;color:#698475;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.12em}
+.sd-quick-title{margin:0;font-family:Outfit,system-ui,sans-serif;font-size:clamp(23px,3vw,29px);font-weight:750;line-height:1.16}
+.sd-quick-close-form{margin:0;flex:0 0 auto}
+.sd-quick-close{min-width:44px;min-height:44px;border:1px solid #d8e5db;border-radius:12px;background:#f5f8f5;color:#2b5340;font-size:25px;cursor:pointer;line-height:1}
+.sd-quick-close:hover{background:#eaf1e9}
+.sd-quick-code{margin:12px 0 0;color:#6b7c70;font-size:12px;word-break:break-word}
+.sd-quick-divider{border:0;border-top:1px solid #e2ebe2;margin:22px 0}
+.sd-quick-badge{display:inline-flex;align-items:center;align-self:start;gap:7px;padding:7px 11px;background:#d9eddf;color:#215a3b;border:1px solid #b1d7be;border-radius:999px;font-size:12px;font-weight:800;margin:20px 0 0}
+.sd-quick-badge.pending{background:#fff0d2;border-color:#edcb8a;color:#68450e}
+.sd-quick-dot{height:7px;width:7px;background:currentColor;border-radius:100%}
+.sd-quick-details{margin:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:18px;row-gap:23px}
+.sd-quick-details>div{min-width:0}
+.sd-quick-details dt{font-size:11px;font-weight:800;color:#668173;letter-spacing:.05em;text-transform:uppercase;margin:0 0 7px}
+.sd-quick-details dd{font-size:15px;font-weight:750;color:#203f30;margin:0;overflow-wrap:anywhere}
+.sd-quick-details .wide{grid-column:1/-1}
+.sd-quick-note{font-size:13px;line-height:1.6;color:#687f6e;margin:23px 0 18px;background:#f2f7f2;border-radius:12px;padding:13px 14px}
+.sd-quick-actions{display:grid;gap:10px;margin-top:auto;padding-top:14px}
+.sd-quick-edit,.sd-quick-return{min-height:46px;display:flex;align-items:center;justify-content:center;border-radius:11px;text-align:center;font-weight:800;font-size:13px;cursor:pointer;text-decoration:none;box-sizing:border-box;padding:12px 18px}
+.sd-quick-edit{background:#195b42;color:#fff;border:1px solid #195b42}
+.sd-quick-edit:hover{background:#124e36;color:#fff}
+.sd-quick-return{background:#fff;border:1px solid #c2d5c6;color:#234b37}
+.sd-quick-return:hover{background:#f2f7f2}
+.sd-quickview :is(a,button):focus-visible{outline:3px solid #91c34c;outline-offset:3px}
+@media(max-width:650px){.sd-quickview{inset:auto 0 0 0;margin:auto 0 0 0;width:100%;height:auto;max-height:90dvh;border-radius:22px 22px 0 0}.sd-quick-inner{min-height:auto;padding:22px 20px max(22px,env(safe-area-inset-bottom))}.sd-quick-actions{margin-top:6px}}
+@media(prefers-reduced-motion:reduce){.sd-quickview{scroll-behavior:auto}}
+
+
+/* v133: make sideways scrolling explicit without changing calendar booking logic. */
+.sd-mobile-scroll-hint { display: none; }
+@media (max-width: 720px) {
+  .sd-actions { display: grid; grid-template-columns: 1fr 1fr; width: 100%; }
+  .sd-actions .sd-button { min-height: 44px; padding: 10px 8px; text-align: center; }
+  .sd-toolbar > .sd-button.primary { width: 100%; }
+  .sd-mobile-scroll-hint { display: block; margin: 0 0 9px; font-size: .8rem; font-weight: 750; color: #4c6e59; }
+  .sd-board { max-width: 100%; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
+  .sd-quickview { max-height: 92dvh; }
+}
+@media (max-width: 390px) {
+  .sd-actions { grid-template-columns: 1fr; }
+  .sd-nav { justify-content: space-between; }
+  .sd-nav strong { width: 100%; order: -1; text-align: center; }
+}
 </style>
-<h1>Weekly room timeline</h1>
-<p>Drag a booking to another room or date to preview a move. The original length of stay and number of beds are preserved. Moves require confirmation and availability validation.</p>
-<form method="get"><label>Week starting <input type="date" name="start" value="{{ start|date:'Y-m-d' }}"></label>
-<label>Hut <select name="hut">{% if request.user.is_superuser %}<option value="">All huts</option>{% endif %}{% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_slug == hut.slug %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}</select></label><button type="submit">Show</button></form>
-<p><a href="?start={{ prev|date:'Y-m-d' }}{% if selected_slug %}&amp;hut={{ selected_slug|urlencode }}{% endif %}">← Previous week</a> · <a href="?start={{ next|date:'Y-m-d' }}{% if selected_slug %}&amp;hut={{ selected_slug|urlencode }}{% endif %}">Next week →</a> · <a href="{% url 'bookings:availability_calendar' %}">Monthly calendar</a></p>
-<div class="tl-wrap"><table class="tl-table"><thead><tr><th>Room</th>{% for day in days %}<th>{{ day|date:'D d M' }}</th>{% endfor %}</tr></thead><tbody>
-{% for row in rows %}<tr><th>{{ row.room.hut.name }}<br>{{ row.room.name }}<br>Capacity {{ row.room.capacity }}</th>
-{% for cell in row.cells %}<td class="tl-slot" data-room="{{ row.room.pk }}" data-day="{{ cell.day|date:'Y-m-d' }}" data-hut="{{ row.room.hut_id }}">
-<span class="{% if cell.free < 0 %}tl-over{% else %}tl-free{% endif %}">{{ cell.free }} free</span>
-{% for item in cell.items %}{% if item.reservation.check_in == cell.day or forloop.parentloop.first %}
-<a draggable="true" class="tl-booking" href="{% url 'bookings:calendar_edit' item.reservation.code %}" data-code="{{ item.reservation.code }}" data-start="{{ item.reservation.check_in|date:'Y-m-d' }}" data-hut="{{ row.room.hut_id }}" title="Drag to move; click to edit">{{ item.reservation.code }} · {{ item.beds }} bed{{ item.beds|pluralize }}</a>
-{% endif %}{% endfor %}
-</td>{% endfor %}</tr>{% empty %}<tr><td colspan="8">No rooms assigned.</td></tr>{% endfor %}
-</tbody></table></div>
-<p id="tl-status" role="status" aria-live="polite">You can also move a reservation through its edit form without dragging.</p>
+<div class="sd-timeline">
+<header class="sd-head"><div><p class="sd-eyebrow">SummitDesk / Reservations</p><h1>Reservation calendar</h1><p class="sd-sub">A clear view of who is staying, in which room, and for how long. Select a booking to review it.</p></div>
+<div class="sd-actions"><a class="sd-button" href="{% url 'bookings:manager_reservations' %}">All reservations</a><a class="sd-button primary" href="{% url 'bookings:manual_booking' %}">+ New reservation</a></div></header>
+<form class="sd-toolbar" method="get">
+<label class="sd-field" for="sd-start">Week starting<input id="sd-start" type="date" name="start" value="{{ start|date:'Y-m-d' }}"></label>
+<label class="sd-field" for="sd-hut">Mountain hut<select id="sd-hut" name="hut">{% if request.user.is_superuser %}<option value="">All huts</option>{% endif %}{% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_slug == hut.slug %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}</select></label>
+<button class="sd-button primary" type="submit">Show dates</button>
+<nav class="sd-nav" aria-label="Calendar navigation"><a class="sd-button" href="?start={{ prev|date:'Y-m-d' }}{% if selected_slug %}&amp;hut={{ selected_slug|urlencode }}{% endif %}">← Previous</a><strong>{{ start|date:'d M' }} – {{ last_day|date:'d M Y' }}</strong><a class="sd-button" href="?start={{ next|date:'Y-m-d' }}{% if selected_slug %}&amp;hut={{ selected_slug|urlencode }}{% endif %}">Next →</a></nav>
+</form>
+<div class="sd-legend"><span><i class="sd-dot"></i>Confirmed</span><span><i class="sd-dot pending"></i>Pending</span><span><i class="sd-dot over"></i>Over capacity</span><span>Bars represent booked nights; departure day is excluded.</span></div>
+<p class="sd-mobile-scroll-hint" id="sd-mobile-scroll-hint">↔ Swipe sideways to view the full week.</p>
+<div class="sd-board" role="region" aria-label="Scrollable seven-day reservation timeline" tabindex="0">
+<div class="sd-grid">
+<div class="sd-corner">ROOM / NIGHT</div>{% for day in days %}<div class="sd-dayhead {% if day == today %}today{% endif %}">{{ day|date:'D' }}<strong>{{ day|date:'d' }}</strong></div>{% endfor %}
+{% for row in rows %}
+<div class="sd-room"><span class="hut">{{ row.room.hut.name }}</span><strong>{{ row.room.name }}</strong><small>{{ row.room.capacity }} beds</small></div>
+<div class="sd-track" style="grid-template-rows:repeat({{ row.track_count }},42px)" data-room="{{ row.room.pk }}" data-hut="{{ row.room.hut_id }}">
+{% for cell in row.cells %}<div class="sd-bg {% if cell.free < 0 %}over{% endif %}" style="grid-column:{{ forloop.counter }};grid-row:1 / {{ row.grid_end }}" data-room="{{ row.room.pk }}" data-day="{{ cell.day|date:'Y-m-d' }}" data-hut="{{ row.room.hut_id }}" title="{{ cell.free }} free beds on {{ cell.day|date:'d M Y' }}"></div>{% endfor %}
+{% for bar in row.bars %}<a class="sd-booking {% if bar.status == 'pending' %}pending{% endif %}" draggable="true" href="{% url 'bookings:calendar_edit' bar.code %}" style="grid-column:{{ bar.first }} / span {{ bar.span }};grid-row:{{ bar.track }}" data-code="{{ bar.code }}" data-start="{{ bar.check_in|date:'Y-m-d' }}" data-hut="{{ row.room.hut_id }}" data-guest="{{ bar.guest }}" data-beds="{{ bar.beds }}" data-status="{{ bar.status }}" data-check-in="{{ bar.check_in|date:'Y-m-d' }}" data-check-out="{{ bar.check_out|date:'Y-m-d' }}" data-room-name="{{ row.room.name }}" data-hut-name="{{ row.room.hut.name }}" title="{{ bar.guest }} · {{ bar.beds }} beds · {{ bar.check_in|date:'d M' }} to {{ bar.check_out|date:'d M' }} · Select to review"><span>{{ bar.guest }}</span><small>· {{ bar.beds }} bed{{ bar.beds|pluralize }}</small></a>{% endfor %}
+</div>
+{% empty %}<div class="sd-empty">No rooms available for this hut.</div>{% endfor %}
+</div></div>
+<p class="sd-summary">{{ rows|length }} rooms · {{ booking_count }} booking entries in this week</p>
+<p id="sd-move-status" class="sd-help" role="status" aria-live="polite">Drag a booking to another room or night to preview a move. You must confirm the change, and the system validates availability. You can also open the booking and edit it directly.</p>
+</div>
+<!-- SUMMITDESK_QUICKVIEW_V114: details for the selected staff-visible booking. -->
+<dialog class="sd-quickview" id="sd-quickview" aria-labelledby="sd-quickview-title" aria-describedby="sd-quick-description">
+  <div class="sd-quick-inner">
+    <div class="sd-quick-head">
+      <div>
+        <p class="sd-quick-eyebrow">Reservation</p>
+        <h2 id="sd-quickview-title" class="sd-quick-title">Reservation details</h2>
+        <p class="sd-quick-code">Booking reference: <strong id="sd-quick-code"></strong></p>
+      </div>
+      <form method="dialog" class="sd-quick-close-form">
+        <button class="sd-quick-close" type="submit" aria-label="Close reservation details">&times;</button>
+      </form>
+    </div>
+    <div class="sd-quick-badge" id="sd-quick-badge"><span class="sd-quick-dot" aria-hidden="true"></span><span id="sd-quick-status"></span></div>
+    <hr class="sd-quick-divider">
+    <dl class="sd-quick-details">
+      <div class="wide"><dt>Guest</dt><dd id="sd-quick-guest"></dd></div>
+      <div><dt>Check-in</dt><dd id="sd-quick-checkin"></dd></div>
+      <div><dt>Check-out</dt><dd id="sd-quick-checkout"></dd></div>
+      <div><dt>Room</dt><dd id="sd-quick-room"></dd></div>
+      <div><dt>Hut</dt><dd id="sd-quick-hut"></dd></div>
+      <div><dt>Beds in this room</dt><dd id="sd-quick-beds"></dd></div>
+      <div><dt>Nights</dt><dd id="sd-quick-nights"></dd></div>
+    </dl>
+    <p id="sd-quick-description" class="sd-quick-note">Review the reservation here without leaving the calendar. Editing opens the existing booking page, where changes are checked before they are saved.</p>
+    <div class="sd-quick-actions">
+      <a href="#" id="sd-quick-edit" class="sd-quick-edit">Edit reservation &rarr;</a>
+      <button type="button" id="sd-quick-return" class="sd-quick-return">Back to calendar</button>
+    </div>
+  </div>
+</dialog>
+
 <script>
 (function(){
-let moving=null;
-function isoAdd(value,offset){const parts=value.split('-').map(Number);const d=new Date(Date.UTC(parts[0],parts[1]-1,parts[2]+offset));return d.toISOString().slice(0,10)}
-document.querySelectorAll('.tl-booking').forEach(el=>el.addEventListener('dragstart',event=>{moving={code:el.dataset.code,start:el.dataset.start,hut:el.dataset.hut};event.dataTransfer.setData('text/plain',moving.code);event.dataTransfer.effectAllowed='move'}));
-document.querySelectorAll('.tl-slot').forEach(cell=>{
-cell.addEventListener('dragover',event=>{if(moving&&moving.hut===cell.dataset.hut){event.preventDefault();cell.classList.add('tl-drop')}});
-cell.addEventListener('dragleave',()=>cell.classList.remove('tl-drop'));
-cell.addEventListener('drop',event=>{event.preventDefault();cell.classList.remove('tl-drop');if(!moving||moving.hut!==cell.dataset.hut)return;
-const offset=Math.round((Date.parse(cell.dataset.day+'T00:00:00Z')-Date.parse(moving.start+'T00:00:00Z'))/86400000);
-const target=isoAdd(moving.start,offset);
-const params=new URLSearchParams({code:moving.code,room:cell.dataset.room,check_in:target});
-window.location.assign('{% url "bookings:calendar_move" %}?'+params.toString());moving=null;
+'use strict';let moving=null;
+function addDays(value,offset){const p=value.split('-').map(Number),d=new Date(Date.UTC(p[0],p[1]-1,p[2]+offset));return d.toISOString().slice(0,10)}
+const status=document.getElementById('sd-move-status');
+document.querySelectorAll('.sd-booking').forEach(el=>{
+ el.addEventListener('dragstart',event=>{moving={code:el.dataset.code,start:el.dataset.start,hut:el.dataset.hut};event.dataTransfer.setData('text/plain',moving.code);event.dataTransfer.effectAllowed='move'});
+ el.addEventListener('dragend',()=>{moving=null;document.querySelectorAll('.sd-drop').forEach(x=>x.classList.remove('sd-drop'))});
 });
+document.querySelectorAll('.sd-bg').forEach(cell=>{
+ cell.addEventListener('dragover',event=>{if(moving&&moving.hut===cell.dataset.hut){event.preventDefault();cell.classList.add('sd-drop')}});
+ cell.addEventListener('dragleave',()=>cell.classList.remove('sd-drop'));
+ cell.addEventListener('drop',event=>{event.preventDefault();cell.classList.remove('sd-drop');if(!moving||moving.hut!==cell.dataset.hut)return;
+ const offset=Math.round((Date.parse(cell.dataset.day+'T00:00:00Z')-Date.parse(moving.start+'T00:00:00Z'))/86400000);
+ const target=addDays(moving.start,offset);
+ const params=new URLSearchParams({code:moving.code,room:cell.dataset.room,check_in:target});
+ window.location.assign('{% url "bookings:calendar_move" %}?'+params.toString());moving=null;
+ });
 });
-document.addEventListener('dragend',()=>{moving=null;document.querySelectorAll('.tl-drop').forEach(el=>el.classList.remove('tl-drop'))});
 })();
+</script>
+<script>
+/* Calendar quick view: uses only information already rendered for permitted rooms. */
+(function () {
+  'use strict';
+  const dialog = document.getElementById('sd-quickview');
+  if (!dialog || typeof dialog.showModal !== 'function') return;
+  const bookings = document.querySelectorAll('.sd-timeline .sd-booking');
+  if (!bookings.length) return;
+
+  const fields = {
+    code: document.getElementById('sd-quick-code'),
+    guest: document.getElementById('sd-quick-guest'),
+    room: document.getElementById('sd-quick-room'),
+    hut: document.getElementById('sd-quick-hut'),
+    checkin: document.getElementById('sd-quick-checkin'),
+    checkout: document.getElementById('sd-quick-checkout'),
+    beds: document.getElementById('sd-quick-beds'),
+    nights: document.getElementById('sd-quick-nights'),
+    status: document.getElementById('sd-quick-status')
+  };
+  const badge = document.getElementById('sd-quick-badge');
+  const edit = document.getElementById('sd-quick-edit');
+  const close = document.getElementById('sd-quick-return');
+  if (Object.values(fields).some(value => !value) || !badge || !edit || !close) return;
+
+  let dragging = false;
+  let ignoreClicksUntil = 0;
+  function prettyDate(value) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value || '')) return value || '—';
+    const parsed = new Date(value + 'T12:00:00Z');
+    if (Number.isNaN(parsed.getTime())) return value;
+    return new Intl.DateTimeFormat(undefined, {day:'numeric', month:'short', year:'numeric', timeZone:'UTC'}).format(parsed);
+  }
+  function nights(from, to) {
+    const a = Date.parse((from || '') + 'T00:00:00Z');
+    const b = Date.parse((to || '') + 'T00:00:00Z');
+    if (!Number.isFinite(a) || !Number.isFinite(b) || b <= a) return '—';
+    return String(Math.round((b - a) / 86400000));
+  }
+  bookings.forEach(link => {
+    link.title = 'View reservation details';
+    link.setAttribute('aria-haspopup', 'dialog');
+    link.addEventListener('dragstart', () => {dragging = true;});
+    link.addEventListener('dragend', () => {dragging = false; ignoreClicksUntil = Date.now() + 450;});
+    link.addEventListener('click', event => {
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      if (dragging || Date.now() < ignoreClicksUntil) {event.preventDefault(); return;}
+      const data = link.dataset;
+      // Do not interpolate guest data into HTML: it is treated only as text.
+      fields.code.textContent = data.code || '—';
+      fields.guest.textContent = data.guest || '—';
+      fields.room.textContent = data.roomName || '—';
+      fields.hut.textContent = data.hutName || '—';
+      fields.checkin.textContent = prettyDate(data.checkIn);
+      fields.checkout.textContent = prettyDate(data.checkOut);
+      fields.beds.textContent = data.beds || '—';
+      fields.nights.textContent = nights(data.checkIn, data.checkOut);
+      const isPending = data.status === 'pending';
+      badge.classList.toggle('pending', isPending);
+      fields.status.textContent = isPending ? 'Pending' : 'Confirmed';
+      edit.href = link.href; // Same edit URL and server-side permission checks as before.
+      event.preventDefault();
+      dialog.showModal();
+    });
+  });
+  close.addEventListener('click', () => dialog.close());
+  dialog.addEventListener('click', event => {
+    if (event.target !== dialog) return;
+    const bounds = dialog.getBoundingClientRect();
+    const outside = event.clientX < bounds.left || event.clientX > bounds.right ||
+                    event.clientY < bounds.top || event.clientY > bounds.bottom;
+    if (outside) dialog.close();
+  });
+})();
+
 </script>
 {% endblock %}

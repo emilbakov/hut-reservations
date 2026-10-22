@@ -121,7 +121,7 @@ class BookingPageTests(TestCase):
             self.url, {"check_in": day(1).isoformat(), "check_out": day(3).isoformat()}
         )
         self.assertContains(response, "Dorm")
-        self.assertContains(response, "4 of 4")
+        self.assertContains(response, "4 available for your stay")
 
     def test_booking_is_saved_and_emailed(self):
         response = self.post(dorm=2, small=1)
@@ -131,7 +131,9 @@ class BookingPageTests(TestCase):
         self.assertEqual(reservation.total_price, 80)  # (2x10 + 1x20) x 2 nights
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn(reservation.code, mail.outbox[0].body)
-        self.assertContains(self.client.get(reservation.get_absolute_url()), "Confirmed")
+        self.assertEqual(reservation.status, Reservation.Status.PENDING)
+        self.assertTrue(reservation.guest_request)
+        self.assertContains(self.client.get(reservation.get_absolute_url()), "Awaiting hut approval")
 
     def test_too_many_beds_is_rejected(self):
         response = self.post(dorm=5)
@@ -238,7 +240,7 @@ class ServiceValidationTests(TestCase):
         self.reserve(beds=2)
         self.client.force_login(user)
         response = self.client.get(reverse("bookings:dashboard"))
-        self.assertContains(response, "Occupancy calendar")
+        self.assertContains(response, "Beds reserved today")
         self.assertContains(response, "Upcoming arrivals")
 
 
@@ -317,7 +319,7 @@ class DashboardPhaseFourTests(TestCase):
         self.client.force_login(user)
         response = self.client.get(reverse("bookings:dashboard"), {"year": "2026", "month": "10"})
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Occupancy calendar")
+        self.assertContains(response, "October 2026 at a glance")
 
 
 class MultiHutTests(TestCase):

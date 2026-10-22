@@ -1,0 +1,32 @@
+[
+  {
+    "path": "bookings/urls.py",
+    "existed": true,
+    "installed_sha256": "78de261ec19a0a9e67abfdfaee5527ae1032b9f7af877ef10cd612bbae10ae85"
+  },
+  {
+    "path": "bookings/templates/bookings/manager_digest_preferences_v130.html",
+    "existed": true,
+    "installed_sha256": "b611b308ac6cd095d5aef9f1a4c7489e6f2d1300090b0d7d39594092187141fc"
+  },
+  {
+    "path": "bookings/templates/bookings/manager_digest_preview_v131.html",
+    "existed": true,
+    "installed_sha256": "bea67a2aa8caa376f3408e5ea1f63d65efea24078a7dfccd953137c76ee4558c"
+  },
+  {
+    "path": "bookings/manager_digest_history_v132.py",
+    "existed": false,
+    "installed_sha256": "82cb15ff1784100d2c6c797f972c473b12425c7eaf748d9937f9466c8c6f3d35"
+  },
+  {
+    "path": "bookings/templates/bookings/manager_digest_history_v132.html",
+    "existed": false,
+    "installed_sha256": "63ab821968f143f3efd6321e6859d9f5f6b6db6893f8ea32f6adae50347312bf"
+  },
+  {
+    "path": "bookings/test_manager_digest_history_v132.py",
+    "existed": false,
+    "installed_sha256": "0974fbd6b19ce715c5388589b5fc96cf0df1cddd8a59ce900297c305f28c0693"
+  }
+]

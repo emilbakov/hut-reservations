@@ -1,0 +1,94 @@
+[
+  {
+    "path": "bookings/templates/bookings/base.html",
+    "existed": true
+  },
+  {
+    "path": "floorplans/templates/floorplans/cleaner_invitations.html",
+    "existed": true
+  },
+  {
+    "path": "floorplans/templates/floorplans/cleaner_portal.html",
+    "existed": true
+  },
+  {
+    "path": "floorplans/templates/floorplans/cleaner_team.html",
+    "existed": true
+  },
+  {
+    "path": "floorplans/templates/floorplans/manager_operations_v63_v67.html",
+    "existed": true
+  },
+  {
+    "path": "floorplans/templates/floorplans/staff_analytics.html",
+    "existed": true
+  },
+  {
+    "path": "floorplans/templates/floorplans/staff_arrivals.html",
+    "existed": true
+  },
+  {
+    "path": "floorplans/templates/floorplans/staff_audit_dashboard.html",
+    "existed": true
+  },
+  {
+    "path": "floorplans/templates/floorplans/staff_calendar.html",
+    "existed": true
+  },
+  {
+    "path": "floorplans/templates/floorplans/staff_financial_analytics.html",
+    "existed": true
+  },
+  {
+    "path": "floorplans/templates/floorplans/staff_history.html",
+    "existed": true
+  },
+  {
+    "path": "floorplans/templates/floorplans/staff_housekeeping.html",
+    "existed": true
+  },
+  {
+    "path": "floorplans/templates/floorplans/staff_hub.html",
+    "existed": true
+  },
+  {
+    "path": "floorplans/templates/floorplans/staff_new_booking.html",
+    "existed": true
+  },
+  {
+    "path": "floorplans/templates/floorplans/staff_overview.html",
+    "existed": true
+  },
+  {
+    "path": "floorplans/templates/floorplans/staff_reservation.html",
+    "existed": true
+  },
+  {
+    "path": "floorplans/templates/floorplans/staff_search.html",
+    "existed": true
+  },
+  {
+    "path": "floorplans/templates/floorplans/staff_tasks.html",
+    "existed": true
+  },
+  {
+    "path": "floorplans/templates/floorplans/staff_transfer.html",
+    "existed": true
+  },
+  {
+    "path": "floorplans/templatetags/summitdesk_nav.py",
+    "existed": true
+  },
+  {
+    "path": "floorplans/templates/floorplans/includes/summitdesk_nav.html",
+    "existed": true
+  },
+  {
+    "path": "floorplans/static/floorplans/summitdesk_shell_v116.css",
+    "existed": false
+  },
+  {
+    "path": "floorplans/static/floorplans/summitdesk_shell_v116.js",
+    "existed": false
+  }
+]

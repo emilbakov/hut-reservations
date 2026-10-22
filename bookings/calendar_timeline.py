@@ -1,3 +1,4 @@
+from .timeline_helpers_v113 import build_bars
 """Accessible, staff-only room-by-room weekly drag and drop timeline."""
 from datetime import date, timedelta
 from django.contrib.admin.views.decorators import staff_member_required
@@ -41,9 +42,15 @@ def calendar_timeline(request):
             booked = slots[room.pk, day]
             cells.append({'day': day, 'items': booked,
                           'free': room.capacity - sum(i.beds for i in booked)})
-        rows.append({'room': room, 'cells': cells})
+        # V113_TIMELINE_LAYOUT: booking bars span the nights occupied.
+        room_items = [item for item in items if item.room_id == room.pk]
+        bars = build_bars(room_items, start, end)
+        track_count = max((bar['track'] for bar in bars), default=1)
+        rows.append({'room': room, 'cells': cells, 'bars': bars,
+                     'track_count': track_count, 'grid_end': track_count + 1})
     return render(request, 'bookings/calendar_timeline.html', {
-        'rows': rows, 'days': days, 'start': start,
+        'rows': rows, 'days': days, 'start': start, 'today': timezone.localdate(),
+        'last_day': days[-1], 'booking_count': sum(len(row['bars']) for row in rows),
         'prev': start - timedelta(days=7), 'next': end,
         'huts': huts, 'selected_slug': slug, 'selected_hut': selected,
     })

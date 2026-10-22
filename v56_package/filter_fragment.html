@@ -1,0 +1,14 @@
+<!-- V56_CAPACITY_FILTER_START -->
+<form method="get" aria-label="Filter capacity warnings" style="display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:14px 0">
+  <input type="hidden" name="forecast_start" value="{{ capacity_export_start_v54|date:'Y-m-d' }}">
+  <label for="v56-capacity-level">Show capacity warnings:</label>
+  <select id="v56-capacity-level" name="capacity_level" style="padding:8px;border:1px solid #c8d7cb;border-radius:8px">
+    <option value="all" {% if capacity_level_v56 == 'all' %}selected{% endif %}>All</option>
+    <option value="critical" {% if capacity_level_v56 == 'critical' %}selected{% endif %}>Critical</option>
+    <option value="warning" {% if capacity_level_v56 == 'warning' %}selected{% endif %}>Warning</option>
+    <option value="notice" {% if capacity_level_v56 == 'notice' %}selected{% endif %}>Notice</option>
+  </select>
+  <button type="submit" style="padding:9px 14px;border-radius:8px;border:0;background:#164537;color:#fff;cursor:pointer">Apply</button>
+  <span class="muted">{{ capacity_filtered_v56|length }} matching warning{{ capacity_filtered_v56|length|pluralize }}</span>
+</form>
+<!-- V56_CAPACITY_FILTER_END -->

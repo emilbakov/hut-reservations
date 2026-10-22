@@ -1,0 +1,120 @@
+{% extends 'bookings/base.html' %}
+{% block title %}New reservation{% endblock %}
+{% block content %}
+<style>
+.mb-wrap{max-width:1100px;margin:35px auto 70px;color:#183329}.mb-eyebrow{font-size:.75rem;letter-spacing:.16em;font-weight:800;color:#477a50;text-transform:uppercase}.mb-title{font-size:clamp(2rem,4vw,3rem);margin:.3rem 0}.mb-muted{color:#60756a}.mb-steps{display:flex;gap:10px;flex-wrap:wrap;margin:24px 0}.mb-step{padding:10px 15px;border-radius:999px;background:#eaf1ea;color:#355342;font-size:.85rem;font-weight:700}.mb-step.active{background:#173c2c;color:#fff}.mb-card{background:#fff;border:1px solid #dce7dc;border-radius:20px;padding:clamp(18px,3vw,30px);box-shadow:0 8px 25px #1833290b;margin:18px 0}.mb-card h2{margin:0 0 8px}.mb-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin:18px 0}.mb-fields.two{grid-template-columns:repeat(2,minmax(0,1fr))}.mb-field label{display:block;font-weight:750;font-size:.86rem;margin-bottom:7px}.mb-field input,.mb-field select,.mb-field textarea{box-sizing:border-box;width:100%;border:1px solid #cbd9ce;border-radius:10px;padding:12px;background:#fff;color:#19392a;font:inherit}.mb-field input:focus,.mb-field select:focus,.mb-field textarea:focus{outline:2px solid #86b657;outline-offset:1px}.mb-btn{background:#c9f27c;color:#163524;border:0;border-radius:11px;padding:13px 20px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;font:inherit;font-weight:800}.mb-btn:hover{background:#b9e768}.mb-btn.secondary{background:#e8eee8;color:#264532}.mb-btn:disabled{opacity:.55;cursor:not-allowed}.mb-actions{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:24px}.mb-room{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;padding:18px 0;border-bottom:1px solid #e5ece6}.mb-room:last-child{border-bottom:0}.mb-room h3{margin:0 0 5px;font-size:1.1rem}.mb-pill{display:inline-block;font-size:.74rem;border-radius:20px;padding:4px 9px;background:#e9f6dc;color:#315626;font-weight:800;margin-top:8px}.mb-pill.full{background:#fce9e7;color:#9b3434}.mb-qty{display:flex;align-items:center;gap:8px}.mb-qty button{width:39px;height:39px;border-radius:10px;border:1px solid #bfcfc1;background:#f6faf5;font-size:1.35rem;cursor:pointer}.mb-qty input{width:55px;text-align:center;border:1px solid #c9d6c9;border-radius:9px;padding:10px 3px;font:inherit;font-weight:800}.mb-summary{display:flex;gap:20px;justify-content:space-between;align-items:center;flex-wrap:wrap;padding:18px;border-radius:13px;background:#f0f6ed;margin-top:20px}.mb-summary strong{font-size:1.35rem}.mb-error{background:#fff1ef;border:1px solid #e8b5ad;color:#8c3027;padding:12px 16px;border-radius:12px;margin:12px 0}.mb-error ul{margin:0;padding-left:18px}.mb-hidden{display:none!important}.mb-note{font-size:.85rem;color:#617568}.mb-suggest{display:flex;align-items:end;gap:12px;flex-wrap:wrap;padding:16px;border:1px solid #d9e6d4;border-radius:14px;background:#f7fbf3;margin:16px 0}.mb-suggest .mb-field{max-width:170px}.mb-suggest-status{font-size:.87rem;color:#42614c;flex-basis:100%;margin:0}.mb-guest-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}.mb-guest-grid .wide{grid-column:1/-1}@media(max-width:720px){.mb-fields,.mb-fields.two,.mb-guest-grid{grid-template-columns:1fr}.mb-room{grid-template-columns:1fr}.mb-qty{justify-content:flex-start}.mb-wrap{margin-top:20px}.mb-actions .mb-btn{flex:1}}
+</style>
+<div class="mb-wrap">
+  <div class="mb-eyebrow">Manager workspace / Reservations</div>
+  <h1 class="mb-title">Create a reservation</h1>
+  <p class="mb-muted">Choose dates, assign available beds, then enter guest details.</p>
+  <div class="mb-steps" aria-label="Booking steps"><span class="mb-step" id="mb-step-1">1 · Dates</span><span class="mb-step" id="mb-step-2">2 · Rooms</span><span class="mb-step" id="mb-step-3">3 · Guest details</span></div>
+  {% if form.non_field_errors %}<div class="mb-error" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+  {% if form.errors %}{% for field in form %}{% if field.errors %}<div class="mb-error" role="alert"><strong>{{ field.label }}:</strong> {{ field.errors }}</div>{% endif %}{% endfor %}{% endif %}
+
+  <section class="mb-card" id="mb-dates-panel">
+    <h2>1. Select hut and dates</h2>
+    <p class="mb-muted">Find beds available for the whole stay.</p>
+    <form method="get" action="{% url 'bookings:manual_booking' %}" id="mb-search">
+      <div class="mb-fields">
+        <div class="mb-field"><label for="id_hut">Mountain hut</label><select id="id_hut" name="hut" required><option value="">Choose a hut</option>{% for h in form.hut.field.queryset %}<option value="{{ h.pk }}" {% if selected_hut.pk == h.pk %}selected{% endif %}>{{ h.name }}</option>{% endfor %}</select></div>
+        <div class="mb-field"><label for="mb-check-in">Check-in</label><input id="mb-check-in" name="check_in" type="date" min="{{ today|date:'Y-m-d' }}" value="{% if request.method == 'POST' %}{{ form.check_in.value|default_if_none:'' }}{% else %}{{ request.GET.check_in|default:'' }}{% endif %}" required></div>
+        <div class="mb-field"><label for="mb-check-out">Check-out</label><input id="mb-check-out" name="check_out" type="date" min="{{ today|date:'Y-m-d' }}" value="{% if request.method == 'POST' %}{{ form.check_out.value|default_if_none:'' }}{% else %}{{ request.GET.check_out|default:'' }}{% endif %}" required></div>
+      </div>
+      <button class="mb-btn" type="submit">Find available rooms →</button>
+    </form>
+  </section>
+
+  {% if dates_ready and selected_hut and room_rows %}
+  <form method="post" id="mb-booking" action="{% url 'bookings:manual_booking' %}" novalidate>
+    {% csrf_token %}
+    <input type="hidden" name="hut" value="{{ selected_hut.pk }}">
+    <input type="hidden" name="check_in" value="{% if request.method == 'POST' %}{{ form.check_in.value|default_if_none:'' }}{% else %}{{ request.GET.check_in }}{% endif %}">
+    <input type="hidden" name="check_out" value="{% if request.method == 'POST' %}{{ form.check_out.value|default_if_none:'' }}{% else %}{{ request.GET.check_out }}{% endif %}">
+    <section class="mb-card" id="mb-rooms-panel">
+      <h2>2. Choose beds</h2><p class="mb-muted">{{ selected_hut.name }} · Select how many beds to reserve in each room.</p>
+      <div class="mb-suggest" aria-label="Automatic room suggestion">
+        <div class="mb-field"><label for="mb-guest-count">Number of guests</label><input id="mb-guest-count" type="number" min="1" step="1" value="2" inputmode="numeric"></div>
+        <button type="button" class="mb-btn" id="mb-suggest">✦ Suggest rooms</button>
+        <button type="button" class="mb-btn secondary" id="mb-clear">Clear selection</button>
+        <p class="mb-suggest-status" id="mb-suggest-status" role="status" aria-live="polite">We'll suggest available beds while trying to use as few rooms as possible. You can adjust the result.</p>
+      </div>
+      <div class="mb-card" style="background:#f7fbf3;border-color:#d5e4d6">
+        <h3 style="margin:0 0 12px">Room locations</h3>
+        <p class="mb-muted">Choose a floor, then click a room to find its bed selector below.</p>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px"><label for="mb-floor">Floor</label><select id="mb-floor" style="padding:9px;border-radius:8px"><option value="0">Ground</option><option value="1">Floor 1</option><option value="2">Floor 2</option><option value="3">Floor 3</option><option value="-1">Basement</option></select><a href="{% url 'floorplans:editor' selected_hut.pk %}" style="margin-left:auto">Edit floor plan ↗</a></div>
+        <div id="mb-floor-grid" style="position:relative;height:360px;background:#edf5e9;border:1px solid #b8d0bb;border-radius:12px;overflow:hidden;background-image:linear-gradient(to right,#d4e4d4 1px,transparent 1px),linear-gradient(to bottom,#d4e4d4 1px,transparent 1px);background-size:6.25% 30px"></div>
+        <p class="mb-note" id="mb-floor-status">Click a room to select beds below.</p>
+      </div>
+      <script>
+      document.addEventListener('DOMContentLoaded',()=>{
+        const grid=document.getElementById('mb-floor-grid'),select=document.getElementById('mb-floor'),status=document.getElementById('mb-floor-status');if(!grid)return;
+        let rooms=[];function draw(){grid.innerHTML='';rooms.filter(r=>r.floor===Number(select.value)).forEach(r=>{const qty=document.querySelector(`[name="beds_${r.id}"]`),free=qty?Number(qty.max):0;const btn=document.createElement('button');btn.type='button';btn.style.cssText=`position:absolute;left:${r.x/16*100}%;top:${r.y*30}px;width:${r.width/16*100}%;height:${r.height*30}px;border:2px solid ${free?'#42824b':'#aa7777'};border-radius:9px;background:${free?'#d9efbd':'#eee0df'};font-weight:800;cursor:pointer;padding:3px;font-size:12px`;btn.textContent=`${r.name} · ${free} free`;btn.title=`${r.capacity} beds total · ${free} available for selected dates · ${Array.isArray(r.beds)?r.beds.length:0} bed markers mapped. Bed positions are illustrative, not individually reservable.`;btn.disabled=!qty;btn.onclick=()=>{qty.closest('.mb-room').scrollIntoView({behavior:'smooth',block:'center'});qty.focus();};grid.append(btn);});}
+        select.addEventListener('change',draw);fetch('{% url "floorplans:data" selected_hut.pk %}').then(r=>{if(!r.ok)throw Error();return r.json()}).then(d=>{rooms=d.rooms;draw()}).catch(()=>status.textContent='Floor plan unavailable. Use the room list below.');
+      });
+      </script>
+      {% for row in room_rows %}
+      <div class="mb-room">
+        <div><h3>{{ row.room.name }}</h3><div class="mb-muted">{{ row.room.price_per_night }} {{ CURRENCY }} per bed / night · {{ row.room.capacity }} total beds</div>
+          {% if row.free is not None %}{% if row.free > 0 %}<span class="mb-pill">{{ row.free }} available</span>{% else %}<span class="mb-pill full">Fully booked</span>{% endif %}{% else %}<span class="mb-pill full">Availability unavailable</span>{% endif %}
+        </div>
+        <div class="mb-qty" data-price="{{ row.room.price_per_night }}" data-free="{{ row.free|default:0 }}">
+          <button type="button" data-change="-1" aria-label="Remove one bed from {{ row.room.name }}" {% if not row.free %}disabled{% endif %}>−</button>
+          <input type="number" name="beds_{{ row.room.pk }}" aria-label="Beds in {{ row.room.name }}" min="0" max="{{ row.free|default:0 }}" step="1" value="{{ row.requested }}" {% if not row.free %}readonly{% endif %}>
+          <button type="button" data-change="1" aria-label="Add one bed to {{ row.room.name }}" {% if not row.free %}disabled{% endif %}>+</button>
+        </div>
+      </div>
+      {% empty %}<p class="mb-muted">No active rooms are configured for this hut.</p>{% endfor %}
+      <div class="mb-summary"><div><div class="mb-muted">Beds selected</div><strong id="mb-bed-count">0</strong></div><div><div class="mb-muted">Estimated booking total</div><strong><span id="mb-estimate">0.00</span> {{ CURRENCY }}</strong></div></div>
+      <p class="mb-note">Estimate based on current room prices. Final amount and availability are verified when the reservation is saved.</p>
+      <div class="mb-actions"><a href="{% url 'bookings:manual_booking' %}" class="mb-btn secondary">Start over</a><button type="button" id="mb-to-guest" class="mb-btn">Continue to guest details →</button></div>
+    </section>
+    <section class="mb-card mb-hidden" id="mb-guest-panel">
+      <h2>3. Guest details</h2><p class="mb-muted">A phone number or email is required. Reservations created here are confirmed immediately.</p>
+      <div class="mb-guest-grid">
+        <div class="mb-field wide"><label for="{{ form.name.id_for_label }}">Guest name *</label>{{ form.name }}</div>
+        <div class="mb-field"><label for="{{ form.phone.id_for_label }}">Phone</label>{{ form.phone }}</div>
+        <div class="mb-field"><label for="{{ form.email.id_for_label }}">Email</label>{{ form.email }}</div>
+        <div class="mb-field wide"><label for="{{ form.notes.id_for_label }}">Notes (optional)</label>{{ form.notes }}</div>
+      </div>
+      <div class="mb-actions"><button type="button" id="mb-back-rooms" class="mb-btn secondary">← Back to rooms</button><button type="submit" class="mb-btn">Confirm reservation ✓</button></div>
+    </section>
+  </form>
+  {% elif request.GET.check_in and request.GET.check_out and selected_hut %}
+    <div class="mb-card"><p class="mb-muted">No active rooms found for this hut, or the dates could not be validated. Review your dates and try again.</p></div>
+  {% endif %}
+  <p><a href="{% url 'bookings:dashboard' %}" class="mb-muted">← Back to dashboard</a></p>
+</div>
+<script>
+(function(){
+ const booking=document.getElementById('mb-booking'), dates=document.getElementById('mb-dates-panel'), rooms=document.getElementById('mb-rooms-panel'), guest=document.getElementById('mb-guest-panel');
+ const steps=[1,2,3].map(n=>document.getElementById('mb-step-'+n));
+ function show(n){if(dates)dates.classList.toggle('mb-hidden',n!==1);if(rooms)rooms.classList.toggle('mb-hidden',n!==2);if(guest)guest.classList.toggle('mb-hidden',n!==3);steps.forEach((el,i)=>el.classList.toggle('active',i===n-1));}
+ if(!booking){show(1);return;}
+ const quantities=[...booking.querySelectorAll('.mb-qty')];
+ const inDate=booking.querySelector('[name="check_in"]').value, outDate=booking.querySelector('[name="check_out"]').value;
+ const nights=Math.max(0,Math.round((Date.parse(outDate+'T00:00:00')-Date.parse(inDate+'T00:00:00'))/86400000));
+ function update(){let beds=0,total=0;for(const group of quantities){const input=group.querySelector('input');const max=Number(group.dataset.free)||0;let val=Number(input.value);if(!Number.isInteger(val)||val<0)val=0;val=Math.min(val,max);input.value=val;beds+=val;total+=val*(Number(group.dataset.price)||0)*nights;}document.getElementById('mb-bed-count').textContent=beds;document.getElementById('mb-estimate').textContent=total.toFixed(2);return beds;}
+ quantities.forEach(group=>{const input=group.querySelector('input');group.querySelectorAll('[data-change]').forEach(btn=>btn.addEventListener('click',()=>{input.value=(Number(input.value)||0)+Number(btn.dataset.change);update();}));input.addEventListener('input',update);});
+ const status=document.getElementById('mb-suggest-status');
+ document.getElementById('mb-suggest').addEventListener('click',()=>{
+   const countInput=document.getElementById('mb-guest-count');
+   const wanted=Number(countInput.value);
+   if(!Number.isSafeInteger(wanted)||wanted<1){status.textContent='Enter a valid number of guests (at least 1).';countInput.focus();return;}
+   const candidates=quantities.map((group,index)=>({group,index,free:Math.max(0,Number(group.dataset.free)||0),price:Number(group.dataset.price)||0}));
+   const available=candidates.reduce((sum,item)=>sum+item.free,0);
+   if(wanted>available){status.textContent=`Only ${available} beds are available for these dates. Try a smaller group or different dates.`;return;}
+   // Prefer fewer rooms; for equal capacities, prefer lower per-bed price.
+   candidates.sort((a,b)=>b.free-a.free||a.price-b.price||a.index-b.index);
+   let remaining=wanted,roomsUsed=0;
+   for(const item of candidates){const beds=Math.min(item.free,remaining);item.group.querySelector('input').value=beds;remaining-=beds;if(beds)roomsUsed++;}
+   update();status.textContent=`Suggested ${wanted} bed${wanted===1?'':'s'} across ${roomsUsed} room${roomsUsed===1?'':'s'}. Review the selection below before continuing.`;
+ });
+ document.getElementById('mb-clear').addEventListener('click',()=>{quantities.forEach(group=>group.querySelector('input').value=0);update();status.textContent='Selection cleared. Choose beds manually or suggest rooms again.';});
+ document.getElementById('mb-to-guest').addEventListener('click',()=>{if(!update()){alert('Select at least one bed to continue.');return;}show(3);});
+ document.getElementById('mb-back-rooms').addEventListener('click',()=>show(2));
+ booking.addEventListener('submit',e=>{if(!update()){e.preventDefault();show(2);alert('Select at least one bed.');return;}const name=booking.querySelector('[name="name"]');const email=booking.querySelector('[name="email"]');const phone=booking.querySelector('[name="phone"]');if(!name.value.trim()||(!email.value.trim()&&!phone.value.trim())){e.preventDefault();show(3);alert('Enter a guest name and at least a phone number or email.');}});
+ show({% if request.method == 'POST' %}3{% else %}2{% endif %});update();
+})();
+</script>
+{% endblock %}

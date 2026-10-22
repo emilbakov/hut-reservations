@@ -1,0 +1,22 @@
+[
+  {
+    "path": "bookings/manual_bookings.py",
+    "existed": true
+  },
+  {
+    "path": "floorplans/staff_new_booking.py",
+    "existed": true
+  },
+  {
+    "path": "bookings/templates/bookings/staff_booking_v121.html",
+    "existed": true
+  },
+  {
+    "path": "bookings/booking_calendar_v122.py",
+    "existed": false
+  },
+  {
+    "path": "bookings/test_booking_calendar_v122.py",
+    "existed": false
+  }
+]

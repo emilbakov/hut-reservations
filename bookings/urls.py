@@ -2,12 +2,23 @@
 from django.urls import path
 
 from . import views
+from . import public_site_v124
+from . import approval_dashboard_v127
+from . import manager_digest_preferences_v130
+from . import manager_digest_preview_v131
+from . import manager_digest_history_v132
+from .request_operations_v128 import request_export
+from .staff_auth_v117 import StaffLoginView, StaffLogoutView
 
 app_name = "bookings"
 
 urlpatterns = [
-    # Homepage — choose a hut
-    path("", views.hut_list, name="hut_list"),
+    path("staff/login/", StaffLoginView.as_view(), name="staff_login"),
+    path("staff/logout/", StaffLogoutView.as_view(), name="staff_logout"),
+    # Public role selection and preserved hut directory
+    path("", public_site_v124.public_home, name="public_home"),
+    path("welcome/", views.role_landing, name="role_landing"),
+    path("huts/", public_site_v124.public_huts, name="hut_list"),
 
     # Booking page for a specific hut
     path("huts/<slug:slug>/", views.hut_detail, name="hut_detail"),
@@ -38,6 +49,15 @@ urlpatterns = [
         views.reservation_cancel,
         name="cancel",
     ),
+
+    # Guest request CSV export (same manager scope as dashboard)
+    path("staff/reservations/requests/export/", request_export, name="request_export"),
+
+    # Guest requests approval dashboard
+    path("staff/reservations/requests/", approval_dashboard_v127.approval_dashboard, name="approval_dashboard"),
+    path("staff/settings/reminders/", manager_digest_preferences_v130.manager_digest_preferences, name="manager_digest_preferences"),
+    path("staff/settings/reminders/preview/", manager_digest_preview_v131.manager_digest_preview, name="manager_digest_preview"),
+    path("staff/settings/reminders/history/", manager_digest_history_v132.manager_digest_history, name="manager_digest_history"),
 
     # Hut manager reservation management
     path("staff/reservations/", views.manager_reservations, name="manager_reservations"),
@@ -124,14 +144,19 @@ urlpatterns += [
     path('staff/deposits/lifecycle/', lifecycle_dashboard, name='lifecycle_dashboard'),
 ]
 
+from . import conversations_v134
 from .communications import communications_dashboard
 urlpatterns += [
     path('staff/communications/', communications_dashboard, name='communications_dashboard'),
+    path('staff/communications/inbox/', conversations_v134.conversation_inbox, name='conversation_inbox'),
+    path('staff/communications/quick-replies/', conversations_v134.quick_replies, name='quick_replies'),
+    path('staff/communications/reservations/<str:code>/', conversations_v134.conversation_thread, name='conversation_thread'),
 ]
 
 from .self_service import guest_self_service, guest_requests_dashboard
 urlpatterns += [
     path('guest/manage/<str:token>/', guest_self_service, name='guest_self_service'),
+    path('guest/manage/<str:token>/messages/', conversations_v134.guest_send_message, name='guest_send_message'),
     path('staff/guest-requests/', guest_requests_dashboard, name='guest_requests_dashboard'),
 ]
 

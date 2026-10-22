@@ -1,31 +1,86 @@
 {% extends "bookings/base.html" %}
-{% block title %}Deposit deadlines{% endblock %}
+{% block title %}Deposits &amp; payment deadlines{% endblock %}
 {% block content %}
-<p><a href="{% url 'bookings:lifecycle_dashboard' %}">Deposit lifecycle &amp; audit log →</a></p>
-<div class="eyebrow">STAFF / DEPOSITS</div>
-<h1>Deposits &amp; payment deadlines</h1>
-<p><a href="{% url 'bookings:manager_reservations' %}">← Reservations</a> · <a href="{% url 'bookings:financial_dashboard' %}">Financial dashboard</a></p>
-<section class="card">
-<form method="get"><label for="hut">Mountain hut</label><select id="hut" name="hut">
-{% if not manager_mode %}<option value="">All huts</option>{% endif %}
-{% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_slug == hut.slug %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}
-</select><button type="submit">Show</button></form>
-</section>
-{% if selected_hut %}
-<section class="card"><h2>Deposit policy — {{ selected_hut.name }}</h2>
-<form method="post">{% csrf_token %}
-<input type="hidden" name="hut_id" value="{{ selected_hut.pk }}">
-<label for="percentage">Deposit percentage</label><input id="percentage" name="percentage" type="number" min="0" max="100" value="{% if policy %}{{ policy.percentage }}{% else %}30{% endif %}" required>
-<label for="due_days">Days after booking until due</label><input id="due_days" name="due_days" type="number" min="0" max="365" value="{% if policy %}{{ policy.due_days }}{% else %}3{% endif %}" required>
-<label><input type="checkbox" name="reminders_enabled" {% if policy.reminders_enabled or not policy %}checked{% endif %}> Enable email reminders</label>
-<button type="submit">Save policy</button></form>
-<p><small>Changes also affect existing bookings. Deadline is measured from the reservation creation date.</small></p>
-</section>
-{% endif %}
-<section class="card"><h2>Awaiting deposit: {{ total_awaiting }} · Overdue: {{ overdue_count }}</h2>
-<p><small>Only active reservations with an unpaid deposit appear. The list shows the first 200; narrow by hut if needed.</small></p>
-<div class="table-wrap"><table><thead><tr><th>Guest</th><th>Arrival</th><th>Deposit due</th><th>Required</th><th>Received (net)</th><th>Remaining</th><th>Status</th><th>Action</th></tr></thead><tbody>
-{% for row in rows %}<tr><td>{{ row.reservation.name }}<br><small>{{ row.reservation.code }}</small></td><td>{{ row.reservation.check_in }}</td><td>{{ row.due_date }}</td><td>{{ row.target|floatformat:2 }} {{ currency }}</td><td>{{ row.net_paid|floatformat:2 }} {{ currency }}</td><td>{{ row.remaining|floatformat:2 }} {{ currency }}</td><td>{% if row.overdue %}<strong>Overdue</strong>{% else %}Awaiting{% endif %}</td><td><a href="{% url 'bookings:reservation_payments' row.reservation.code %}">Payments</a></td></tr>
-{% empty %}<tr><td colspan="8">No deposits awaiting payment.</td></tr>{% endfor %}
-</tbody></table></div></section>
+<style>
+  .dd-page{--dd-forest:#143e34;--dd-deep:#102c28;--dd-lime:#d8f17d;--dd-text:#233b33;--dd-muted:#62746c;--dd-line:#e0e8e2;--dd-surface:#fff;color:var(--dd-text);max-width:1440px;margin:0 auto;padding:clamp(12px,2vw,28px) 0 55px}
+  .dd-page *{box-sizing:border-box}.dd-page a{color:inherit}.dd-hero{background:linear-gradient(125deg,#102c28,#1c5545);color:#fff;border-radius:24px;padding:clamp(24px,4vw,44px);position:relative;overflow:hidden}.dd-hero:after{content:"";position:absolute;width:280px;height:280px;right:-100px;top:-140px;border:55px solid rgba(216,241,125,.1);border-radius:50%;pointer-events:none}.dd-eyebrow{text-transform:uppercase;letter-spacing:.16em;font-size:.72rem;font-weight:800;color:var(--dd-lime);margin:0 0 12px}.dd-hero h1{color:#fff;font-size:clamp(1.8rem,4vw,3rem);line-height:1.12;margin:0 0 12px}.dd-hero p{color:#d6e6dd;max-width:700px;margin:0 0 22px}.dd-nav{display:flex;gap:9px;flex-wrap:wrap}.dd-nav a{border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:10px 14px;text-decoration:none;color:#fff;font-size:.88rem;font-weight:700}.dd-nav a:hover{background:rgba(255,255,255,.12)}.dd-nav a.dd-accent{background:var(--dd-lime);border-color:var(--dd-lime);color:#17352b}
+  .dd-card{background:var(--dd-surface);border:1px solid var(--dd-line);border-radius:19px;padding:clamp(18px,2.5vw,27px);margin-top:20px;box-shadow:0 8px 25px rgba(20,62,52,.035)}.dd-card h2{font-size:1.16rem;margin:0 0 10px;color:var(--dd-deep)}.dd-sub{font-size:.9rem;color:var(--dd-muted);line-height:1.6;margin:0 0 20px}.dd-filter{display:flex;align-items:end;flex-wrap:wrap;gap:14px}.dd-field{flex:1;min-width:190px}.dd-page label{display:block;font-weight:700;font-size:.87rem;margin-bottom:8px}.dd-page select,.dd-page input[type=number]{width:100%;min-height:46px;padding:10px 13px;background:#fbfdfb;border:1px solid #cbd9ce;border-radius:10px;color:var(--dd-deep);font:inherit}.dd-page input:focus,.dd-page select:focus{outline:3px solid rgba(137,179,75,.25);border-color:#6e9e53}.dd-btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:10px 20px;border:0;border-radius:10px;background:var(--dd-forest);color:#fff!important;font:inherit;font-weight:750;cursor:pointer;text-decoration:none}.dd-btn:hover{background:#23624c}.dd-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:20px}.dd-stat{background:#fff;border:1px solid var(--dd-line);border-radius:18px;padding:24px}.dd-stat span{display:block;color:var(--dd-muted);font-size:.88rem;font-weight:700}.dd-stat strong{display:block;font-size:clamp(2rem,4vw,2.8rem);line-height:1.2;margin-top:8px;color:var(--dd-deep)}.dd-stat.dd-alert{background:#fff7f2;border-color:#f3d2c3}.dd-stat.dd-alert strong{color:#ad3e22}.dd-layout{display:grid;grid-template-columns:minmax(280px,.85fr) minmax(0,1.5fr);gap:20px;align-items:start}.dd-policy-form{display:grid;gap:16px}.dd-check{display:flex!important;align-items:center;gap:10px;cursor:pointer;margin:0!important}.dd-check input{width:18px;height:18px;accent-color:var(--dd-forest)}.dd-note{margin:17px 0 0;padding:13px 15px;border-radius:10px;background:#fff9e9;color:#735323;font-size:.86rem;line-height:1.55}.dd-table-wrap{overflow-x:auto;max-width:100%;border:1px solid var(--dd-line);border-radius:13px}.dd-table{border-collapse:collapse;width:100%;min-width:900px;background:#fff;font-size:.89rem}.dd-table th{background:#f2f7f2;color:#456052;text-align:left;font-size:.75rem;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}.dd-table th,.dd-table td{padding:15px 13px;border-bottom:1px solid #e8eee9;vertical-align:middle}.dd-table tbody tr:last-child td{border-bottom:0}.dd-table tbody tr:hover{background:#fbfdfb}.dd-table .dd-guest{font-weight:800;color:var(--dd-deep)}.dd-table small{display:block;color:var(--dd-muted);margin-top:3px}.dd-money{font-variant-numeric:tabular-nums;white-space:nowrap}.dd-remaining{font-weight:800}.dd-status{display:inline-block;padding:6px 10px;border-radius:999px;background:#f0f5e7;color:#496b30;font-weight:800;font-size:.76rem;white-space:nowrap}.dd-status.dd-overdue{background:#ffe6dd;color:#a43a1e}.dd-link{font-weight:800;color:#1a5e48!important;text-decoration:none;white-space:nowrap}.dd-link:hover{text-decoration:underline}.dd-empty{text-align:center;padding:38px!important;color:var(--dd-muted)}.dd-section-top{display:flex;justify-content:space-between;align-items:start;gap:12px;flex-wrap:wrap}.dd-hint{font-size:.83rem;color:var(--dd-muted);margin:4px 0 15px}
+  @media(max-width:1050px){.dd-layout{grid-template-columns:1fr}}@media(max-width:600px){.dd-stats{grid-template-columns:1fr}.dd-hero{border-radius:18px}.dd-card{border-radius:16px}.dd-filter .dd-btn{width:100%}}
+</style>
+<div class="dd-page">
+  <header class="dd-hero">
+    <div class="dd-eyebrow">Staff / Payment management</div>
+    <h1>Deposits &amp; payment deadlines</h1>
+    <p>Track outstanding deposits, review overdue reservations, and manage payment policies for your mountain huts.</p>
+    <nav class="dd-nav" aria-label="Staff navigation">
+      <a href="{% url 'bookings:dashboard' %}">← Operations</a>
+      <a href="{% url 'bookings:manager_reservations' %}">Reservations</a>
+      <a href="{% url 'bookings:financial_dashboard' %}">Financial dashboard</a>
+      <a class="dd-accent" href="{% url 'bookings:lifecycle_dashboard' %}">Deposit lifecycle &amp; audit log ↗</a>
+    </nav>
+  </header>
+
+  <section class="dd-card" aria-labelledby="dd-filter-title">
+    <h2 id="dd-filter-title">Select mountain hut</h2>
+    <form class="dd-filter" method="get">
+      <div class="dd-field">
+        <label for="hut">Mountain hut</label>
+        <select id="hut" name="hut">
+          {% if not manager_mode %}<option value="">All huts</option>{% endif %}
+          {% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_slug == hut.slug %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}
+        </select>
+      </div>
+      <button class="dd-btn" type="submit">Show deposits →</button>
+    </form>
+  </section>
+
+  <div class="dd-stats" aria-label="Deposit overview">
+    <div class="dd-stat"><span>Reservations awaiting deposit</span><strong>{{ total_awaiting }}</strong></div>
+    <div class="dd-stat dd-alert"><span>Overdue deposits</span><strong>{{ overdue_count }}</strong></div>
+  </div>
+
+  <div class="dd-layout">
+    {% if selected_hut %}
+    <section class="dd-card" aria-labelledby="dd-policy-title">
+      <h2 id="dd-policy-title">Deposit policy</h2>
+      <p class="dd-sub">Settings for <strong>{{ selected_hut.name }}</strong></p>
+      <form class="dd-policy-form" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="hut_id" value="{{ selected_hut.pk }}">
+        <div><label for="percentage">Deposit percentage (%)</label><input id="percentage" name="percentage" type="number" min="0" max="100" value="{% if policy %}{{ policy.percentage }}{% else %}30{% endif %}" required></div>
+        <div><label for="due_days">Days after booking until due</label><input id="due_days" name="due_days" type="number" min="0" max="365" value="{% if policy %}{{ policy.due_days }}{% else %}3{% endif %}" required></div>
+        <label class="dd-check"><input type="checkbox" name="reminders_enabled" {% if policy.reminders_enabled or not policy %}checked{% endif %}> Enable email reminders</label>
+        <button class="dd-btn" type="submit">Save deposit policy</button>
+      </form>
+      <p class="dd-note"><strong>Important:</strong> Changes also affect existing bookings. Deposit deadlines are calculated from the reservation creation date.</p>
+    </section>
+    {% endif %}
+
+    <section class="dd-card" aria-labelledby="dd-outstanding-title">
+      <div class="dd-section-top"><div><h2 id="dd-outstanding-title">Outstanding deposits</h2><p class="dd-sub">Review deadlines and open the reservation payment record to take action.</p></div></div>
+      <p class="dd-hint">Only active reservations with an unpaid deposit are shown. The list is limited to the first 200; filter by hut to narrow results.</p>
+      <div class="dd-table-wrap">
+        <table class="dd-table">
+          <thead><tr><th scope="col">Guest</th><th scope="col">Arrival</th><th scope="col">Deposit due</th><th scope="col">Required</th><th scope="col">Received (net)</th><th scope="col">Remaining</th><th scope="col">Status</th><th scope="col">Action</th></tr></thead>
+          <tbody>
+          {% for row in rows %}
+            <tr>
+              <td><span class="dd-guest">{{ row.reservation.name }}</span><small>{{ row.reservation.code }}</small></td>
+              <td>{{ row.reservation.check_in }}</td>
+              <td>{{ row.due_date }}</td>
+              <td class="dd-money">{{ row.target|floatformat:2 }} {{ currency }}</td>
+              <td class="dd-money">{{ row.net_paid|floatformat:2 }} {{ currency }}</td>
+              <td class="dd-money dd-remaining">{{ row.remaining|floatformat:2 }} {{ currency }}</td>
+              <td>{% if row.overdue %}<span class="dd-status dd-overdue">Overdue</span>{% else %}<span class="dd-status">Awaiting</span>{% endif %}</td>
+              <td><a class="dd-link" href="{% url 'bookings:reservation_payments' row.reservation.code %}">View payments →</a></td>
+            </tr>
+          {% empty %}
+            <tr><td class="dd-empty" colspan="8">No deposits awaiting payment.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</div>
 {% endblock %}

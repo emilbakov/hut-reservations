@@ -1,24 +1,24 @@
-WEEKLY DRAG & DROP RESERVATION CALENDAR
-Requires Availability Calendar and Interactive Calendar modules.
+SummitDesk v37 — Staff Hub Daily Overview
 
-Back up your project and database first. Upload ZIP to Django project root:
-  unzip -o drag_drop_calendar.zip
-  python install_drag_drop_calendar.py
-  python manage.py check
-  python manage.py test bookings.test_calendar_drag
-  python manage.py test bookings
-  sudo systemctl restart gunicorn
+Adds a manager-only daily confirmed booking snapshot to the existing Staff Hub.
+It preserves existing v36 links, operations, and cleaner task views.
 
-Open /staff/availability/week/ or click the link in monthly availability calendar.
+INSTALL
+1. Upload summitdesk_v37.zip to /home/deploy/hut-reservations/
+2. SSH to the server, cd /home/deploy/hut-reservations
+3. unzip -o summitdesk_v37.zip
+4. python3 install_v37.py
+5. Activate your virtualenv and PostgreSQL environment as usual.
+6. python manage.py check
+7. sudo systemctl restart gunicorn.service
+8. Open /staff/floorplans/3/hub/
 
-Drag a booking to a different date or room in the SAME hut. A separate confirmation
-page appears; changes only happen after pressing Confirm move. The existing
-modify_reservation service validates capacity and writes changes.
+No migrations. No reservation data changes. The installer creates a backup
+folder named v37_backup_YYYYMMDD_HHMMSS before changing existing files.
+The installer aborts if it cannot identify the expected v27/v36 code markers.
 
-Limitations: single-room bookings only; preserves duration and bed count;
-no automated email or refund; dragging does not work on touch-only devices,
-but the existing edit form is available. Reservations that begin before the
-visible week can be opened via the existing calendar instead.
-
-SECURITY: CSRF protection on POST; staff login and hut scoping on all endpoints;
-no cross-hut moves; service-side availability checks on submission.
+NOTES
+- Current active rooms only, same scope as v34/v35.
+- Confirmed nightly value is NOT payment revenue.
+- The existing hub's top occupancy figures include pending holds;
+  the new snapshot is confirmed-only.

@@ -1,0 +1,10 @@
+SummitDesk v136 — local validation
+
+- Django template parsed and rendered with representative monthly room/booking context.
+- Desktop 1440px and mobile 390px screenshots generated with Chromium.
+- Mobile viewport: no document-level horizontal overflow; calendar scrolls within its region.
+- Preflight, install, rollback preview, and rollback verified in an isolated project copy.
+- Verified installer refuses unexpected original-file modifications and rollback refuses
+  post-install changes (see local validation output).
+- Full Django database integration tests MUST run on the user's Ubuntu server; local
+  vendor Django distribution lacks django.contrib.staticfiles and cannot run project tests.

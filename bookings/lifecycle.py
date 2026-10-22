@@ -60,7 +60,9 @@ def lifecycle_dashboard(request):
                     policy.save(update_fields=["grace_days", "auto_cancel_enabled"] if request.user.is_superuser else ["grace_days"])
                 messages.success(request, "Lifecycle policy saved.")
                 return redirect("bookings:lifecycle_dashboard")
-    qs = manageable_reservations(request.user).filter(status__in=Reservation.HOLDING)
+    qs = manageable_reservations(request.user).filter(status__in=Reservation.HOLDING).exclude(
+        status=Reservation.Status.PENDING, guest_request=True
+    )
     if selected_hut:
         qs = qs.filter(items__room__hut=selected_hut)
     rows = []
@@ -87,7 +89,9 @@ def process_lifecycle(*, dry_run=False, allow_cancellation=False, today=None, ou
     """Idempotent and lock-protected. No emails; existing reminder job handles email."""
     today = today or timezone.localdate()
     warned = cancelled = skipped = 0
-    candidates = Reservation.objects.filter(status__in=Reservation.HOLDING).values_list("pk", flat=True)
+    candidates = Reservation.objects.filter(status__in=Reservation.HOLDING).exclude(
+        status=Reservation.Status.PENDING, guest_request=True
+    ).values_list("pk", flat=True)
     for pk in candidates.iterator():
         with transaction.atomic():
             reservation = Reservation.objects.select_for_update().get(pk=pk)

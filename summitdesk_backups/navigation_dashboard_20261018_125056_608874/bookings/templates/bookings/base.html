@@ -1,0 +1,91 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#142b24">
+  <title>{% block title %}Mountain adventures{% endblock %} · {{ HUT_NAME }}</title>
+  <link rel="stylesheet" href="{% static 'bookings/site.css' %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    /* Shared shell only: deliberately avoids changing the individual page layouts. */
+    .site-header.adventure-header{position:relative;z-index:50;background:#142b24;color:#f6f9f2;border-bottom:1px solid rgba(255,255,255,.12);box-shadow:0 6px 24px rgba(14,32,25,.10)}
+    .adventure-header .header-inner{display:flex;align-items:center;justify-content:space-between;gap:1.5rem;min-height:82px;padding-top:12px;padding-bottom:12px}
+    .adventure-header .brand{display:inline-flex;align-items:center;gap:12px;min-width:0;color:#fff;text-decoration:none;font-family:Outfit, sans-serif;font-weight:800;font-size:1.18rem;line-height:1.15;letter-spacing:-.025em}
+    .adventure-header .brand:hover{color:#fff}
+    .adventure-header .brand-icon{display:grid;place-items:center;flex:none;width:43px;height:43px;border-radius:13px;background:#c9ef71;color:#183126;font-size:1.35rem;box-shadow:0 4px 12px rgba(0,0,0,.13)}
+    .adventure-header .brand small{display:block;margin-top:5px;color:#c1d2c9;font-family:'DM Sans',sans-serif;font-size:.59rem;font-weight:800;letter-spacing:.16em;white-space:nowrap}
+    .adventure-header .desktop-nav{display:flex;align-items:center;gap:clamp(12px,2vw,28px)}
+    .adventure-header .desktop-nav a{color:#e6eee9;text-decoration:none;font-weight:700;font-size:.88rem;white-space:nowrap;transition:color .15s}
+    .adventure-header .desktop-nav a:hover,.adventure-header .desktop-nav a:focus-visible{color:#c9ef71}
+    .adventure-header .desktop-nav .nav-cta{display:inline-flex;align-items:center;gap:9px;padding:12px 17px;border-radius:12px;background:#c9ef71;color:#183126;font-weight:800}
+    .adventure-header .desktop-nav .nav-cta:hover{background:#ddf9a1;color:#183126}
+    .adventure-header .mobile-menu{display:none;position:relative;margin-left:auto}
+    .adventure-header .mobile-menu summary{display:flex;align-items:center;justify-content:center;gap:8px;list-style:none;cursor:pointer;border:1px solid rgba(255,255,255,.25);border-radius:12px;padding:10px 14px;font-size:.88rem;font-weight:800;color:#fff;user-select:none}
+    .adventure-header .mobile-menu summary::-webkit-details-marker{display:none}
+    .adventure-header .mobile-menu summary:focus-visible,.adventure-header a:focus-visible{outline:3px solid #c9ef71;outline-offset:3px}
+    .adventure-header .mobile-menu[open] summary{background:#24483b}
+    .adventure-header .mobile-nav{position:absolute;top:calc(100% + 12px);right:0;min-width:min(300px,calc(100vw - 32px));padding:10px;background:#19372d;border:1px solid #456456;border-radius:16px;box-shadow:0 18px 35px rgba(0,0,0,.26);display:flex;flex-direction:column;gap:3px}
+    .adventure-header .mobile-nav a{display:block;padding:12px 14px;color:#f4f8f4;text-decoration:none;border-radius:9px;font-size:.95rem;font-weight:700}
+    .adventure-header .mobile-nav a:hover,.adventure-header .mobile-nav a:focus-visible{background:#2c5041;color:#d7f69a}
+    .adventure-header .mobile-nav .mobile-cta{margin-top:5px;background:#c9ef71;color:#173025;text-align:center}
+    .adventure-header .mobile-nav .mobile-cta:hover{background:#ddf9a1;color:#173025}
+    .adventure-footer.site-footer{margin-top:64px;background:#142b24;color:#e5eee7;border-top:4px solid #c9ef71}
+    .adventure-footer .footer-inner{display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;padding-top:32px;padding-bottom:32px}
+    .adventure-footer strong{display:block;color:#fff;font-family:Outfit,sans-serif;font-size:1.2rem;font-weight:800}
+    .adventure-footer small{display:block;margin-top:5px;color:#b9ccc1;font-size:.84rem}
+    .adventure-footer .footer-tagline{color:#b9ccc1;font-size:.85rem;font-weight:600}
+    .adventure-footer .footer-tagline span{color:#c9ef71;padding:0 5px}
+    @media(max-width:900px){.adventure-header .desktop-nav{display:none}.adventure-header .mobile-menu{display:block}}
+    @media(max-width:540px){.adventure-header .header-inner{min-height:72px;gap:8px}.adventure-header .brand{font-size:1rem;gap:9px}.adventure-header .brand-icon{width:38px;height:38px;border-radius:11px}.adventure-header .brand small{font-size:.49rem;letter-spacing:.10em}.adventure-header .mobile-menu summary{padding:9px 11px}.adventure-footer .footer-inner{align-items:flex-start;flex-direction:column;gap:16px}}
+    @media(prefers-reduced-motion:reduce){.adventure-header .desktop-nav a{transition:none}}
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <header class="site-header adventure-header">
+    <div class="shell header-inner">
+      <a class="brand" href="{% url 'bookings:hut_list' %}" aria-label="{{ HUT_NAME }} — home">
+        <span class="brand-icon" aria-hidden="true">▲</span>
+        <span>{{ HUT_NAME }}<small>GO BEYOND THE ORDINARY</small></span>
+      </a>
+      <nav class="desktop-nav" aria-label="Main navigation">
+        <a href="{% url 'bookings:hut_list' %}">Explore huts</a>
+        <a href="{% url 'bookings:hut_list' %}#how-it-works">How it works</a>
+        {% if request.user.is_staff %}
+        <a href="{% url 'bookings:dashboard' %}">Dashboard</a>
+        <a href="{% url 'admin:index' %}">Admin</a>
+        {% endif %}
+        <a class="nav-cta" href="{% url 'bookings:hut_list' %}#explore">Find your stay <span aria-hidden="true">↗</span></a>
+      </nav>
+      <details class="mobile-menu">
+        <summary aria-label="Toggle navigation">☰ <span>Menu</span></summary>
+        <nav class="mobile-nav" aria-label="Mobile navigation">
+          <a href="{% url 'bookings:hut_list' %}">Explore huts</a>
+          <a href="{% url 'bookings:hut_list' %}#how-it-works">How it works</a>
+          {% if request.user.is_staff %}
+          <a href="{% url 'bookings:dashboard' %}">Dashboard</a>
+          <a href="{% url 'admin:index' %}">Admin</a>
+          {% endif %}
+          <a class="mobile-cta" href="{% url 'bookings:hut_list' %}#explore">Find your stay ↗</a>
+        </nav>
+      </details>
+    </div>
+  </header>
+  <main id="main-content" class="shell">
+    {% for message in messages %}
+    <p class="notice" role="status">{{ message }}</p>
+    {% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="site-footer adventure-footer">
+    <div class="shell footer-inner">
+      <div><strong>{{ HUT_NAME }}</strong><small>Wild places. Good nights. Great stories.</small></div>
+      <div class="footer-tagline">Made for the mountains <span aria-hidden="true">✳</span> Built for adventure</div>
+    </div>
+  </footer>
+</body>
+</html>

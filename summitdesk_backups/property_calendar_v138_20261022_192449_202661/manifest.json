@@ -1,0 +1,19 @@
+{
+  "version": "v138-property",
+  "originals": {
+    "floorplans/staff_calendar.py": "ee3247d9b8072f07131e305ed9b0a7fcfdb9e3012f1cc1f90512e3d3478de9fd",
+    "floorplans/templates/floorplans/staff_calendar.html": "327822394874ddd6f945b564f4c290045f6e87ce473c70455c851950a74ba690"
+  },
+  "installed": {
+    "floorplans/staff_calendar.py": "e668afc819ac7b4ffa2aa653efa644118511a1cb6c6ade51cc9f22fea57e7aef",
+    "floorplans/templates/floorplans/staff_calendar.html": "da3ae851ac5d0fff17793280fb1a2bc5ac29b40a9c59e100b55e48806e5108bc",
+    "floorplans/property_calendar_v138.py": "ded23956be73a88d7e3286523ee5586bef0958328be55e80576bcd482e1f92bb",
+    "floorplans/templates/floorplans/property_calendar_v138.html": "5dd0a0b89b3eeba1cb941962b7a9dceef38634fe99f8e47e0e6738c36981f090",
+    "floorplans/test_property_calendar_v138.py": "f8e5f24ef4f00fc36269bdd09d345606355d4a5034c8e87bce22c960d5adba43"
+  },
+  "created": [
+    "floorplans/property_calendar_v138.py",
+    "floorplans/templates/floorplans/property_calendar_v138.html",
+    "floorplans/test_property_calendar_v138.py"
+  ]
+}

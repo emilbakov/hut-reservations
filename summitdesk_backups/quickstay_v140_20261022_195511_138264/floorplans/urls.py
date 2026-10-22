@@ -1,0 +1,162 @@
+from django.urls import path
+from . import views
+from . import bed_management as bm
+from . import visual_beds as vb
+from . import bed_markers as bm8
+from . import staff_calendar as sc11
+from . import staff_arrivals as ops13
+from . import staff_overview as ov14
+from . import staff_new_booking as nb15
+from . import staff_reservation as sr16
+from . import staff_transfer as tr18
+from . import staff_housekeeping as hk21
+from . import staff_tasks as tasks23
+from . import staff_tasks as team24
+from . import staff_invitations as invitations26
+from . import staff_hub as hub27
+from . import staff_home as home28
+from . import staff_search as search30
+from . import staff_history as history31
+from . import staff_audit_dashboard as audit33
+from . import staff_analytics as analytics34
+from . import staff_financial_analytics as finance35
+
+app_name = "floorplans"
+urlpatterns = [
+    path("<int:hut_id>/edit/", views.editor, name="editor"),
+    path("<int:hut_id>/data/", views.data, name="data"),
+    path("<int:hut_id>/save/", views.save, name="save"),
+    path("<int:hut_id>/availability/", views.availability, name="availability"),
+
+    path("<int:hut_id>/availability-map/",views.availability_map,name="availability_map", ),
+
+    path(
+    "<int:hut_id>/rooms/<int:room_id>/reservations/",
+    views.room_reservations,
+    name="room_reservations",
+    ),
+
+    path("<int:hut_id>/beds/", bm.bed_manager, name="bed_manager"),
+    path("<int:hut_id>/rooms/<int:room_id>/beds/data/", bm.bed_data, name="bed_data"),
+    path("<int:hut_id>/rooms/<int:room_id>/beds/initialize/", bm.initialize_beds, name="initialize_beds"),
+    path("<int:hut_id>/rooms/<int:room_id>/beds/assign/", bm.assign_bed, name="assign_bed"),
+    path("<int:hut_id>/rooms/<int:room_id>/beds/unassign/", bm.unassign_bed, name="unassign_bed"),
+    path("<int:hut_id>/rooms/<int:room_id>/beds/close/", bm.close_bed, name="close_bed"),
+    path("<int:hut_id>/rooms/<int:room_id>/beds/reopen/", bm.reopen_bed, name="reopen_bed"),
+
+    path(
+    "<int:hut_id>/visual-beds/",
+    vb.visual_beds,
+    name="visual_beds",
+    ),
+
+    path("<int:hut_id>/bed-layout/", bm8.layout_page, name="bed_layout"),
+    path("<int:hut_id>/rooms/<int:room_id>/markers/", bm8.markers, name="bed_markers"),
+    path("<int:hut_id>/rooms/<int:room_id>/markers/save/", bm8.save_markers, name="save_bed_markers"),
+
+    path(
+    "<int:hut_id>/calendar/",
+    sc11.staff_calendar,
+    name="staff_calendar",
+    ),
+
+    path(
+    "<int:hut_id>/arrivals/",
+    ops13.staff_arrivals,
+    name="staff_arrivals",
+    ),
+
+    path(
+    "<int:hut_id>/overview/",
+    ov14.staff_overview,
+    name="staff_overview",
+    ),
+
+    path(
+    "<int:hut_id>/new-booking/",
+    nb15.staff_new_booking,
+    name="staff_new_booking",
+    ),
+
+    path(
+    "<int:hut_id>/reservations/<str:code>/",
+    sr16.staff_reservation,
+    name="staff_reservation",
+    ),
+
+    path(
+    "<int:hut_id>/reservations/<str:code>/transfer/",
+    tr18.review_transfer,
+    name="review_transfer",
+    ),
+
+    path(
+    "<int:hut_id>/housekeeping/",
+    hk21.staff_housekeeping,
+    name="staff_housekeeping",
+    ),
+
+    path(
+    "<int:hut_id>/cleaning-tasks/",
+    tasks23.staff_tasks,
+    name="staff_tasks",
+    ),
+
+    path(
+    "<int:hut_id>/cleaning-team/",
+    team24.cleaner_team,
+    name="cleaner_team",
+    ),
+
+    path(
+    "<int:hut_id>/cleaning-invitations/",
+    invitations26.cleaner_invitations,
+    name="cleaner_invitations",
+    ),
+    path(
+        "cleaning-join/<str:token>/",
+        invitations26.cleaner_accept_invite,
+        name="cleaner_accept_invite",
+    ),
+
+    path(
+    "<int:hut_id>/hub/",
+    hub27.staff_hub,
+    name="staff_hub",
+    ),
+
+    path(
+    "",
+    home28.staff_home,
+    name="staff_home",
+    ),
+
+    path(
+    "<int:hut_id>/search/",
+    search30.staff_search,
+    name="staff_search",
+    ),
+
+    path(
+    "<int:hut_id>/reservations/<str:code>/history/",
+    history31.staff_history,
+    name="staff_history",
+    ),
+
+    path(
+    "<int:hut_id>/audit/",
+    audit33.staff_audit_dashboard,
+    name="staff_audit_dashboard",
+    ),
+
+    path(
+    "<int:hut_id>/analytics/",
+    analytics34.staff_analytics,
+    name="staff_analytics",
+    ),
+    path(
+    "<int:hut_id>/financial-analytics/",
+    finance35.staff_financial_analytics,
+    name="staff_financial_analytics",
+    ),
+]    

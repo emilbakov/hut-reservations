@@ -1,0 +1,19 @@
+{% if manager %}
+<!-- V38_FORECAST_START -->
+<section class="section card" aria-labelledby="v38-forecast-title">
+  <h2 id="v38-forecast-title">Next 7 days · Operations forecast</h2>
+  <p class="muted">Confirmed and pending bed places, expected arrivals/departures, closures and scheduled cleaning tasks. Arrivals/departures count bed places, not individual guests.</p>
+  <div style="overflow-x:auto">
+    <table style="width:100%;min-width:780px;border-collapse:collapse;text-align:left">
+      <thead><tr><th scope="col">Day</th><th scope="col">Confirmed beds</th><th scope="col">Pending beds</th><th scope="col">Free beds</th><th scope="col">Arrivals</th><th scope="col">Departures</th><th scope="col">Closed beds</th><th scope="col">Cleaning tasks</th></tr></thead>
+      <tbody>{% for day in forecast_v38 %}
+        <tr style="border-top:1px solid #dce7dc">
+          <th scope="row" style="padding:11px 6px">{{ day.day|date:"D, j M" }}</th>
+          <td>{{ day.occupied }} / {{ day.available_capacity }}</td><td>{{ day.pending }}</td><td>{{ day.free }}</td><td>{{ day.arrivals }}</td><td>{{ day.departures }}</td><td>{{ day.closed }}</td><td>{{ day.tasks }}</td>
+        </tr>{% if day.over_capacity %}<tr><td colspan="8" style="color:#a22">Warning: booked/held places exceed available capacity for this day.</td></tr>{% endif %}
+      {% endfor %}</tbody>
+    </table>
+  </div>
+</section>
+<!-- V38_FORECAST_END -->
+{% endif %}

@@ -1,66 +1,172 @@
 {% extends "bookings/base.html" %}
 {% block title %}Manage hut reservations{% endblock %}
 {% block content %}
-<p><a href="{% url 'bookings:availability_calendar' %}">Availability calendar</a></p>
-<p><a href="{% url 'bookings:guest_link_controls' %}">Guest access links</a></p>
-<p><a href="{% url 'bookings:guest_requests_dashboard' %}">Guest change &amp; cancellation requests</a></p>
-<p><a href="{% url 'bookings:communications_dashboard' %}">Guest communications &amp; message history</a></p>
-<p><a href="{% url 'bookings:deposit_dashboard' %}">Deposit deadlines &amp; overdue payments</a></p>
-<div class="eyebrow">STAFF / RESERVATIONS</div>
-<h1>Hut reservations</h1>
-<p class="lead">Review, confirm, and cancel reservations for your permitted huts.</p>
-<p><a href="{% url 'bookings:dashboard' %}">← Operations dashboard</a> · <a href="{% url 'bookings:manual_booking' %}{% if selected_slug %}?hut={{ selected_slug|urlencode }}{% endif %}" class="button">+ New Reservation</a></p>
-<section class="card">
-<form method="get">
-  <label for="hut">Mountain hut</label>
-  <select name="hut" id="hut">
-    {% if not manager_mode %}<option value="">All huts</option>{% endif %}
-    {% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_slug == hut.slug %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}
-  </select>
-  <label for="q">Guest, email or reference</label>
-  <input id="q" type="search" name="q" value="{{ q }}" maxlength="120">
-  <label for="status">Status</label>
-  <select name="status" id="status">
-    <option value="">All statuses</option>
-    {% for value,label in statuses %}<option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
-  </select>
-  <button type="submit">Search</button>
-</form>
-</section>
-<section class="card">
-<div class="table-wrap"><table>
-<thead><tr><th>Guest</th><th>Hut</th><th>Dates</th><th>Beds</th><th>Status</th><th>Actions</th></tr></thead>
-<tbody>
-{% for reservation in page %}
-<tr>
-  <td><strong>{{ reservation.name }}</strong><div>{{ reservation.email }}</div><small>{{ reservation.code }}</small></td>
-  <td>{% for item in reservation.items.all %}{{ item.room.hut.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-  <td>{{ reservation.check_in|date:"j M Y" }} – {{ reservation.check_out|date:"j M Y" }}</td>
-  <td>{{ reservation.total_beds }}</td>
-  <td>{{ reservation.get_status_display }}</td>
-  <td>
-  <a href="{% url 'bookings:reservation_payments' reservation.code %}">Payments</a>
-   {% if reservation.status == 'pending' %}
-    <form method="post" action="{% url 'bookings:manager_reservation_action' reservation.code %}">
-      {% csrf_token %}<input type="hidden" name="action" value="confirm">
-      <button type="submit">Confirm</button>
+<style>
+  .mr-page{--pine:#173e34;--deep:#112b26;--lime:#d9f279;--ink:#20352f;--muted:#63766e;--line:#dce7df;--paper:#f6f8f4;color:var(--ink);max-width:1440px;margin:0 auto;padding:clamp(16px,3vw,36px) 0 56px}
+  .mr-page *{box-sizing:border-box}
+  .mr-hero{background:linear-gradient(120deg,#102a25,#235445);color:#fff;border-radius:24px;padding:clamp(24px,4vw,44px);position:relative;overflow:hidden}
+  .mr-hero:after{content:"";position:absolute;right:-60px;top:-110px;width:340px;height:340px;border:1px solid #ffffff26;border-radius:50%;box-shadow:0 0 0 58px #ffffff0b,0 0 0 118px #ffffff08;pointer-events:none}
+  .mr-kicker{font-size:.73rem;letter-spacing:.19em;text-transform:uppercase;color:var(--lime);font-weight:800;margin:0 0 10px}
+  .mr-hero h1{font-size:clamp(2rem,4vw,3.3rem);line-height:1.1;color:#fff;margin:0 0 12px}
+  .mr-hero p{color:#e0eee6;max-width:620px;margin:0}
+  .mr-hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:25px;position:relative;z-index:1}
+  .mr-page a.mr-btn,.mr-page button.mr-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:42px;padding:10px 17px;border-radius:11px;text-decoration:none;font-weight:750;font-size:.9rem;border:1px solid transparent;cursor:pointer;line-height:1.2}
+  .mr-btn-primary{background:var(--lime);color:#172e22!important}
+  .mr-btn-ghost{background:#ffffff12;color:#fff!important;border-color:#ffffff50!important}
+  .mr-btn-outline{background:#fff;color:var(--pine)!important;border-color:var(--line)!important}
+  .mr-quicklinks{display:flex;gap:9px;flex-wrap:wrap;margin:18px 0 24px}
+  .mr-quicklinks a{display:inline-flex;align-items:center;padding:9px 13px;border:1px solid var(--line);background:#fff;color:var(--pine);border-radius:999px;text-decoration:none;font-size:.85rem;font-weight:700}
+  .mr-panel{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:0 8px 28px #163c2a09;margin-top:18px;overflow:hidden}
+  .mr-panel-header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:22px 24px 12px}
+  .mr-panel-header h2{font-size:1.15rem;margin:0;color:var(--deep)}
+  .mr-subtitle{color:var(--muted);font-size:.87rem;margin:4px 0 0}
+  .mr-filters{display:grid;grid-template-columns:minmax(160px,1fr) minmax(200px,1.6fr) minmax(150px,1fr) auto;align-items:end;gap:14px;padding:12px 24px 24px}
+  .mr-field label{display:block;font-size:.78rem;font-weight:800;color:var(--deep);margin-bottom:7px}
+  .mr-field input,.mr-field select{width:100%;height:44px;border:1px solid #cfded3;background:#fbfdf9;border-radius:10px;padding:0 12px;color:var(--deep);font:inherit;min-width:0}
+  .mr-field input:focus,.mr-field select:focus{outline:2px solid #a6cf85;outline-offset:1px}
+  .mr-filter-submit{background:var(--pine)!important;color:#fff!important;height:44px;white-space:nowrap}
+  .mr-table-wrap{width:100%;overflow-x:auto}
+  .mr-table{width:100%;border-collapse:collapse;min-width:890px;font-size:.9rem}
+  .mr-table th{background:#f2f7f1;color:#51665b;text-align:left;text-transform:uppercase;letter-spacing:.07em;font-size:.69rem;padding:14px 17px;white-space:nowrap}
+  .mr-table td{padding:17px;border-top:1px solid #e7eee8;vertical-align:middle}
+  .mr-table tbody tr:hover{background:#f9fbf7}
+  .mr-guest{font-weight:800;color:var(--deep)}
+  .mr-secondary{color:var(--muted);font-size:.82rem;margin-top:4px;overflow-wrap:anywhere}
+  .mr-ref{display:inline-block;font-size:.72rem;letter-spacing:.025em;background:#edf3eb;border-radius:6px;padding:4px 7px;color:#4e6657;margin-top:7px}
+  .mr-dates{white-space:nowrap;font-weight:650}
+  .mr-beds{display:inline-flex;min-width:35px;justify-content:center;padding:6px 10px;background:#edf3eb;border-radius:8px;font-weight:800}
+  .mr-status{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:7px 11px;font-size:.76rem;font-weight:800;white-space:nowrap;background:#edf1ed;color:#42564c}
+  .mr-status:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+  .mr-status-pending{background:#fff4d8;color:#95610c}
+  .mr-status-confirmed{background:#e3f4e8;color:#237144}
+  .mr-status-cancelled{background:#f7e8e8;color:#a04444}
+  .mr-actions{display:flex;flex-wrap:wrap;align-items:center;gap:7px}
+  .mr-actions form{display:inline;margin:0}
+  .mr-actions a,.mr-actions button{font:inherit;font-size:.78rem;font-weight:800;padding:8px 10px;border-radius:8px;text-decoration:none;border:1px solid #cbded0;background:#fff;color:var(--pine);cursor:pointer;white-space:nowrap}
+  .mr-actions button.mr-confirm{background:#e3f4e8;border-color:#b5dcc1;color:#1f6a3e}
+  .mr-actions button.mr-cancel{border-color:#f0cece;color:#a34242}
+  .mr-empty{text-align:center;color:var(--muted);padding:42px 18px!important}
+  .mr-pagination{display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap;padding:20px;border-top:1px solid var(--line);color:var(--muted);font-size:.85rem}
+  .mr-pagination a{color:var(--pine);text-decoration:none;font-weight:800;padding:9px 13px;border:1px solid var(--line);border-radius:9px}
+  @media(max-width:900px){.mr-filters{grid-template-columns:1fr 1fr}.mr-filter-submit{width:100%}}
+  @media(max-width:560px){.mr-hero{border-radius:18px}.mr-panel{border-radius:16px}.mr-panel-header{padding:20px 16px 10px}.mr-filters{grid-template-columns:1fr;padding:12px 16px 20px}.mr-quicklinks a{font-size:.79rem}}
+
+/* v133: readable, touch-friendly reservation cards on phones. */
+@media (max-width: 720px) {
+  .mr-page { padding-top: 8px; }
+  .mr-hero { padding: 24px 20px; }
+  .mr-hero h1 { font-size: clamp(1.8rem, 8vw, 2.5rem); }
+  .mr-hero-actions { display: grid; grid-template-columns: 1fr; }
+  .mr-hero-actions .mr-btn { width: 100%; min-height: 46px; }
+  .mr-quicklinks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .mr-quicklinks a { border-radius: 11px; min-height: 44px; justify-content: center; text-align: center; line-height: 1.35; padding: 10px; }
+  .mr-panel { overflow: hidden; }
+  .mr-table-wrap { overflow: visible; }
+  .mr-table { display: block; width: 100%; min-width: 0; }
+  .mr-table thead { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+  .mr-table tbody { display: grid; gap: 12px; padding: 4px 12px 16px; }
+  .mr-table tbody tr { display: block; min-width: 0; background: #fff; border: 1px solid #dce7df; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 14px #153b2908; }
+  .mr-table td { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; border: 0; padding: 11px 13px; min-width: 0; overflow-wrap: anywhere; }
+  .mr-table td + td { border-top: 1px solid #edf2ed; }
+  .mr-table td[data-label]::before { content: attr(data-label); flex: 0 0 82px; font-size: .72rem; font-weight: 800; color: #627568; text-transform: uppercase; letter-spacing: .035em; padding-top: 3px; }
+  .mr-table td:first-child { display: block; background: #f6faf5; }
+  .mr-table td:first-child::before { display: none; }
+  .mr-table td:last-child { display: block; }
+  .mr-table td:last-child::before { display: block; margin-bottom: 10px; }
+  .mr-table .mr-dates { white-space: normal; }
+  .mr-table .mr-empty { display: block; padding: 25px 16px !important; }
+  .mr-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .mr-actions form { display: block; min-width: 0; }
+  .mr-actions a, .mr-actions button { display: flex; align-items: center; justify-content: center; min-height: 44px; width: 100%; text-align: center; white-space: normal; }
+  .mr-pagination { padding: 16px 12px; gap: 10px; }
+  .mr-pagination a { min-height: 44px; display: inline-flex; align-items: center; }
+}
+@media (max-width: 370px) {
+  .mr-quicklinks { grid-template-columns: 1fr; }
+  .mr-table td[data-label]::before { flex-basis: 72px; }
+}
+</style>
+<div class="mr-page">
+  <header class="mr-hero">
+    <div class="mr-kicker">STAFF / RESERVATIONS</div>
+    <h1>Hut reservations</h1>
+    <p>Review bookings, confirm arrivals, manage payments, and keep every mountain stay on track.</p>
+    <div class="mr-hero-actions">
+      <a class="mr-btn mr-btn-primary" href="{% url 'bookings:manual_booking' %}{% if selected_slug %}?hut={{ selected_slug|urlencode }}{% endif %}">+ New reservation</a>
+      <a class="mr-btn mr-btn-ghost" href="{% url 'bookings:dashboard' %}">← Operations dashboard</a>
+    </div>
+  </header>
+
+  <nav class="mr-quicklinks" aria-label="Reservation management tools">
+    <a href="{% url 'bookings:approval_dashboard' %}">Guest requests · Review &amp; approve ↗</a>
+    <a href="{% url 'bookings:availability_calendar' %}">Availability calendar ↗</a>
+    <a href="{% url 'bookings:guest_link_controls' %}">Guest access links ↗</a>
+    <a href="{% url 'bookings:guest_requests_dashboard' %}">Change &amp; cancellation requests ↗</a>
+    <a href="{% url 'bookings:communications_dashboard' %}">Guest communications ↗</a>
+    <a href="{% url 'bookings:deposit_dashboard' %}">Deposits &amp; overdue payments ↗</a>
+  </nav>
+
+  <section class="mr-panel" aria-labelledby="mr-filter-title">
+    <div class="mr-panel-header">
+      <div><h2 id="mr-filter-title">Find a reservation</h2><p class="mr-subtitle">Filter by hut, guest, booking reference, or status.</p></div>
+    </div>
+    <form method="get" class="mr-filters">
+      <div class="mr-field"><label for="mr-hut">Mountain hut</label><select name="hut" id="mr-hut">
+        {% if not manager_mode %}<option value="">All huts</option>{% endif %}
+        {% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_slug == hut.slug %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}
+      </select></div>
+      <div class="mr-field"><label for="mr-query">Guest, email or reference</label><input id="mr-query" type="search" name="q" value="{{ q }}" maxlength="120" placeholder="Search reservations"></div>
+      <div class="mr-field"><label for="mr-status">Status</label><select name="status" id="mr-status">
+        <option value="">All statuses</option>
+        {% for value,label in statuses %}<option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select></div>
+      <button type="submit" class="mr-btn mr-filter-submit">Search reservations →</button>
     </form>
-  {% endif %}
-  {% if reservation.status != 'cancelled' %}
-    <form method="post" action="{% url 'bookings:manager_reservation_action' reservation.code %}" onsubmit="return confirm('Cancel this reservation?');">
-      {% csrf_token %}<input type="hidden" name="action" value="cancel">
-      <button type="submit">Cancel</button>
-    </form>
-  {% endif %}
-  </td>
-</tr>
-{% empty %}<tr><td colspan="6">No matching reservations.</td></tr>
-{% endfor %}
-</tbody></table></div>
-{% if page.has_other_pages %}<nav aria-label="Pages">
-{% if page.has_previous %}<a href="?hut={{ selected_slug|urlencode }}&amp;q={{ q|urlencode }}&amp;status={{ status_filter|urlencode }}&amp;page={{ page.previous_page_number }}">← Previous</a>{% endif %}
-Page {{ page.number }} of {{ page.paginator.num_pages }}
-{% if page.has_next %}<a href="?hut={{ selected_slug|urlencode }}&amp;q={{ q|urlencode }}&amp;status={{ status_filter|urlencode }}&amp;page={{ page.next_page_number }}">Next →</a>{% endif %}
-</nav>{% endif %}
-</section>
+  </section>
+
+  <section class="mr-panel" aria-labelledby="mr-results-title">
+    <div class="mr-panel-header">
+      <div><h2 id="mr-results-title">Reservation list</h2><p class="mr-subtitle">Manage guests and bookings for your permitted huts.</p></div>
+    </div>
+    <div class="mr-table-wrap">
+      <table class="mr-table">
+        <thead><tr><th scope="col">Guest</th><th scope="col">Mountain hut</th><th scope="col">Stay dates</th><th scope="col">Beds</th><th scope="col">Status</th><th scope="col">Actions</th></tr></thead>
+        <tbody>
+        {% for reservation in page %}
+          <tr>
+            <td data-label="Guest"><div class="mr-guest">{{ reservation.name }}</div><div class="mr-secondary">{{ reservation.email }}</div><span class="mr-ref">{{ reservation.code }}</span></td>
+            <td data-label="Hut">{% for item in reservation.items.all %}{{ item.room.hut.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+            <td class="mr-dates" data-label="Stay dates">{{ reservation.check_in|date:"j M Y" }} – {{ reservation.check_out|date:"j M Y" }}</td>
+            <td data-label="Beds"><span class="mr-beds">{{ reservation.total_beds }}</span></td>
+            <td data-label="Status"><span class="mr-status {% if reservation.status == 'pending' %}mr-status-pending{% elif reservation.status == 'confirmed' %}mr-status-confirmed{% elif reservation.status == 'cancelled' %}mr-status-cancelled{% endif %}">{% if reservation.guest_request and reservation.status == "pending" %}Awaiting approval{% else %}{{ reservation.get_status_display }}{% endif %}</span></td>
+            <td data-label="Actions"><div class="mr-actions">
+              <a href="{% url 'bookings:reservation_payments' reservation.code %}">Payments</a>
+              <a href="{% url 'bookings:conversation_thread' reservation.code %}">Messages</a>
+              {% if reservation.status == 'pending' %}
+                <form method="post" action="{% url 'bookings:manager_reservation_action' reservation.code %}">
+                  {% csrf_token %}<input type="hidden" name="action" value="confirm"><button class="mr-confirm" type="submit">{% if reservation.guest_request %}Approve{% else %}Confirm{% endif %}</button>
+                </form>
+              {% endif %}
+              {% if reservation.status != 'cancelled' %}
+                <form method="post" action="{% url 'bookings:manager_reservation_action' reservation.code %}" onsubmit="return confirm('Cancel this reservation?');">
+                  {% csrf_token %}<input type="hidden" name="action" value="cancel"><button class="mr-cancel" type="submit">{% if reservation.guest_request and reservation.status == "pending" %}Decline{% else %}Cancel{% endif %}</button>
+                </form>
+              {% endif %}
+            </div></td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6" class="mr-empty">No matching reservations. Try changing your filters.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if page.has_other_pages %}
+      <nav class="mr-pagination" aria-label="Reservation pages">
+        {% if page.has_previous %}<a href="?hut={{ selected_slug|urlencode }}&amp;q={{ q|urlencode }}&amp;status={{ status_filter|urlencode }}&amp;page={{ page.previous_page_number }}">← Previous</a>{% endif %}
+        <span>Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+        {% if page.has_next %}<a href="?hut={{ selected_slug|urlencode }}&amp;q={{ q|urlencode }}&amp;status={{ status_filter|urlencode }}&amp;page={{ page.next_page_number }}">Next →</a>{% endif %}
+      </nav>
+    {% endif %}
+  </section>
+</div>
 {% endblock %}

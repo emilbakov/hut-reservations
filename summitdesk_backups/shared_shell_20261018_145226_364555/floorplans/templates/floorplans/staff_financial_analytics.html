@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Booking Value Analytics — {{ hut.name }}</title>
+<style>
+:root{font-family:system-ui,-apple-system,sans-serif;color:#15263b}body{margin:0;background:#f4f7fb}main{max-width:1150px;margin:auto;padding:28px 18px 65px}h1{margin-bottom:5px}.muted{color:#63758c}.panel,.metric{background:white;border:1px solid #dfe7f0;border-radius:14px;padding:20px}.panel{margin-top:22px;overflow-x:auto}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:13px;margin-top:20px}.metric strong{display:block;font-size:27px;margin-top:9px}.filters{display:flex;flex-wrap:wrap;align-items:end;gap:12px}label{display:grid;gap:5px;font-size:14px;font-weight:600}input,button,.button{font:inherit;border-radius:8px;padding:10px}input{border:1px solid #cbd5e1}button,.button{background:#174d86;color:white;border:0;text-decoration:none;cursor:pointer}table{border-collapse:collapse;width:100%;min-width:550px}th,td{text-align:left;border-bottom:1px solid #e6ecf3;padding:12px}th{background:#f8fafc}td.num{text-align:right;font-variant-numeric:tabular-nums}.note{font-size:13px;line-height:1.6}a{color:#1e5b9c}
+</style>
+</head>
+<body><main>
+<a href="{% url 'floorplans:staff_home' %}">← Staff home</a>
+<h1>Booking value analytics</h1>
+<p class="muted">{{ hut.name }} · SummitDesk v35</p>
+<section class="panel"><form method="get" class="filters">
+<label>From <input type="date" name="from" value="{{ start }}" required></label>
+<label>To (inclusive) <input type="date" name="to" value="{{ end }}" required></label>
+<button type="submit">Update report</button>
+<a class="button" href="?from={{ start|urlencode }}&amp;to={{ end|urlencode }}&amp;export=csv">Export CSV</a>
+</form></section>
+<section class="grid" aria-label="Booking value summary">
+<div class="metric">Confirmed booking value<strong>{{ confirmed_total|floatformat:2 }}</strong></div>
+<div class="metric">Pending booking value<strong>{{ pending_total|floatformat:2 }}</strong></div>
+<div class="metric">Cancelled booking value (excluded)<strong>{{ cancelled_total|floatformat:2 }}</strong></div>
+<div class="metric">Confirmed reservations<strong>{{ confirmed_count }}</strong></div>
+<div class="metric">Pending reservations<strong>{{ pending_count }}</strong></div>
+<div class="metric">Cancelled reservations<strong>{{ cancelled_count }}</strong></div>
+<div class="metric">Confirmed bed-nights<strong>{{ confirmed_nights }}</strong></div>
+<div class="metric">Pending bed-nights<strong>{{ pending_nights }}</strong></div>
+</section>
+<section class="panel"><h2>Monthly booking value by stay night</h2>
+<table><thead><tr><th>Month</th><th>Confirmed</th><th>Pending</th></tr></thead><tbody>
+{% for month in months %}<tr><td>{{ month.month }}</td><td class="num">{{ month.confirmed|floatformat:2 }}</td><td class="num">{{ month.pending|floatformat:2 }}</td></tr>
+{% empty %}<tr><td colspan="3">No confirmed or pending stays in this period.</td></tr>{% endfor %}
+</tbody></table></section>
+<section class="panel"><h2>Room booking value</h2>
+<table><thead><tr><th>Room</th><th>Confirmed</th><th>Pending</th><th>Cancelled (excluded)</th></tr></thead><tbody>
+{% for room in rooms %}<tr><td>{{ room.name }}</td><td class="num">{{ room.confirmed|floatformat:2 }}</td><td class="num">{{ room.pending|floatformat:2 }}</td><td class="num">{{ room.cancelled|floatformat:2 }}</td></tr>
+{% empty %}<tr><td colspan="4">No active rooms.</td></tr>{% endfor %}
+</tbody></table></section>
+<p class="muted note"><strong>Interpretation:</strong> Booking value is estimated using each reservation item's stored price per bed per night. It is not collected revenue, payment confirmation, or accounting income. Dates are stay nights; checkout is exclusive. Confirmed and pending values are separate; cancelled values are excluded from active totals. Only currently active rooms and current reservation statuses are included. Values use the price units stored in the database; no currency conversion is performed. Changes to historical statuses, prices or room activity can change this report.</p>
+</main></body></html>

@@ -1,0 +1,72 @@
+{% extends "bookings/base.html" %}
+{% block title %}Email reminder settings{% endblock %}
+{% block content %}
+<style>
+  .dr{max-width:850px;margin:0 auto;padding:clamp(20px,3vw,38px) 0 65px;color:#17352a}
+  .dr *{box-sizing:border-box}
+  .dr-header{background:linear-gradient(125deg,#132f26,#2b5944);border-radius:22px;padding:clamp(24px,4vw,40px);color:#fff}
+  .dr-header small{color:#d6f485;font-size:.75rem;font-weight:850;letter-spacing:.16em}
+  .dr-header h1{font-size:clamp(1.7rem,3.8vw,2.65rem);margin:12px 0;color:#fff}
+  .dr-header p{color:#e0eae3;line-height:1.6;margin:0}
+  .dr-header a{display:inline-block;margin-top:20px;color:#fff;font-weight:800;text-underline-offset:4px}
+  .dr-panel{background:#fff;border:1px solid #dce8df;border-radius:18px;padding:clamp(18px,3vw,28px);margin-top:20px;box-shadow:0 7px 24px #183b290a}
+  .dr-panel h2{margin:0 0 7px;font-size:1.3rem}
+  .dr-panel p{color:#5c7165;line-height:1.6;margin:0 0 16px}
+  .dr-option{display:flex;gap:15px;align-items:flex-start;padding:18px 0;border-bottom:1px solid #edf2ed;cursor:pointer}
+  .dr-option input{width:20px;height:20px;margin:3px 0 0;accent-color:#256a48;flex:none}
+  .dr-option strong{display:block;font-size:1rem}
+  .dr-option small{display:block;color:#5b7163;line-height:1.6;margin-top:4px;font-size:.88rem}
+  .dr-save{margin-top:24px;min-height:46px;padding:11px 22px;border:0;border-radius:11px;background:#1c503b;color:#fff;font:inherit;font-weight:800;cursor:pointer}
+  .dr-save:hover{background:#26654b}.dr-save:focus-visible,.dr a:focus-visible,.dr input:focus-visible{outline:3px solid #90bd6e;outline-offset:3px}
+  .dr-table{width:100%;border-collapse:collapse;text-align:left;font-size:.88rem}
+  .dr-table th,.dr-table td{padding:12px 9px;border-bottom:1px solid #e7eee8}
+  .dr-table th{color:#5b7163;font-size:.78rem}
+  .dr-muted{color:#627569;font-size:.88rem}
+  @media(max-width:560px){.dr-panel{padding:17px}.dr-table{font-size:.78rem}.dr-table th,.dr-table td{padding:10px 5px}}
+</style>
+<div class="dr">
+  <header class="dr-header">
+    <small>SUMMITDESK / MANAGER SETTINGS</small>
+    <h1>Daily email reminders</h1>
+    <p>Choose when you receive the daily summary of pending public guest reservations. These settings only affect your own email account.</p>
+    <a href="{% url 'bookings:approval_dashboard' %}">← Back to guest requests</a>
+  </header>
+  <section class="dr-panel" aria-label="Reminder preferences">
+    <h2>Your reminder preferences</h2>
+    <p>You manage {{ assigned_huts }} active hut{{ assigned_huts|pluralize }}. Changes take effect for the next email run; an email already sent today cannot be recalled.</p>
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="save">
+      <label class="dr-option" for="dr-enabled">
+        <input type="checkbox" id="dr-enabled" name="enabled" {% if digest_enabled %}checked{% endif %}>
+        <span><strong>Receive daily email summaries</strong><small>Turn off to stop future daily reminder emails. You can still review all requests in SummitDesk.</small></span>
+      </label>
+      <label class="dr-option" for="dr-urgent">
+        <input type="checkbox" id="dr-urgent" name="urgent_only" {% if urgent_only %}checked{% endif %}>
+        <span><strong>Only email me when a request is urgent</strong><small>Send a summary only if at least one pending request has waited more than 24 hours or its arrival is within two days (or overdue). The summary still lists all pending requests in your huts.</small></span>
+      </label>
+      <button type="submit" class="dr-save">Save preferences</button>
+    </form>
+  </section>
+  <section class="dr-panel" aria-label="Preview next reminder">
+    <h2>Preview your next reminder</h2>
+    <p>See which pending requests would appear in your next daily summary, and check why a reminder might not be sent. No email is sent by the preview.</p>
+    <a href="{% url 'bookings:manager_digest_preview' %}" style="display:inline-flex;align-items:center;min-height:44px;padding:10px 16px;background:#1c503b;color:#fff;border-radius:10px;font-weight:800;text-decoration:none">Preview daily email →</a>
+  </section>
+  <section class="dr-panel" aria-label="Email delivery history">
+    <h2>Recent email history</h2>
+    <p><a href="{% url 'bookings:manager_digest_history' %}" style="color:#1c503b;font-weight:800;text-underline-offset:3px">View full history and download CSV →</a></p>
+    <p>Last 10 successfully submitted daily summaries for your account. Preview runs and failed deliveries do not appear here.</p>
+    {% if history %}
+    <div style="overflow-x:auto">
+      <table class="dr-table">
+        <thead><tr><th scope="col">Date</th><th scope="col">Sent to</th><th scope="col">Huts</th><th scope="col">Requests</th></tr></thead>
+        <tbody>{% for entry in history %}
+          <tr><td>{{ entry.digest_date|date:"d M Y" }}</td><td>{{ entry.recipient }}</td><td>{{ entry.hut_count }}</td><td>{{ entry.request_count }}</td></tr>
+        {% endfor %}</tbody>
+      </table>
+    </div>
+    {% else %}<p class="dr-muted">No daily reminder emails have been recorded yet.</p>{% endif %}
+  </section>
+</div>
+{% endblock %}

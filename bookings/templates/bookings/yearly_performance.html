@@ -1,31 +1,69 @@
 {% extends 'bookings/base.html' %}
+{% block title %}Annual performance{% endblock %}
 {% block content %}
 <style>
-.performance-wrap{max-width:1080px;margin:2rem auto;padding:0 1rem}.performance-controls{display:flex;flex-wrap:wrap;gap:.75rem;align-items:end;margin:1.2rem 0}.performance-controls label{display:block;font-weight:600;margin-bottom:.3rem}.performance-controls input,.performance-controls select{padding:.55rem;border:1px solid #aaa;border-radius:.4rem}.performance-controls button,.performance-download{display:inline-block;padding:.65rem 1rem;background:#176a45;color:white;border:0;border-radius:.4rem;text-decoration:none}.performance-table{width:100%;border-collapse:collapse;margin:1rem 0}.performance-table th,.performance-table td{padding:.75rem .5rem;border-bottom:1px solid #ddd;text-align:left}.performance-track{background:#e7e7e7;border-radius:8px;height:12px;min-width:80px;overflow:hidden}.performance-fill{background:#198754;height:100%}.performance-summary{display:flex;flex-wrap:wrap;gap:1rem}.performance-summary div{padding:1rem;background:#f1f5f3;border-radius:.5rem;flex:1;min-width:140px}.performance-summary strong{display:block;font-size:1.5rem}@media(max-width:700px){.performance-table{font-size:.8rem}.performance-table th,.performance-table td{padding:.4rem .2rem}}
+.yp-page{--forest:#123d30;--forest2:#1b5945;--lime:#c9f36c;--ink:#19332b;--muted:#66776f;--line:#dce7df;--paper:#f5f8f3;max-width:1180px;margin:0 auto;padding:24px 16px 60px;color:var(--ink)}
+.yp-page *{box-sizing:border-box}.yp-page .yp-hero{background:linear-gradient(120deg,#123d30,#24644b);color:#fff;padding:clamp(24px,4vw,44px);border-radius:24px;position:relative;overflow:hidden}.yp-page .yp-hero:after{content:"";position:absolute;width:260px;height:260px;right:-90px;top:-110px;border:55px solid rgba(201,243,108,.12);border-radius:50%;pointer-events:none}.yp-page .yp-kicker{color:var(--lime);font-size:.75rem;letter-spacing:.17em;font-weight:800;text-transform:uppercase;margin:0 0 10px}.yp-page h1{color:#fff;margin:0 0 12px;font-size:clamp(1.8rem,3.5vw,2.8rem);line-height:1.12}.yp-page .yp-hero p:last-child{max-width:740px;color:#e3f1e8;margin:0;line-height:1.65}.yp-page .yp-topnav{margin:0 0 16px}.yp-page .yp-topnav a{color:var(--forest2);font-weight:700;text-decoration:none}.yp-page .yp-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:clamp(18px,2.6vw,28px);box-shadow:0 9px 30px rgba(15,55,36,.055);margin-top:20px}.yp-page .yp-card h2{font-size:1.3rem;margin:0 0 14px;color:var(--forest)}.yp-page .yp-controls{display:flex;gap:14px;flex-wrap:wrap;align-items:end}.yp-page .yp-field{flex:1 1 185px;min-width:0}.yp-page label{display:block;font-weight:750;font-size:.85rem;margin:0 0 7px}.yp-page input,.yp-page select{display:block;width:100%;min-height:45px;padding:10px 12px;border:1px solid #bfcfc4;border-radius:11px;background:#fff;color:var(--ink);font:inherit}.yp-page input:focus,.yp-page select:focus{outline:3px solid rgba(201,243,108,.55);border-color:var(--forest2)}.yp-page .yp-btn{display:inline-flex;align-items:center;justify-content:center;min-height:45px;padding:10px 19px;background:var(--forest);color:#fff;border:1px solid var(--forest);border-radius:11px;text-decoration:none;font:inherit;font-weight:800;cursor:pointer;white-space:nowrap}.yp-page .yp-btn:hover{background:var(--forest2);color:#fff}.yp-page .yp-btn-lime{background:var(--lime);border-color:var(--lime);color:#15392c}.yp-page .yp-btn-lime:hover{background:#b6e45a;color:#15392c}.yp-page .yp-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:20px}.yp-page .yp-metric{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;min-width:0}.yp-page .yp-metric span{display:block;font-size:.82rem;color:var(--muted);font-weight:750;margin-bottom:12px}.yp-page .yp-metric strong{display:block;font-size:clamp(1.4rem,2.4vw,2rem);color:var(--forest);overflow-wrap:anywhere;line-height:1.2}.yp-page .yp-metric small{display:block;color:var(--muted);margin-top:8px}.yp-page .yp-sectionhead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}.yp-page .yp-sectionhead h2{margin:0}.yp-page .yp-tabs{display:flex;flex-wrap:wrap;gap:8px}.yp-page .yp-tab{border:1px solid #c7d8cc;background:#f5f8f3;color:var(--forest);border-radius:999px;padding:9px 14px;font:inherit;font-size:.88rem;font-weight:800;cursor:pointer}.yp-page .yp-tab[aria-pressed="true"]{background:var(--forest);color:#fff;border-color:var(--forest)}.yp-page .yp-chart[hidden]{display:none!important}.yp-page .yp-chart{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:9px;align-items:end;min-height:240px}.yp-page .yp-col{display:flex;flex-direction:column;align-items:center;min-width:0;gap:8px}.yp-page .yp-value{font-size:.72rem;font-weight:800;color:var(--forest);white-space:nowrap}.yp-page .yp-barspace{height:170px;width:100%;display:flex;align-items:flex-end;justify-content:center;background:#f1f6f1;border-radius:8px;overflow:hidden}.yp-page .yp-bar{width:72%;max-width:38px;background:linear-gradient(0deg,#2e7b56,#9edc85);border-radius:6px 6px 0 0;min-height:0}.yp-page .yp-bar.yp-revenue{background:linear-gradient(0deg,#25678d,#73b3d2)}.yp-page .yp-month{font-size:.76rem;color:var(--muted);font-weight:750}.yp-page .yp-note{font-size:.82rem;line-height:1.6;color:var(--muted);margin:14px 0 0}.yp-page .yp-tablewrap{overflow-x:auto}.yp-page table{width:100%;border-collapse:collapse;min-width:680px;margin:0}.yp-page th{text-align:left;background:#f2f7f2;color:#40584a;font-size:.76rem;text-transform:uppercase;letter-spacing:.04em;padding:13px 14px}.yp-page td{padding:15px 14px;border-bottom:1px solid #e8eee8;vertical-align:middle}.yp-page tbody tr:last-child td{border-bottom:0}.yp-page tbody tr:hover{background:#f9fbf8}.yp-page .yp-progress{height:8px;background:#e7eee7;border-radius:20px;overflow:hidden;min-width:90px;margin-top:6px}.yp-page .yp-fill{height:100%;background:#4d9869;border-radius:20px}.yp-page .yp-empty{padding:26px;text-align:center;background:#f5f8f3;border-radius:14px;color:var(--muted)}.yp-page .yp-export{margin-top:18px}.yp-page .yp-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}@media(max-width:720px){.yp-page .yp-summary{grid-template-columns:1fr}.yp-page .yp-chart{gap:3px;min-height:205px}.yp-page .yp-barspace{height:140px}.yp-page .yp-value{font-size:.55rem}.yp-page .yp-month{font-size:.61rem}.yp-page .yp-card{padding:17px}.yp-page .yp-controls .yp-btn{width:100%}}@media(prefers-reduced-motion:no-preference){.yp-page .yp-btn,.yp-page .yp-tab{transition:background .2s ease,color .2s ease}}
 </style>
-<div class="performance-wrap">
-<h1>Annual occupancy &amp; revenue</h1>
-<p>Confirmed bookings only. Revenue is an estimate from booked beds and recorded nightly prices, not payments received. Occupancy uses current active room capacity.</p>
-<form method="get" class="performance-controls">
-<label>Year <input type="number" name="year" min="2000" max="2100" value="{{ year }}"></label>
-<label>Hut <select name="hut">
-{% if not manager_mode %}<option value="">Select a hut</option>{% endif %}
-{% for h in huts %}<option value="{{ h.slug }}" {% if selected_hut.pk == h.pk %}selected{% endif %}>{{ h.name }}</option>{% endfor %}
-</select></label>
-<button type="submit">View report</button>
-</form>
-{% if select_hut %}<p>Select a hut to view its annual report.</p>{% else %}
-<div class="performance-summary">
-<div><span>Booked bed-nights</span><strong>{{ total_bed_nights }}</strong></div>
-<div><span>Booked occupancy</span><strong>{{ year_occupancy }}%</strong></div>
-<div><span>Estimated revenue</span><strong>{{ total_revenue }} {{ currency }}</strong></div>
+<div class="yp-page">
+  <nav class="yp-topnav"><a href="{% url 'bookings:dashboard' %}">← Back to dashboard</a></nav>
+  <header class="yp-hero">
+    <p class="yp-kicker">Staff / Performance insights</p>
+    <h1>Annual occupancy &amp; revenue</h1>
+    <p>Explore confirmed booking trends by month. Revenue is estimated from booked beds and recorded nightly prices, not payments received. Occupancy uses current active room capacity.</p>
+  </header>
+  <section class="yp-card" aria-labelledby="yp-filter-title">
+    <h2 id="yp-filter-title">Report filters</h2>
+    <form method="get" class="yp-controls">
+      <div class="yp-field"><label for="yp-year">Year</label><input id="yp-year" type="number" name="year" min="2000" max="2100" value="{{ year }}" required></div>
+      <div class="yp-field"><label for="yp-hut">Mountain hut</label><select id="yp-hut" name="hut">{% if not manager_mode %}<option value="">Select a hut</option>{% endif %}{% for h in huts %}<option value="{{ h.slug }}" {% if selected_hut.pk == h.pk %}selected{% endif %}>{{ h.name }}</option>{% endfor %}</select></div>
+      <button class="yp-btn" type="submit">View report →</button>
+    </form>
+  </section>
+  {% if select_hut %}
+  <section class="yp-card"><div class="yp-empty">Select a mountain hut above to view its annual performance report.</div></section>
+  {% else %}
+  <div class="yp-summary" aria-label="Annual performance summary">
+    <div class="yp-metric"><span>Booked bed-nights</span><strong>{{ total_bed_nights }}</strong><small>Confirmed reservations</small></div>
+    <div class="yp-metric"><span>Booked occupancy</span><strong>{{ year_occupancy }}%</strong><small>Based on current active capacity</small></div>
+    <div class="yp-metric"><span>Estimated revenue</span><strong>{{ total_revenue }} {{ currency }}</strong><small>Booking value, not cash received</small></div>
+  </div>
+  <div class="yp-export"><a class="yp-btn yp-btn-lime" href="{% url 'bookings:yearly_performance_export' %}?year={{ year }}&amp;hut={{ selected_hut.slug|urlencode }}">↓ Download annual CSV</a></div>
+  <section class="yp-card" aria-labelledby="yp-chart-heading">
+    <div class="yp-sectionhead"><h2 id="yp-chart-heading">Monthly trends · {{ year }}</h2><div class="yp-tabs" role="group" aria-label="Chart metric"><button type="button" class="yp-tab" id="yp-show-occupancy" aria-pressed="true">Booked occupancy</button><button type="button" class="yp-tab" id="yp-show-revenue" aria-pressed="false">Estimated revenue</button></div></div>
+    <div id="yp-chart-occupancy" class="yp-chart" role="img" aria-label="Monthly booked occupancy percentages">
+      {% for r in rows %}<div class="yp-col" title="{{ r.month|date:'F Y' }}: {{ r.occupancy }}% occupancy"><span class="yp-value">{{ r.occupancy }}%</span><div class="yp-barspace"><div class="yp-bar" style="height:{% if r.occupancy > 100 %}100{% elif r.occupancy < 0 %}0{% else %}{{ r.occupancy }}{% endif %}%"></div></div><span class="yp-month">{{ r.month|date:'M' }}</span></div>{% endfor %}
+    </div>
+    <div id="yp-chart-revenue" class="yp-chart" role="img" aria-label="Monthly estimated booking revenue" hidden>
+      {% for r in rows %}<div class="yp-col" title="{{ r.month|date:'F Y' }}: {{ r.revenue }} {{ currency }}"><span class="yp-value">{{ r.revenue|floatformat:0 }}</span><div class="yp-barspace"><div class="yp-bar yp-revenue" style="height:{% if r.revenue_percent > 100 %}100{% elif r.revenue_percent < 0 %}0{% else %}{{ r.revenue_percent }}{% endif %}%"></div></div><span class="yp-month">{{ r.month|date:'M' }}</span></div>{% endfor %}
+    </div>
+    <p class="yp-note">Revenue bars are scaled to the highest month in the selected year. All figures are booking estimates, not payments received.</p>
+  </section>
+  <section class="yp-card" aria-labelledby="yp-table-heading">
+    <div class="yp-sectionhead"><h2 id="yp-table-heading">Monthly breakdown</h2></div>
+    <div class="yp-tablewrap"><table><thead><tr><th scope="col">Month</th><th scope="col">Bookings*</th><th scope="col">Bed-nights</th><th scope="col">Occupancy</th><th scope="col">Estimated revenue</th></tr></thead><tbody>
+    {% for r in rows %}<tr><td><strong>{{ r.month|date:'M Y' }}</strong></td><td>{{ r.count }}</td><td>{{ r.bed_nights }}</td><td><strong>{{ r.occupancy }}%</strong><div class="yp-progress" aria-hidden="true"><div class="yp-fill" style="width:{% if r.occupancy > 100 %}100{% elif r.occupancy < 0 %}0{% else %}{{ r.occupancy }}{% endif %}%"></div></div></td><td><strong>{{ r.revenue }} {{ currency }}</strong></td></tr>{% empty %}<tr><td colspan="5">No monthly data for this selection.</td></tr>{% endfor %}
+    </tbody></table></div>
+    <p class="yp-note">*A booking spanning two months is counted in each overlapping month. Bed-nights and revenue are allocated to the nights in each month.</p>
+  </section>
+  {% endif %}
 </div>
-<p><a class="performance-download" href="{% url 'bookings:yearly_performance_export' %}?year={{ year }}&amp;hut={{ selected_hut.slug|urlencode }}">Download CSV</a></p>
-<table class="performance-table"><thead><tr><th>Month</th><th>Bookings*</th><th>Bed-nights</th><th>Occupancy</th><th>Estimated revenue</th></tr></thead><tbody>
-{% for r in rows %}<tr><td>{{ r.month|date:'M Y' }}</td><td>{{ r.count }}</td><td>{{ r.bed_nights }}</td><td><div>{{ r.occupancy }}%</div><div class="performance-track"><div class="performance-fill" style="width:{{ r.occupancy }}%"></div></div></td><td>{{ r.revenue }} {{ currency }}</td></tr>{% endfor %}
-</tbody></table>
-<p><small>*A booking spanning two months is counted in each overlapping month. Bed-nights and revenue are allocated to the nights in each month.</small></p>
-{% endif %}
-<p><a href="{% url 'bookings:dashboard' %}">Back to dashboard</a></p>
-</div>
+<script>
+(function () {
+  const occupancy = document.getElementById('yp-chart-occupancy');
+  const revenue = document.getElementById('yp-chart-revenue');
+  const occupancyButton = document.getElementById('yp-show-occupancy');
+  const revenueButton = document.getElementById('yp-show-revenue');
+  if (!occupancy || !revenue || !occupancyButton || !revenueButton) return;
+  function show(metric) {
+    const isOccupancy = metric === 'occupancy';
+    occupancy.hidden = !isOccupancy;
+    revenue.hidden = isOccupancy;
+    occupancyButton.setAttribute('aria-pressed', String(isOccupancy));
+    revenueButton.setAttribute('aria-pressed', String(!isOccupancy));
+  }
+  occupancyButton.addEventListener('click', function () { show('occupancy'); });
+  revenueButton.addEventListener('click', function () { show('revenue'); });
+})();
+</script>
 {% endblock %}

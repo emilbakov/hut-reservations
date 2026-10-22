@@ -1,0 +1,16 @@
+<!-- V39_ALERTS_START -->
+{% if manager %}
+<section class="section card" aria-labelledby="v39-alerts-heading">
+  <h2 id="v39-alerts-heading">Operations alerts · Next 7 days</h2>
+  <p class="muted">Read-only capacity and preparation checks. Alerts are indicators, not proof of an individual bed conflict.</p>
+  {% for alert in alerts_v39 %}
+    <div class="task">
+      <div><strong>{{ alert.title }}</strong><div class="muted">{{ alert.day|date:"D, j M" }} · {{ alert.detail }}</div></div>
+      <span class="pill">{{ alert.level|title }}</span>
+    </div>
+  {% empty %}
+    <p class="muted">No operational alerts for the next seven days.</p>
+  {% endfor %}
+</section>
+{% endif %}
+<!-- V39_ALERTS_END -->

@@ -1,0 +1,27 @@
+[
+  {
+    "path": "bookings/urls.py",
+    "existed": true,
+    "installed_sha256": "cc4d28380ade3d51ab5cc460d9295d108eddce4a79a38bf1832999f3b4624112"
+  },
+  {
+    "path": "bookings/approval_dashboard_v127.py",
+    "existed": true,
+    "installed_sha256": "c34325e21fe7560172290d7ca2453e0616174595491ade566875d95744e03ba7"
+  },
+  {
+    "path": "bookings/templates/bookings/approval_dashboard_v127.html",
+    "existed": true,
+    "installed_sha256": "34515bfddaafda6eb3052ed80f0481e834284c202d02ca48b55a34f3eb8c6c82"
+  },
+  {
+    "path": "bookings/request_operations_v128.py",
+    "existed": false,
+    "installed_sha256": "91926e94276340b944c6f556ba453f3ff1331b4b6ab72d9885f2eedccf95f279"
+  },
+  {
+    "path": "bookings/test_request_operations_v128.py",
+    "existed": false,
+    "installed_sha256": "fad13d893a8076073c94476cb0a9d421ceb79fb74b6cbb077403afde6f239bf1"
+  }
+]

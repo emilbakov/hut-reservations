@@ -1,0 +1,30 @@
+/* SummitDesk manager workspace: presentation only, no business logic changes. */
+:root{--sd-ink:#193c35;--sd-accent:#176348;--sd-bg:#f4f7f6;--sd-line:#e1eae6;--sd-muted:#61746d}
+html{scroll-behavior:smooth}body{background:var(--sd-bg);color:var(--sd-ink)}
+body.sd-ready{min-height:100vh}body.sd-ready main{max-width:1600px;margin:0 0 0 246px;padding:24px clamp(14px,2.5vw,40px)}
+body.sd-ready .hero{border-radius:18px;background:linear-gradient(115deg,#143e33,#236b52);padding:24px}
+body.sd-ready .hero h1{font-size:clamp(24px,3vw,34px);margin:8px 0 12px}
+body.sd-ready .panel{border:1px solid var(--sd-line);box-shadow:0 3px 18px rgba(18,49,37,.035);border-radius:16px}
+body.sd-ready .panel h2{font-size:1.13rem;margin:0 0 14px}body.sd-ready .cards{gap:12px}
+body.sd-ready .cards>.panel{margin-top:0}body.sd-ready .number{font-size:clamp(25px,3vw,32px)}
+body.sd-ready .sd-sidebar{position:fixed;inset:0 auto 0 0;width:246px;background:#fff;border-right:1px solid var(--sd-line);z-index:100;display:flex;flex-direction:column;padding:20px 12px;overflow:auto}
+body.sd-ready .sd-brand{display:flex;gap:10px;align-items:center;padding:9px 12px 22px;font-size:20px;font-weight:750;letter-spacing:-.5px}
+body.sd-ready .sd-brand-mark{display:grid;place-items:center;width:36px;height:36px;border-radius:11px;background:#1a6048;color:#fff;font-size:19px}
+body.sd-ready .sd-side-link{display:flex;align-items:center;gap:10px;padding:12px 13px;margin:3px 0;color:#35584b;text-decoration:none;border-radius:10px;font-size:14px;font-weight:600;min-height:44px}
+body.sd-ready .sd-side-link:hover,body.sd-ready .sd-side-link:focus-visible{background:#edf5f0}
+body.sd-ready .sd-side-link[aria-current="page"]{background:#e4f2e9;color:#12583d}
+body.sd-ready .sd-sidebar-bottom{margin-top:auto;border-top:1px solid var(--sd-line);padding-top:12px}
+body.sd-ready .sd-mobile-top{display:none}body.sd-ready .sd-view[hidden]{display:none!important}
+body.sd-ready input,body.sd-ready select,body.sd-ready button{min-height:42px;max-width:100%;border-radius:9px}
+body.sd-ready a{overflow-wrap:anywhere}body.sd-ready .scroll{max-width:100%;overscroll-behavior-x:contain}
+body.sd-ready .scroll table{font-size:13px}body.sd-ready .scroll th,body.sd-ready .scroll td{padding:10px 8px}
+body.sd-ready .scroll th:first-child{position:sticky;left:0;background:#f5f8f5;z-index:1}
+body.sd-ready .sd-intro{color:var(--sd-muted);font-size:14px;margin:0 0 18px}
+body.sd-ready .sd-overview-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
+body.sd-ready .sd-overview-actions button{background:#fff;color:#185740;border:1px solid #b6d4c2}
+body.sd-ready .sd-overview-actions button:hover{background:#e9f5ed}
+body.sd-ready .sd-mobile-shade{display:none}
+@media(max-width:850px){body.sd-ready main{margin-left:0;padding:12px}body.sd-ready .sd-sidebar{transform:translateX(-102%);transition:transform .18s ease;box-shadow:0 14px 30px rgba(0,0,0,.12)}body.sd-ready.sd-menu-open .sd-sidebar{transform:translateX(0)}body.sd-ready .sd-mobile-top{display:flex;align-items:center;gap:12px;padding:10px 4px 15px}body.sd-ready .sd-mobile-top button{background:#fff;color:#174c3a;border:1px solid #cadcd0;min-width:44px}body.sd-ready.sd-menu-open .sd-mobile-shade{display:block;position:fixed;inset:0;background:rgba(8,31,22,.42);z-index:99}}
+@media(max-width:540px){body.sd-ready .hero{padding:17px}body.sd-ready .cards{grid-template-columns:repeat(2,minmax(0,1fr))}body.sd-ready .panel{padding:14px}body.sd-ready .cards .panel{padding:13px}body.sd-ready .muted{font-size:12px}body.sd-ready form{display:flex;gap:8px;flex-wrap:wrap;align-items:center}body.sd-ready .scroll{margin:0 -8px;padding:0 8px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}body.sd-ready .sd-sidebar{transition:none}}
+@media print{body.sd-ready main{margin:0;padding:0}body.sd-ready .sd-sidebar,body.sd-ready .sd-mobile-top,body.sd-ready .sd-mobile-shade,body.sd-ready .sd-overview-actions{display:none!important}body.sd-ready .sd-view[hidden]{display:block!important}body.sd-ready .panel{break-inside:avoid;box-shadow:none}}

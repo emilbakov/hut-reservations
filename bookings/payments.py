@@ -10,7 +10,7 @@ from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
 from .models import PaymentTransaction, Reservation
-from .views import manageable_reservations
+from .views import manageable_reservations, get_locked_manageable_reservation
 
 
 def balance(reservation):
@@ -45,7 +45,7 @@ def reservation_payments(request, code):
                 messages.error(request, 'Enter a positive amount with at most two decimal places.')
             else:
                 with transaction.atomic():
-                    locked = get_object_or_404(manageable_reservations(request.user).select_for_update(), pk=reservation.pk)
+                    locked = get_locked_manageable_reservation(request.user, pk=reservation.pk)
                     current = balance(locked)
                     if kind == PaymentTransaction.Kind.REFUND and amount > current['net']:
                         messages.error(request, 'Refund cannot exceed the net amount received.')

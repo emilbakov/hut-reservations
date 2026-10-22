@@ -1,0 +1,11 @@
+SUMMITDESK v134 — Two-way guest communications
+
+Run from /home/deploy/hut-reservations (beside manage.py):
+  unzip -o summitdesk_v134.zip
+  python3 v134_package/install_v134.py
+
+Then activate myprojectenv, load config.settings_postgres and
+/etc/hut-reservations/postgres.env, run migrate and TARGETED tests.
+See v134_package/README.txt for complete commands.
+
+No full test suite is required in this workflow.

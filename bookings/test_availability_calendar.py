@@ -1,3 +1,4 @@
+from django.test import override_settings
 from datetime import date, timedelta
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -7,6 +8,7 @@ from .availability_calendar import build_month
 from .models import Hut, Room, Reservation, ReservationItem
 
 
+@override_settings(SECURE_SSL_REDIRECT=False)
 class AvailabilityCalendarTests(TestCase):
     def setUp(self):
         User = get_user_model()

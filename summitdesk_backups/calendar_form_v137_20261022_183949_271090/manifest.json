@@ -1,0 +1,13 @@
+{
+  "version": "v137",
+  "originals": {
+    "bookings/templates/bookings/calendar_booking_form.html": "a1308b00d8251e650b21b5320f4a1a65da8f08b74feda05b899a1283cd0d48db"
+  },
+  "installed": {
+    "bookings/templates/bookings/calendar_booking_form.html": "59cc3909172fee1d7122e7c4aa0b7435292766b2fc2e609f98ea9a6556ddc263",
+    "bookings/test_calendar_form_ui_v137.py": "f247a6d174e62b123ce3681cdc421196a419571c157c63acf9d4c745edd0b20f"
+  },
+  "created": [
+    "bookings/test_calendar_form_ui_v137.py"
+  ]
+}

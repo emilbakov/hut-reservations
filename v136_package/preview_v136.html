@@ -1,0 +1,1178 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>SummitDesk v136 — preview</title><style>body{margin:0;background:#f6f8f4;color:#19372d;font-family:Arial,sans-serif}.preview-header{height:68px;background:#153b2b;display:flex;align-items:center;justify-content:space-between;padding:0 max(24px,calc((100vw - 1360px)/2));color:white}.preview-header strong{font-size:20px;letter-spacing:-.04em}.preview-header strong span{color:#c9ef71}.preview-header nav{font-size:13px;color:#d4e8d8;display:flex;gap:25px}.preview-shell{max-width:1360px;margin:0 auto;padding:0 24px}@media(max-width:600px){.preview-header{padding:0 18px;height:62px}.preview-header nav{display:none}.preview-shell{padding:0 15px}}</style></head><body><header class="preview-header"><strong><span>▲</span> SummitDesk</strong><nav><span>Overview</span><span>Calendar</span><span>Reservations</span><span>Messages</span></nav></header><main class="preview-shell">
+<style>
+/* SummitDesk v136 — scoped, read-only monthly availability UI. */
+.sd136{--ink:#173b30;--muted:#61776c;--line:#dce7df;--pine:#195b42;--lime:#d9edbd;max-width:1600px;margin:0 auto;padding:12px 0 50px;color:var(--ink);font-family:'DM Sans',system-ui,sans-serif}
+.sd136 *{box-sizing:border-box}
+.sd136 a{color:inherit}
+.sd136 a:focus-visible,.sd136 button:focus-visible,.sd136 select:focus-visible,.sd136 input:focus-visible,.sd136 summary:focus-visible{outline:3px solid #9bca52;outline-offset:3px}
+.sd136-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px;margin:10px 0 23px}
+.sd136-eyebrow{margin:0 0 7px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:850;color:#60816b}
+.sd136 h1{font-family:Outfit,system-ui,sans-serif;font-size:clamp(1.8rem,3.2vw,2.75rem);letter-spacing:-.035em;line-height:1.1;margin:0}
+.sd136-intro{font-size:14px;line-height:1.6;color:var(--muted);margin:9px 0 0;max-width:690px}
+.sd136-actions{display:flex;gap:9px;flex-wrap:wrap}
+.sd136-btn{min-height:44px;display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;border:1px solid #c4d5c8;border-radius:11px;background:#fff;text-decoration:none;font-size:13px;font-weight:800;white-space:nowrap;cursor:pointer}
+.sd136-btn:hover{background:#f2f8f1}
+.sd136-btn.primary{background:var(--pine);color:#fff;border-color:var(--pine)}
+.sd136-btn.primary:hover{background:#104a34}
+.sd136-filter{display:flex;align-items:end;gap:13px;flex-wrap:wrap;background:#f7faf6;border:1px solid var(--line);border-radius:17px;padding:16px;margin:0 0 18px}
+.sd136-field{display:grid;gap:6px;font-size:12px;font-weight:800;color:#385d49}
+.sd136-field select,.sd136-field input{font:inherit;font-size:14px;font-weight:600;height:44px;min-width:130px;padding:8px 11px;background:#fff;color:#173b30;border:1px solid #c6d7ca;border-radius:10px}
+.sd136-field.hut select{min-width:210px;max-width:340px}
+.sd136-filter .sd136-btn{margin-left:2px}
+.sd136-period{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;margin:5px 0 18px}
+.sd136-period-name{display:grid;gap:3px}
+.sd136-period-name strong{font-family:Outfit,system-ui,sans-serif;font-size:22px;letter-spacing:-.02em}
+.sd136-period-name span{font-size:12px;color:var(--muted)}
+.sd136-period-nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sd136-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 21px}
+.sd136-stat{border:1px solid var(--line);background:#fff;border-radius:15px;padding:17px 19px;min-width:0;box-shadow:0 6px 22px rgba(22,57,35,.035)}
+.sd136-stat small{display:block;font-size:12px;font-weight:750;color:var(--muted);margin:0 0 8px}
+.sd136-stat strong{display:block;font:750 clamp(23px,2.5vw,33px)/1.1 Outfit,system-ui,sans-serif;letter-spacing:-.02em}
+.sd136-stat span{display:block;color:#73877b;font-size:11px;margin-top:7px}
+.sd136-stat.warning{border-color:#f0d4bf;background:#fffcf8}
+.sd136-stat.warning strong{color:#a45324}
+.sd136-boardhead{display:flex;align-items:start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:0 0 12px}
+.sd136-boardhead h2{font:750 19px/1.2 Outfit,system-ui,sans-serif;margin:0 0 4px}
+.sd136-boardhead p{margin:0;color:var(--muted);font-size:12px;line-height:1.5}
+.sd136-key{display:flex;flex-wrap:wrap;gap:8px 13px;align-items:center;font-size:11px;font-weight:700;color:#567163}
+.sd136-key span{display:inline-flex;align-items:center;gap:6px}
+.sd136-swatch{display:inline-block;width:11px;height:11px;border-radius:3px;border:1px solid rgba(0,0,0,.05)}
+.sd136-swatch.open{background:#dff4e6}.sd136-swatch.limited{background:#fff0c6}.sd136-swatch.full{background:#fce0d9}.sd136-swatch.over{background:#aa3e34}
+.sd136-mobilehint{display:none;margin:0 0 9px;color:#567263;font-size:12px;font-weight:750}
+.sd136-scroll{max-width:100%;overflow:auto;border:1px solid var(--line);border-radius:16px;background:#fff;box-shadow:0 10px 30px rgba(17,57,35,.06);-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.sd136-table{border-collapse:separate;border-spacing:0;width:100%;min-width:max-content;font-size:12px}
+.sd136-table th,.sd136-table td{border-right:1px solid #e8eee8;border-bottom:1px solid #e8eee8;vertical-align:top}
+.sd136-table tr:last-child th,.sd136-table tr:last-child td{border-bottom:0}
+.sd136-table tr>*:last-child{border-right:0}
+.sd136-table thead th{position:sticky;top:0;z-index:3;background:#eef5ee;min-width:70px;padding:13px 4px;text-align:center;color:#617669;font-weight:800}
+.sd136-table thead th strong{display:block;color:#1d4834;font-size:16px;margin-top:4px}
+.sd136-table thead th:first-child{left:0;z-index:6;min-width:205px;text-align:left;padding:15px 16px;color:#1b4935}
+.sd136-table tbody th{position:sticky;left:0;z-index:2;min-width:205px;max-width:205px;background:#fff;text-align:left;padding:14px 14px}
+.sd136-roomhut{display:block;color:#819286;font-size:10px;letter-spacing:.04em;text-transform:uppercase;overflow-wrap:anywhere}
+.sd136-roomname{display:block;font-size:14px;line-height:1.35;color:#1a4834;margin:5px 0;overflow-wrap:anywhere}
+.sd136-roomcap{display:inline-flex;align-items:center;gap:4px;color:#648071;font-size:11px;font-weight:700}
+.sd136-table td{width:78px;min-width:78px;max-width:78px;text-align:center;padding:9px 4px 7px}
+.sd136-table td.open{background:#f0faf2}.sd136-table td.limited{background:#fff7de}.sd136-table td.full{background:#fff0e9}.sd136-table td.over{background:#a7433b;color:#fff}
+.sd136-available{font:800 20px/1.2 Outfit,system-ui,sans-serif;display:block}
+.sd136-free{font-size:10px;display:block;opacity:.8;margin:2px 0 7px}
+.sd136-book{display:inline-flex;align-items:center;justify-content:center;min-height:26px;min-width:53px;border:1px solid #c5dfce;border-radius:7px;background:#fff;text-decoration:none;font-size:10px;font-weight:850;color:#1d6040!important}
+.sd136-book:hover{background:#e6f5e9}
+.sd136-overlabel{display:block;font-size:10px;font-weight:850;margin:5px 0}
+.sd136-details{font-size:10px;line-height:1.45;margin-top:7px}
+.sd136-details summary{cursor:pointer;font-weight:800;text-decoration:underline;text-underline-offset:2px}
+.sd136-reservation{margin-top:6px;padding:5px 3px;border-top:1px solid rgba(70,93,70,.15);overflow-wrap:anywhere}
+.sd136-reservation a{font-weight:850;text-decoration:underline;text-underline-offset:2px}
+.sd136-reservation em{display:block;font-style:normal;font-size:9px;opacity:.82}
+.sd136-table td.over .sd136-book{border-color:#fff}
+.sd136-empty{padding:38px 20px!important;text-align:center;font-size:14px;color:var(--muted)}
+.sd136-footnote{font-size:12px;color:var(--muted);line-height:1.7;margin:13px 0 0}
+@media(max-width:850px){.sd136-stats{gap:9px}.sd136-stat{padding:14px}.sd136-boardhead{display:block}.sd136-key{margin-top:12px}.sd136-mobilehint{display:block}.sd136-table thead th:first-child,.sd136-table tbody th{min-width:145px;max-width:145px}.sd136-table tbody th{padding:12px 10px}.sd136-table td{min-width:74px;max-width:74px}}
+@media(max-width:590px){.sd136{padding-top:3px}.sd136-top{margin-top:5px}.sd136-actions{width:100%;display:grid;grid-template-columns:1fr 1fr}.sd136-actions .sd136-btn{padding:10px 7px;white-space:normal;text-align:center}.sd136-filter{padding:12px;gap:10px}.sd136-field.hut{width:100%}.sd136-field.hut select{width:100%;max-width:none}.sd136-field{flex:1 1 100px}.sd136-field select,.sd136-field input{min-width:0;width:100%}.sd136-filter .sd136-btn{flex:1 1 100%;width:100%}.sd136-period{align-items:start}.sd136-period-nav{width:100%}.sd136-period-nav .sd136-btn{flex:1}.sd136-stats{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.sd136-stat{padding:11px 10px}.sd136-stat small{font-size:10px;min-height:26px}.sd136-stat strong{font-size:23px}.sd136-stat span{font-size:9px}.sd136-table thead th:first-child,.sd136-table tbody th{min-width:124px;max-width:124px}.sd136-roomname{font-size:12px}.sd136-table thead th{min-width:70px}}
+@media(prefers-reduced-motion:reduce){.sd136-scroll{scroll-behavior:auto}}
+</style>
+<section class="sd136" aria-labelledby="sd136-title">
+  <header class="sd136-top">
+    <div>
+      <p class="sd136-eyebrow">SummitDesk / Room management</p>
+      <h1 id="sd136-title">Room availability</h1>
+      <p class="sd136-intro">Plan every bed with confidence. View room capacity, occupied nights and upcoming stays across the month.</p>
+    </div>
+    <div class="sd136-actions">
+      <a class="sd136-btn" href="/staff/availability/week/?hut=rila-lakes">Weekly timeline &rarr;</a>
+      <a class="sd136-btn primary" href="/staff/availability/new/?hut=rila-lakes">+ New reservation</a>
+    </div>
+  </header>
+
+  <form class="sd136-filter" method="get" aria-label="Calendar filters">
+    <label class="sd136-field hut">Mountain hut
+      <select name="hut">
+        
+        <option value="rila-lakes" selected>Rila Lakes Hut</option>
+      </select>
+    </label>
+    <label class="sd136-field">Month
+      <select name="month">
+        <option value="1" >January</option>
+        <option value="2" >February</option>
+        <option value="3" >March</option>
+        <option value="4" >April</option>
+        <option value="5" >May</option>
+        <option value="6" >June</option>
+        <option value="7" >July</option>
+        <option value="8" >August</option>
+        <option value="9" >September</option>
+        <option value="10" selected>October</option>
+        <option value="11" >November</option>
+        <option value="12" >December</option>
+      </select>
+    </label>
+    <label class="sd136-field">Year
+      <input type="number" name="year" min="2000" max="2100" value="2026" required>
+    </label>
+    
+    <button class="sd136-btn primary" type="submit">Apply filters</button>
+  </form>
+
+  <div class="sd136-period">
+    <div class="sd136-period-name">
+      <strong>October 2026</strong>
+      <span>All permitted rooms · Monthly overview</span>
+    </div>
+    <nav class="sd136-period-nav" aria-label="Month navigation">
+      <a class="sd136-btn" href="?year=2026&amp;month=9&amp;hut=rila-lakes">&larr; Previous</a>
+      <a class="sd136-btn" href="?hut=rila-lakes">Today</a>
+      <a class="sd136-btn" href="?year=2026&amp;month=11&amp;hut=rila-lakes">Next &rarr;</a>
+    </nav>
+  </div>
+
+  <div class="sd136-stats" aria-label="Monthly availability summary">
+    <div class="sd136-stat"><small>Room capacity</small><strong>21</strong><span>Beds across 4 rooms</span></div>
+    <div class="sd136-stat"><small>Occupied bed-nights</small><strong>131</strong><span>Pending and confirmed stays</span></div>
+    <div class="sd136-stat warning"><small>Over-capacity nights</small><strong>1</strong><span>Room-days needing attention</span></div>
+  </div>
+
+  <div class="sd136-boardhead">
+    <div><h2>Availability by room</h2><p>Each number is the beds still free on that night. Select “Booked” to see reservations.</p></div>
+    <div class="sd136-key" aria-label="Availability legend">
+      <span><i class="sd136-swatch open" aria-hidden="true"></i>Available</span>
+      <span><i class="sd136-swatch limited" aria-hidden="true"></i>1–2 left</span>
+      <span><i class="sd136-swatch full" aria-hidden="true"></i>Full</span>
+      <span><i class="sd136-swatch over" aria-hidden="true"></i>Overbooked</span>
+    </div>
+  </div>
+  <p class="sd136-mobilehint">&harr; Swipe sideways to explore the month. Room names remain visible.</p>
+  <div class="sd136-scroll" role="region" aria-label="Scrollable monthly room availability" tabindex="0">
+    <table class="sd136-table">
+      <thead><tr><th scope="col">ROOM / BEDS</th><th scope="col"><span>Thu</span><strong>1</strong></th><th scope="col"><span>Fri</span><strong>2</strong></th><th scope="col"><span>Sat</span><strong>3</strong></th><th scope="col"><span>Sun</span><strong>4</strong></th><th scope="col"><span>Mon</span><strong>5</strong></th><th scope="col"><span>Tue</span><strong>6</strong></th><th scope="col"><span>Wed</span><strong>7</strong></th><th scope="col"><span>Thu</span><strong>8</strong></th><th scope="col"><span>Fri</span><strong>9</strong></th><th scope="col"><span>Sat</span><strong>10</strong></th><th scope="col"><span>Sun</span><strong>11</strong></th><th scope="col"><span>Mon</span><strong>12</strong></th><th scope="col"><span>Tue</span><strong>13</strong></th><th scope="col"><span>Wed</span><strong>14</strong></th><th scope="col"><span>Thu</span><strong>15</strong></th><th scope="col"><span>Fri</span><strong>16</strong></th><th scope="col"><span>Sat</span><strong>17</strong></th><th scope="col"><span>Sun</span><strong>18</strong></th><th scope="col"><span>Mon</span><strong>19</strong></th><th scope="col"><span>Tue</span><strong>20</strong></th><th scope="col"><span>Wed</span><strong>21</strong></th><th scope="col"><span>Thu</span><strong>22</strong></th><th scope="col"><span>Fri</span><strong>23</strong></th><th scope="col"><span>Sat</span><strong>24</strong></th><th scope="col"><span>Sun</span><strong>25</strong></th><th scope="col"><span>Mon</span><strong>26</strong></th><th scope="col"><span>Tue</span><strong>27</strong></th><th scope="col"><span>Wed</span><strong>28</strong></th><th scope="col"><span>Thu</span><strong>29</strong></th><th scope="col"><span>Fri</span><strong>30</strong></th><th scope="col"><span>Sat</span><strong>31</strong></th></tr></thead>
+      <tbody>
+        
+          <tr>
+            <th scope="row"><span class="sd136-roomhut">Rila Lakes Hut</span><strong class="sd136-roomname">Panorama Dormitory</strong><span class="sd136-roomcap">8 beds total</span></th>
+            
+              <td class="open" title="01 Oct 2026: 0 occupied of 8">
+                <strong class="sd136-available">8</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-01&amp;room=1&amp;hut=rila-lakes" aria-label="Create reservation for Panorama Dormitory on 01 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="02 Oct 2026: 0 occupied of 8">
+                <strong class="sd136-available">8</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-02&amp;room=1&amp;hut=rila-lakes" aria-label="Create reservation for Panorama Dormitory on 02 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="03 Oct 2026: 0 occupied of 8">
+                <strong class="sd136-available">8</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-03&amp;room=1&amp;hut=rila-lakes" aria-label="Create reservation for Panorama Dormitory on 03 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="04 Oct 2026: 0 occupied of 8">
+                <strong class="sd136-available">8</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-04&amp;room=1&amp;hut=rila-lakes" aria-label="Create reservation for Panorama Dormitory on 04 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="05 Oct 2026: 0 occupied of 8">
+                <strong class="sd136-available">8</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-05&amp;room=1&amp;hut=rila-lakes" aria-label="Create reservation for Panorama Dormitory on 05 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="06 Oct 2026: 0 occupied of 8">
+                <strong class="sd136-available">8</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-06&amp;room=1&amp;hut=rila-lakes" aria-label="Create reservation for Panorama Dormitory on 06 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="07 Oct 2026: 0 occupied of 8">
+                <strong class="sd136-available">8</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-07&amp;room=1&amp;hut=rila-lakes" aria-label="Create reservation for Panorama Dormitory on 07 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="08 Oct 2026: 0 occupied of 8">
+                <strong class="sd136-available">8</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-08&amp;room=1&amp;hut=rila-lakes" aria-label="Create reservation for Panorama Dormitory on 08 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="09 Oct 2026: 5 occupied of 8">
+                <strong class="sd136-available">3</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-09&amp;room=1&amp;hut=rila-lakes" aria-label="Create reservation for Panorama Dormitory on 09 Oct 2026">+ Book</a>
+                
+                  <details class="sd136-details"><summary>5 booked</summary>
+                    <div class="sd136-reservation"><a href="/staff/availability/edit/RL0808/?hut=rila-lakes">RL0808</a><em>Elena Petrova · 5 beds · confirmed</em></div>
+                  </details>
+                
+                
+              </td>
+            
+              <td class="limited" title="10 Oct 2026: 6 occupied of 8">
+                <strong class="sd136-available">2</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-10&amp;room=1&amp;hut=rila-lakes" aria-label="Create reservation for Panorama Dormitory on 10 Oct 2026">+ Book</a>
+                
+                  <details class="sd136-details"><summary>6 booked</summary>
+                    <div class="sd136-reservation"><a href="/staff/availability/edit/RL0908/?hut=rila-lakes">RL0908</a><em>Elena Petrova · 6 beds · confirmed</em></div>
+                  </details>
+                
+                
+              </td>
+            
+              <td class="open" title="11 Oct 2026: 2 occupied of 8">
+                <strong class="sd136-available">6</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-11&amp;room=1&amp;hut=rila-lakes" aria-label="Create reservation for Panorama Dormitory on 11 Oct 2026">+ Book</a>
+                
+                  <details class="sd136-details"><summary>2 booked</summary>
+                    <div class="sd136-reservation"><a href="/staff/availability/edit/RL1008/?hut=rila-lakes">RL1008</a><em>Elena Petrova · 2 beds · confirmed</em></div>
+                  </details>
+                
+                
+              </td>
+            
+              <td class="open" title="12 Oct 2026: 3 occupied of 8">
+                <strong class="sd136-available">5</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-12&amp;room=1&amp;hut=rila-lakes" aria-label="Create reservation for Panorama Dormitory on 12 Oct 2026">+ Book</a>
+                
+                  <details class="sd136-details"><summary>3 booked</summary>
+                    <div class="sd136-reservation"><a href="/staff/availability/edit/RL1108/?hut=rila-lakes">RL1108</a><em>Elena Petrova · 3 beds · confirmed</em></div>
+                  </details>
+                
+                
+              </td>
+            
+              <td class="open" title="13 Oct 2026: 4 occupied of 8">
+                <strong class="sd136-available">4</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-13&amp;room=1&amp;hut=rila-lakes" aria-label="Create reservation for Panorama Dormitory on 13 Oct 2026">+ Book</a>
+                
+                  <details class="sd136-details"><summary>4 booked</summary>
+                    <div class="sd136-reservation"><a href="/staff/availability/edit/RL1208/?hut=rila-lakes">RL1208</a><em>Elena Petrova · 4 beds · confirmed</em></div>
+                  </details>
+                
+                
+              </td>
+            
+              <td class="open" title="14 Oct 2026: 5 occupied of 8">
+                <strong class="sd136-available">3</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-14&amp;room=1&amp;hut=rila-lakes" aria-label="Create reservation for Panorama Dormitory on 14 Oct 2026">+ Book</a>
+                
+                  <details class="sd136-details"><summary>5 booked</summary>
+                    <div class="sd136-reservation"><a href="/staff/availability/edit/RL1308/?hut=rila-lakes">RL1308</a><em>Elena Petrova · 5 beds · confirmed</em></div>
+                  </details>
+                
+                
+              </td>
+            
+              <td class="limited" title="15 Oct 2026: 6 occupied of 8">
+                <strong class="sd136-available">2</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-15&amp;room=1&amp;hut=rila-lakes" aria-label="Create reservation for Panorama Dormitory on 15 Oct 2026">+ Book</a>
+                
+                  <details class="sd136-details"><summary>6 booked</summary>
+                    <div class="sd136-reservation"><a href="/staff/availability/edit/RL1408/?hut=rila-lakes">RL1408</a><em>Elena Petrova · 6 beds · confirmed</em></div>
+                  </details>
+                
+                
+              </td>
+            
+              <td class="open" title="16 Oct 2026: 2 occupied of 8">
+                <strong class="sd136-available">6</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-16&amp;room=1&amp;hut=rila-lakes" aria-label="Create reservation for Panorama Dormitory on 16 Oct 2026">+ Book</a>
+                
+                  <details class="sd136-details"><summary>2 booked</summary>
+                    <div class="sd136-reservation"><a href="/staff/availability/edit/RL1508/?hut=rila-lakes">RL1508</a><em>Elena Petrova · 2 beds · confirmed</em></div>
+                  </details>
+                
+                
+              </td>
+            
+              <td class="over" title="17 Oct 2026: 9 occupied of 8">
+                <strong class="sd136-available">0</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-17&amp;room=1&amp;hut=rila-lakes" aria-label="Create reservation for Panorama Dormitory on 17 Oct 2026">+ Book</a>
+                
+                  <details class="sd136-details"><summary>9 booked</summary>
+                    <div class="sd136-reservation"><a href="/staff/availability/edit/RL1608/?hut=rila-lakes">RL1608</a><em>Elena Petrova · 9 beds · confirmed</em></div>
+                  </details>
+                
+                <strong class="sd136-overlabel">Overbooked!</strong>
+              </td>
+            
+              <td class="open" title="18 Oct 2026: 4 occupied of 8">
+                <strong class="sd136-available">4</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-18&amp;room=1&amp;hut=rila-lakes" aria-label="Create reservation for Panorama Dormitory on 18 Oct 2026">+ Book</a>
+                
+                  <details class="sd136-details"><summary>4 booked</summary>
+                    <div class="sd136-reservation"><a href="/staff/availability/edit/RL1708/?hut=rila-lakes">RL1708</a><em>Elena Petrova · 4 beds · confirmed</em></div>
+                  </details>
+                
+                
+              </td>
+            
+              <td class="open" title="19 Oct 2026: 5 occupied of 8">
+                <strong class="sd136-available">3</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-19&amp;room=1&amp;hut=rila-lakes" aria-label="Create reservation for Panorama Dormitory on 19 Oct 2026">+ Book</a>
+                
+                  <details class="sd136-details"><summary>5 booked</summary>
+                    <div class="sd136-reservation"><a href="/staff/availability/edit/RL1808/?hut=rila-lakes">RL1808</a><em>Elena Petrova · 5 beds · confirmed</em></div>
+                  </details>
+                
+                
+              </td>
+            
+              <td class="limited" title="20 Oct 2026: 6 occupied of 8">
+                <strong class="sd136-available">2</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-20&amp;room=1&amp;hut=rila-lakes" aria-label="Create reservation for Panorama Dormitory on 20 Oct 2026">+ Book</a>
+                
+                  <details class="sd136-details"><summary>6 booked</summary>
+                    <div class="sd136-reservation"><a href="/staff/availability/edit/RL1908/?hut=rila-lakes">RL1908</a><em>Elena Petrova · 6 beds · confirmed</em></div>
+                  </details>
+                
+                
+              </td>
+            
+              <td class="open" title="21 Oct 2026: 2 occupied of 8">
+                <strong class="sd136-available">6</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-21&amp;room=1&amp;hut=rila-lakes" aria-label="Create reservation for Panorama Dormitory on 21 Oct 2026">+ Book</a>
+                
+                  <details class="sd136-details"><summary>2 booked</summary>
+                    <div class="sd136-reservation"><a href="/staff/availability/edit/RL2008/?hut=rila-lakes">RL2008</a><em>Elena Petrova · 2 beds · confirmed</em></div>
+                  </details>
+                
+                
+              </td>
+            
+              <td class="open" title="22 Oct 2026: 3 occupied of 8">
+                <strong class="sd136-available">5</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-22&amp;room=1&amp;hut=rila-lakes" aria-label="Create reservation for Panorama Dormitory on 22 Oct 2026">+ Book</a>
+                
+                  <details class="sd136-details"><summary>3 booked</summary>
+                    <div class="sd136-reservation"><a href="/staff/availability/edit/RL2108/?hut=rila-lakes">RL2108</a><em>Elena Petrova · 3 beds · confirmed</em></div>
+                  </details>
+                
+                
+              </td>
+            
+              <td class="open" title="23 Oct 2026: 4 occupied of 8">
+                <strong class="sd136-available">4</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-23&amp;room=1&amp;hut=rila-lakes" aria-label="Create reservation for Panorama Dormitory on 23 Oct 2026">+ Book</a>
+                
+                  <details class="sd136-details"><summary>4 booked</summary>
+                    <div class="sd136-reservation"><a href="/staff/availability/edit/RL2208/?hut=rila-lakes">RL2208</a><em>Elena Petrova · 4 beds · confirmed</em></div>
+                  </details>
+                
+                
+              </td>
+            
+              <td class="open" title="24 Oct 2026: 0 occupied of 8">
+                <strong class="sd136-available">8</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-24&amp;room=1&amp;hut=rila-lakes" aria-label="Create reservation for Panorama Dormitory on 24 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="25 Oct 2026: 0 occupied of 8">
+                <strong class="sd136-available">8</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-25&amp;room=1&amp;hut=rila-lakes" aria-label="Create reservation for Panorama Dormitory on 25 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="26 Oct 2026: 0 occupied of 8">
+                <strong class="sd136-available">8</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-26&amp;room=1&amp;hut=rila-lakes" aria-label="Create reservation for Panorama Dormitory on 26 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="27 Oct 2026: 0 occupied of 8">
+                <strong class="sd136-available">8</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-27&amp;room=1&amp;hut=rila-lakes" aria-label="Create reservation for Panorama Dormitory on 27 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="28 Oct 2026: 0 occupied of 8">
+                <strong class="sd136-available">8</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-28&amp;room=1&amp;hut=rila-lakes" aria-label="Create reservation for Panorama Dormitory on 28 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="29 Oct 2026: 0 occupied of 8">
+                <strong class="sd136-available">8</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-29&amp;room=1&amp;hut=rila-lakes" aria-label="Create reservation for Panorama Dormitory on 29 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="30 Oct 2026: 0 occupied of 8">
+                <strong class="sd136-available">8</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-30&amp;room=1&amp;hut=rila-lakes" aria-label="Create reservation for Panorama Dormitory on 30 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="31 Oct 2026: 0 occupied of 8">
+                <strong class="sd136-available">8</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-31&amp;room=1&amp;hut=rila-lakes" aria-label="Create reservation for Panorama Dormitory on 31 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+          </tr>
+        
+          <tr>
+            <th scope="row"><span class="sd136-roomhut">Rila Lakes Hut</span><strong class="sd136-roomname">Alpine Room</strong><span class="sd136-roomcap">4 beds total</span></th>
+            
+              <td class="open" title="01 Oct 2026: 0 occupied of 4">
+                <strong class="sd136-available">4</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-01&amp;room=2&amp;hut=rila-lakes" aria-label="Create reservation for Alpine Room on 01 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="02 Oct 2026: 0 occupied of 4">
+                <strong class="sd136-available">4</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-02&amp;room=2&amp;hut=rila-lakes" aria-label="Create reservation for Alpine Room on 02 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="03 Oct 2026: 0 occupied of 4">
+                <strong class="sd136-available">4</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-03&amp;room=2&amp;hut=rila-lakes" aria-label="Create reservation for Alpine Room on 03 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="04 Oct 2026: 0 occupied of 4">
+                <strong class="sd136-available">4</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-04&amp;room=2&amp;hut=rila-lakes" aria-label="Create reservation for Alpine Room on 04 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="05 Oct 2026: 0 occupied of 4">
+                <strong class="sd136-available">4</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-05&amp;room=2&amp;hut=rila-lakes" aria-label="Create reservation for Alpine Room on 05 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="06 Oct 2026: 0 occupied of 4">
+                <strong class="sd136-available">4</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-06&amp;room=2&amp;hut=rila-lakes" aria-label="Create reservation for Alpine Room on 06 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="07 Oct 2026: 0 occupied of 4">
+                <strong class="sd136-available">4</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-07&amp;room=2&amp;hut=rila-lakes" aria-label="Create reservation for Alpine Room on 07 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="08 Oct 2026: 0 occupied of 4">
+                <strong class="sd136-available">4</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-08&amp;room=2&amp;hut=rila-lakes" aria-label="Create reservation for Alpine Room on 08 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="09 Oct 2026: 0 occupied of 4">
+                <strong class="sd136-available">4</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-09&amp;room=2&amp;hut=rila-lakes" aria-label="Create reservation for Alpine Room on 09 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="10 Oct 2026: 0 occupied of 4">
+                <strong class="sd136-available">4</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-10&amp;room=2&amp;hut=rila-lakes" aria-label="Create reservation for Alpine Room on 10 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="11 Oct 2026: 0 occupied of 4">
+                <strong class="sd136-available">4</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-11&amp;room=2&amp;hut=rila-lakes" aria-label="Create reservation for Alpine Room on 11 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="limited" title="12 Oct 2026: 3 occupied of 4">
+                <strong class="sd136-available">1</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-12&amp;room=2&amp;hut=rila-lakes" aria-label="Create reservation for Alpine Room on 12 Oct 2026">+ Book</a>
+                
+                  <details class="sd136-details"><summary>3 booked</summary>
+                    <div class="sd136-reservation"><a href="/staff/availability/edit/RL1118/?hut=rila-lakes">RL1118</a><em>Martin Ivanov · 3 beds · confirmed</em></div>
+                  </details>
+                
+                
+              </td>
+            
+              <td class="limited" title="13 Oct 2026: 3 occupied of 4">
+                <strong class="sd136-available">1</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-13&amp;room=2&amp;hut=rila-lakes" aria-label="Create reservation for Alpine Room on 13 Oct 2026">+ Book</a>
+                
+                  <details class="sd136-details"><summary>3 booked</summary>
+                    <div class="sd136-reservation"><a href="/staff/availability/edit/RL1218/?hut=rila-lakes">RL1218</a><em>Martin Ivanov · 3 beds · confirmed</em></div>
+                  </details>
+                
+                
+              </td>
+            
+              <td class="limited" title="14 Oct 2026: 3 occupied of 4">
+                <strong class="sd136-available">1</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-14&amp;room=2&amp;hut=rila-lakes" aria-label="Create reservation for Alpine Room on 14 Oct 2026">+ Book</a>
+                
+                  <details class="sd136-details"><summary>3 booked</summary>
+                    <div class="sd136-reservation"><a href="/staff/availability/edit/RL1318/?hut=rila-lakes">RL1318</a><em>Martin Ivanov · 3 beds · confirmed</em></div>
+                  </details>
+                
+                
+              </td>
+            
+              <td class="limited" title="15 Oct 2026: 3 occupied of 4">
+                <strong class="sd136-available">1</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-15&amp;room=2&amp;hut=rila-lakes" aria-label="Create reservation for Alpine Room on 15 Oct 2026">+ Book</a>
+                
+                  <details class="sd136-details"><summary>3 booked</summary>
+                    <div class="sd136-reservation"><a href="/staff/availability/edit/RL1418/?hut=rila-lakes">RL1418</a><em>Martin Ivanov · 3 beds · confirmed</em></div>
+                  </details>
+                
+                
+              </td>
+            
+              <td class="limited" title="16 Oct 2026: 3 occupied of 4">
+                <strong class="sd136-available">1</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-16&amp;room=2&amp;hut=rila-lakes" aria-label="Create reservation for Alpine Room on 16 Oct 2026">+ Book</a>
+                
+                  <details class="sd136-details"><summary>3 booked</summary>
+                    <div class="sd136-reservation"><a href="/staff/availability/edit/RL1518/?hut=rila-lakes">RL1518</a><em>Martin Ivanov · 3 beds · confirmed</em></div>
+                  </details>
+                
+                
+              </td>
+            
+              <td class="limited" title="17 Oct 2026: 3 occupied of 4">
+                <strong class="sd136-available">1</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-17&amp;room=2&amp;hut=rila-lakes" aria-label="Create reservation for Alpine Room on 17 Oct 2026">+ Book</a>
+                
+                  <details class="sd136-details"><summary>3 booked</summary>
+                    <div class="sd136-reservation"><a href="/staff/availability/edit/RL1618/?hut=rila-lakes">RL1618</a><em>Martin Ivanov · 3 beds · confirmed</em></div>
+                  </details>
+                
+                
+              </td>
+            
+              <td class="limited" title="18 Oct 2026: 3 occupied of 4">
+                <strong class="sd136-available">1</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-18&amp;room=2&amp;hut=rila-lakes" aria-label="Create reservation for Alpine Room on 18 Oct 2026">+ Book</a>
+                
+                  <details class="sd136-details"><summary>3 booked</summary>
+                    <div class="sd136-reservation"><a href="/staff/availability/edit/RL1718/?hut=rila-lakes">RL1718</a><em>Martin Ivanov · 3 beds · confirmed</em></div>
+                  </details>
+                
+                
+              </td>
+            
+              <td class="open" title="19 Oct 2026: 0 occupied of 4">
+                <strong class="sd136-available">4</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-19&amp;room=2&amp;hut=rila-lakes" aria-label="Create reservation for Alpine Room on 19 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="20 Oct 2026: 0 occupied of 4">
+                <strong class="sd136-available">4</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-20&amp;room=2&amp;hut=rila-lakes" aria-label="Create reservation for Alpine Room on 20 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="21 Oct 2026: 0 occupied of 4">
+                <strong class="sd136-available">4</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-21&amp;room=2&amp;hut=rila-lakes" aria-label="Create reservation for Alpine Room on 21 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="22 Oct 2026: 0 occupied of 4">
+                <strong class="sd136-available">4</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-22&amp;room=2&amp;hut=rila-lakes" aria-label="Create reservation for Alpine Room on 22 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="23 Oct 2026: 0 occupied of 4">
+                <strong class="sd136-available">4</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-23&amp;room=2&amp;hut=rila-lakes" aria-label="Create reservation for Alpine Room on 23 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="24 Oct 2026: 0 occupied of 4">
+                <strong class="sd136-available">4</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-24&amp;room=2&amp;hut=rila-lakes" aria-label="Create reservation for Alpine Room on 24 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="25 Oct 2026: 0 occupied of 4">
+                <strong class="sd136-available">4</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-25&amp;room=2&amp;hut=rila-lakes" aria-label="Create reservation for Alpine Room on 25 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="26 Oct 2026: 0 occupied of 4">
+                <strong class="sd136-available">4</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-26&amp;room=2&amp;hut=rila-lakes" aria-label="Create reservation for Alpine Room on 26 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="27 Oct 2026: 0 occupied of 4">
+                <strong class="sd136-available">4</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-27&amp;room=2&amp;hut=rila-lakes" aria-label="Create reservation for Alpine Room on 27 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="28 Oct 2026: 0 occupied of 4">
+                <strong class="sd136-available">4</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-28&amp;room=2&amp;hut=rila-lakes" aria-label="Create reservation for Alpine Room on 28 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="29 Oct 2026: 0 occupied of 4">
+                <strong class="sd136-available">4</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-29&amp;room=2&amp;hut=rila-lakes" aria-label="Create reservation for Alpine Room on 29 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="30 Oct 2026: 0 occupied of 4">
+                <strong class="sd136-available">4</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-30&amp;room=2&amp;hut=rila-lakes" aria-label="Create reservation for Alpine Room on 30 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="31 Oct 2026: 0 occupied of 4">
+                <strong class="sd136-available">4</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-31&amp;room=2&amp;hut=rila-lakes" aria-label="Create reservation for Alpine Room on 31 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+          </tr>
+        
+          <tr>
+            <th scope="row"><span class="sd136-roomhut">Rila Lakes Hut</span><strong class="sd136-roomname">Family Suite</strong><span class="sd136-roomcap">3 beds total</span></th>
+            
+              <td class="open" title="01 Oct 2026: 0 occupied of 3">
+                <strong class="sd136-available">3</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-01&amp;room=3&amp;hut=rila-lakes" aria-label="Create reservation for Family Suite on 01 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="02 Oct 2026: 0 occupied of 3">
+                <strong class="sd136-available">3</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-02&amp;room=3&amp;hut=rila-lakes" aria-label="Create reservation for Family Suite on 02 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="03 Oct 2026: 0 occupied of 3">
+                <strong class="sd136-available">3</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-03&amp;room=3&amp;hut=rila-lakes" aria-label="Create reservation for Family Suite on 03 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="04 Oct 2026: 0 occupied of 3">
+                <strong class="sd136-available">3</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-04&amp;room=3&amp;hut=rila-lakes" aria-label="Create reservation for Family Suite on 04 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="05 Oct 2026: 0 occupied of 3">
+                <strong class="sd136-available">3</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-05&amp;room=3&amp;hut=rila-lakes" aria-label="Create reservation for Family Suite on 05 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="06 Oct 2026: 0 occupied of 3">
+                <strong class="sd136-available">3</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-06&amp;room=3&amp;hut=rila-lakes" aria-label="Create reservation for Family Suite on 06 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="07 Oct 2026: 0 occupied of 3">
+                <strong class="sd136-available">3</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-07&amp;room=3&amp;hut=rila-lakes" aria-label="Create reservation for Family Suite on 07 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="08 Oct 2026: 0 occupied of 3">
+                <strong class="sd136-available">3</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-08&amp;room=3&amp;hut=rila-lakes" aria-label="Create reservation for Family Suite on 08 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="09 Oct 2026: 0 occupied of 3">
+                <strong class="sd136-available">3</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-09&amp;room=3&amp;hut=rila-lakes" aria-label="Create reservation for Family Suite on 09 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="10 Oct 2026: 0 occupied of 3">
+                <strong class="sd136-available">3</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-10&amp;room=3&amp;hut=rila-lakes" aria-label="Create reservation for Family Suite on 10 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="11 Oct 2026: 0 occupied of 3">
+                <strong class="sd136-available">3</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-11&amp;room=3&amp;hut=rila-lakes" aria-label="Create reservation for Family Suite on 11 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="12 Oct 2026: 0 occupied of 3">
+                <strong class="sd136-available">3</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-12&amp;room=3&amp;hut=rila-lakes" aria-label="Create reservation for Family Suite on 12 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="13 Oct 2026: 0 occupied of 3">
+                <strong class="sd136-available">3</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-13&amp;room=3&amp;hut=rila-lakes" aria-label="Create reservation for Family Suite on 13 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="14 Oct 2026: 0 occupied of 3">
+                <strong class="sd136-available">3</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-14&amp;room=3&amp;hut=rila-lakes" aria-label="Create reservation for Family Suite on 14 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="15 Oct 2026: 0 occupied of 3">
+                <strong class="sd136-available">3</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-15&amp;room=3&amp;hut=rila-lakes" aria-label="Create reservation for Family Suite on 15 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="16 Oct 2026: 0 occupied of 3">
+                <strong class="sd136-available">3</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-16&amp;room=3&amp;hut=rila-lakes" aria-label="Create reservation for Family Suite on 16 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="full" title="17 Oct 2026: 3 occupied of 3">
+                <strong class="sd136-available">0</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-17&amp;room=3&amp;hut=rila-lakes" aria-label="Create reservation for Family Suite on 17 Oct 2026">+ Book</a>
+                
+                  <details class="sd136-details"><summary>3 booked</summary>
+                    <div class="sd136-reservation"><a href="/staff/availability/edit/RL1628/?hut=rila-lakes">RL1628</a><em>Alex Novak · 3 beds · pending</em></div>
+                  </details>
+                
+                
+              </td>
+            
+              <td class="full" title="18 Oct 2026: 3 occupied of 3">
+                <strong class="sd136-available">0</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-18&amp;room=3&amp;hut=rila-lakes" aria-label="Create reservation for Family Suite on 18 Oct 2026">+ Book</a>
+                
+                  <details class="sd136-details"><summary>3 booked</summary>
+                    <div class="sd136-reservation"><a href="/staff/availability/edit/RL1728/?hut=rila-lakes">RL1728</a><em>Alex Novak · 3 beds · pending</em></div>
+                  </details>
+                
+                
+              </td>
+            
+              <td class="full" title="19 Oct 2026: 3 occupied of 3">
+                <strong class="sd136-available">0</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-19&amp;room=3&amp;hut=rila-lakes" aria-label="Create reservation for Family Suite on 19 Oct 2026">+ Book</a>
+                
+                  <details class="sd136-details"><summary>3 booked</summary>
+                    <div class="sd136-reservation"><a href="/staff/availability/edit/RL1828/?hut=rila-lakes">RL1828</a><em>Alex Novak · 3 beds · pending</em></div>
+                  </details>
+                
+                
+              </td>
+            
+              <td class="full" title="20 Oct 2026: 3 occupied of 3">
+                <strong class="sd136-available">0</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-20&amp;room=3&amp;hut=rila-lakes" aria-label="Create reservation for Family Suite on 20 Oct 2026">+ Book</a>
+                
+                  <details class="sd136-details"><summary>3 booked</summary>
+                    <div class="sd136-reservation"><a href="/staff/availability/edit/RL1928/?hut=rila-lakes">RL1928</a><em>Alex Novak · 3 beds · pending</em></div>
+                  </details>
+                
+                
+              </td>
+            
+              <td class="open" title="21 Oct 2026: 0 occupied of 3">
+                <strong class="sd136-available">3</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-21&amp;room=3&amp;hut=rila-lakes" aria-label="Create reservation for Family Suite on 21 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="22 Oct 2026: 0 occupied of 3">
+                <strong class="sd136-available">3</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-22&amp;room=3&amp;hut=rila-lakes" aria-label="Create reservation for Family Suite on 22 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="23 Oct 2026: 0 occupied of 3">
+                <strong class="sd136-available">3</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-23&amp;room=3&amp;hut=rila-lakes" aria-label="Create reservation for Family Suite on 23 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="24 Oct 2026: 0 occupied of 3">
+                <strong class="sd136-available">3</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-24&amp;room=3&amp;hut=rila-lakes" aria-label="Create reservation for Family Suite on 24 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="25 Oct 2026: 0 occupied of 3">
+                <strong class="sd136-available">3</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-25&amp;room=3&amp;hut=rila-lakes" aria-label="Create reservation for Family Suite on 25 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="26 Oct 2026: 0 occupied of 3">
+                <strong class="sd136-available">3</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-26&amp;room=3&amp;hut=rila-lakes" aria-label="Create reservation for Family Suite on 26 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="27 Oct 2026: 0 occupied of 3">
+                <strong class="sd136-available">3</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-27&amp;room=3&amp;hut=rila-lakes" aria-label="Create reservation for Family Suite on 27 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="28 Oct 2026: 0 occupied of 3">
+                <strong class="sd136-available">3</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-28&amp;room=3&amp;hut=rila-lakes" aria-label="Create reservation for Family Suite on 28 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="29 Oct 2026: 0 occupied of 3">
+                <strong class="sd136-available">3</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-29&amp;room=3&amp;hut=rila-lakes" aria-label="Create reservation for Family Suite on 29 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="30 Oct 2026: 0 occupied of 3">
+                <strong class="sd136-available">3</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-30&amp;room=3&amp;hut=rila-lakes" aria-label="Create reservation for Family Suite on 30 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="31 Oct 2026: 0 occupied of 3">
+                <strong class="sd136-available">3</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-31&amp;room=3&amp;hut=rila-lakes" aria-label="Create reservation for Family Suite on 31 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+          </tr>
+        
+          <tr>
+            <th scope="row"><span class="sd136-roomhut">Rila Lakes Hut</span><strong class="sd136-roomname">Summit Bunks</strong><span class="sd136-roomcap">6 beds total</span></th>
+            
+              <td class="open" title="01 Oct 2026: 0 occupied of 6">
+                <strong class="sd136-available">6</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-01&amp;room=4&amp;hut=rila-lakes" aria-label="Create reservation for Summit Bunks on 01 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="02 Oct 2026: 0 occupied of 6">
+                <strong class="sd136-available">6</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-02&amp;room=4&amp;hut=rila-lakes" aria-label="Create reservation for Summit Bunks on 02 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="03 Oct 2026: 0 occupied of 6">
+                <strong class="sd136-available">6</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-03&amp;room=4&amp;hut=rila-lakes" aria-label="Create reservation for Summit Bunks on 03 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="04 Oct 2026: 0 occupied of 6">
+                <strong class="sd136-available">6</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-04&amp;room=4&amp;hut=rila-lakes" aria-label="Create reservation for Summit Bunks on 04 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="05 Oct 2026: 0 occupied of 6">
+                <strong class="sd136-available">6</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-05&amp;room=4&amp;hut=rila-lakes" aria-label="Create reservation for Summit Bunks on 05 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="06 Oct 2026: 0 occupied of 6">
+                <strong class="sd136-available">6</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-06&amp;room=4&amp;hut=rila-lakes" aria-label="Create reservation for Summit Bunks on 06 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="07 Oct 2026: 0 occupied of 6">
+                <strong class="sd136-available">6</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-07&amp;room=4&amp;hut=rila-lakes" aria-label="Create reservation for Summit Bunks on 07 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="08 Oct 2026: 0 occupied of 6">
+                <strong class="sd136-available">6</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-08&amp;room=4&amp;hut=rila-lakes" aria-label="Create reservation for Summit Bunks on 08 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="09 Oct 2026: 0 occupied of 6">
+                <strong class="sd136-available">6</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-09&amp;room=4&amp;hut=rila-lakes" aria-label="Create reservation for Summit Bunks on 09 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="10 Oct 2026: 0 occupied of 6">
+                <strong class="sd136-available">6</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-10&amp;room=4&amp;hut=rila-lakes" aria-label="Create reservation for Summit Bunks on 10 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="11 Oct 2026: 0 occupied of 6">
+                <strong class="sd136-available">6</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-11&amp;room=4&amp;hut=rila-lakes" aria-label="Create reservation for Summit Bunks on 11 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="12 Oct 2026: 0 occupied of 6">
+                <strong class="sd136-available">6</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-12&amp;room=4&amp;hut=rila-lakes" aria-label="Create reservation for Summit Bunks on 12 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="13 Oct 2026: 0 occupied of 6">
+                <strong class="sd136-available">6</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-13&amp;room=4&amp;hut=rila-lakes" aria-label="Create reservation for Summit Bunks on 13 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="14 Oct 2026: 0 occupied of 6">
+                <strong class="sd136-available">6</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-14&amp;room=4&amp;hut=rila-lakes" aria-label="Create reservation for Summit Bunks on 14 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="15 Oct 2026: 0 occupied of 6">
+                <strong class="sd136-available">6</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-15&amp;room=4&amp;hut=rila-lakes" aria-label="Create reservation for Summit Bunks on 15 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="16 Oct 2026: 0 occupied of 6">
+                <strong class="sd136-available">6</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-16&amp;room=4&amp;hut=rila-lakes" aria-label="Create reservation for Summit Bunks on 16 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="17 Oct 2026: 0 occupied of 6">
+                <strong class="sd136-available">6</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-17&amp;room=4&amp;hut=rila-lakes" aria-label="Create reservation for Summit Bunks on 17 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="18 Oct 2026: 0 occupied of 6">
+                <strong class="sd136-available">6</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-18&amp;room=4&amp;hut=rila-lakes" aria-label="Create reservation for Summit Bunks on 18 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="19 Oct 2026: 0 occupied of 6">
+                <strong class="sd136-available">6</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-19&amp;room=4&amp;hut=rila-lakes" aria-label="Create reservation for Summit Bunks on 19 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="20 Oct 2026: 0 occupied of 6">
+                <strong class="sd136-available">6</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-20&amp;room=4&amp;hut=rila-lakes" aria-label="Create reservation for Summit Bunks on 20 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="limited" title="21 Oct 2026: 4 occupied of 6">
+                <strong class="sd136-available">2</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-21&amp;room=4&amp;hut=rila-lakes" aria-label="Create reservation for Summit Bunks on 21 Oct 2026">+ Book</a>
+                
+                  <details class="sd136-details"><summary>4 booked</summary>
+                    <div class="sd136-reservation"><a href="/staff/availability/edit/RL2038/?hut=rila-lakes">RL2038</a><em>Nina Georgieva · 4 beds · confirmed</em></div>
+                  </details>
+                
+                
+              </td>
+            
+              <td class="limited" title="22 Oct 2026: 4 occupied of 6">
+                <strong class="sd136-available">2</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-22&amp;room=4&amp;hut=rila-lakes" aria-label="Create reservation for Summit Bunks on 22 Oct 2026">+ Book</a>
+                
+                  <details class="sd136-details"><summary>4 booked</summary>
+                    <div class="sd136-reservation"><a href="/staff/availability/edit/RL2138/?hut=rila-lakes">RL2138</a><em>Nina Georgieva · 4 beds · confirmed</em></div>
+                  </details>
+                
+                
+              </td>
+            
+              <td class="limited" title="23 Oct 2026: 4 occupied of 6">
+                <strong class="sd136-available">2</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-23&amp;room=4&amp;hut=rila-lakes" aria-label="Create reservation for Summit Bunks on 23 Oct 2026">+ Book</a>
+                
+                  <details class="sd136-details"><summary>4 booked</summary>
+                    <div class="sd136-reservation"><a href="/staff/availability/edit/RL2238/?hut=rila-lakes">RL2238</a><em>Nina Georgieva · 4 beds · confirmed</em></div>
+                  </details>
+                
+                
+              </td>
+            
+              <td class="limited" title="24 Oct 2026: 4 occupied of 6">
+                <strong class="sd136-available">2</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-24&amp;room=4&amp;hut=rila-lakes" aria-label="Create reservation for Summit Bunks on 24 Oct 2026">+ Book</a>
+                
+                  <details class="sd136-details"><summary>4 booked</summary>
+                    <div class="sd136-reservation"><a href="/staff/availability/edit/RL2338/?hut=rila-lakes">RL2338</a><em>Nina Georgieva · 4 beds · confirmed</em></div>
+                  </details>
+                
+                
+              </td>
+            
+              <td class="limited" title="25 Oct 2026: 4 occupied of 6">
+                <strong class="sd136-available">2</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-25&amp;room=4&amp;hut=rila-lakes" aria-label="Create reservation for Summit Bunks on 25 Oct 2026">+ Book</a>
+                
+                  <details class="sd136-details"><summary>4 booked</summary>
+                    <div class="sd136-reservation"><a href="/staff/availability/edit/RL2438/?hut=rila-lakes">RL2438</a><em>Nina Georgieva · 4 beds · confirmed</em></div>
+                  </details>
+                
+                
+              </td>
+            
+              <td class="limited" title="26 Oct 2026: 4 occupied of 6">
+                <strong class="sd136-available">2</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-26&amp;room=4&amp;hut=rila-lakes" aria-label="Create reservation for Summit Bunks on 26 Oct 2026">+ Book</a>
+                
+                  <details class="sd136-details"><summary>4 booked</summary>
+                    <div class="sd136-reservation"><a href="/staff/availability/edit/RL2538/?hut=rila-lakes">RL2538</a><em>Nina Georgieva · 4 beds · confirmed</em></div>
+                  </details>
+                
+                
+              </td>
+            
+              <td class="limited" title="27 Oct 2026: 4 occupied of 6">
+                <strong class="sd136-available">2</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-27&amp;room=4&amp;hut=rila-lakes" aria-label="Create reservation for Summit Bunks on 27 Oct 2026">+ Book</a>
+                
+                  <details class="sd136-details"><summary>4 booked</summary>
+                    <div class="sd136-reservation"><a href="/staff/availability/edit/RL2638/?hut=rila-lakes">RL2638</a><em>Nina Georgieva · 4 beds · confirmed</em></div>
+                  </details>
+                
+                
+              </td>
+            
+              <td class="limited" title="28 Oct 2026: 4 occupied of 6">
+                <strong class="sd136-available">2</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-28&amp;room=4&amp;hut=rila-lakes" aria-label="Create reservation for Summit Bunks on 28 Oct 2026">+ Book</a>
+                
+                  <details class="sd136-details"><summary>4 booked</summary>
+                    <div class="sd136-reservation"><a href="/staff/availability/edit/RL2738/?hut=rila-lakes">RL2738</a><em>Nina Georgieva · 4 beds · confirmed</em></div>
+                  </details>
+                
+                
+              </td>
+            
+              <td class="open" title="29 Oct 2026: 0 occupied of 6">
+                <strong class="sd136-available">6</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-29&amp;room=4&amp;hut=rila-lakes" aria-label="Create reservation for Summit Bunks on 29 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="30 Oct 2026: 0 occupied of 6">
+                <strong class="sd136-available">6</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-30&amp;room=4&amp;hut=rila-lakes" aria-label="Create reservation for Summit Bunks on 30 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+              <td class="open" title="31 Oct 2026: 0 occupied of 6">
+                <strong class="sd136-available">6</strong><span class="sd136-free">free</span>
+                <a class="sd136-book" href="/staff/availability/new/?check_in=2026-10-31&amp;room=4&amp;hut=rila-lakes" aria-label="Create reservation for Summit Bunks on 31 Oct 2026">+ Book</a>
+                
+                
+              </td>
+            
+          </tr>
+        
+      </tbody>
+    </table>
+  </div>
+  <p class="sd136-footnote">Check-out day does not occupy a bed. Pending and confirmed reservations count toward occupancy; cancelled reservations are excluded. Availability is read-only here—reservation changes use the existing validated booking pages.</p>
+</section>
+</main></body></html>

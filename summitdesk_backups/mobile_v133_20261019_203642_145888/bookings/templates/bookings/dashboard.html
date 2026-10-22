@@ -1,0 +1,28 @@
+{% extends "bookings/base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<style>
+.sd115{--line:#dce6dc;--ink:#19372d;color:var(--ink);padding:22px 0 42px}.sd115 *{box-sizing:border-box}
+.sd115 h1,.sd115 h2,.sd115 p{margin-top:0}.sd115 h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.04em}.sd115 h2{font-size:1.2rem}
+.sd115-top{display:flex;justify-content:space-between;align-items:end;gap:18px;flex-wrap:wrap;margin-bottom:22px}.sd115-sub{color:#617469;margin:6px 0 0}
+.sd115-button{display:inline-flex;align-items:center;justify-content:center;padding:12px 16px;border-radius:11px;background:#193f32;color:white!important;text-decoration:none;font-weight:800;border:0}
+.sd115-button:hover{background:#2a654d}.sd115-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:20px 0}
+.sd115-metric,.sd115-panel{border:1px solid var(--line);border-radius:17px;background:#fff;padding:20px;box-shadow:0 5px 18px #153b2910}
+.sd115-metric span{display:block;color:#5b7365;font-size:.86rem;font-weight:700;margin-bottom:9px}.sd115-metric strong{font-size:clamp(1.5rem,2.8vw,2.15rem);letter-spacing:-.04em}
+.sd115-grid{display:grid;grid-template-columns:1.25fr 1fr;gap:16px}.sd115-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.sd115-links a{padding:14px;border-radius:12px;border:1px solid var(--line);background:#f8faf7;text-decoration:none;color:#1d4b36;font-weight:750}.sd115-links a:hover{background:#eaf5e5}
+.sd115-filter{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.sd115-filter select{padding:10px;border:1px solid #b9cbbb;border-radius:10px;max-width:100%}
+.sd115-table{overflow-x:auto}.sd115 table{border-collapse:collapse;width:100%;min-width:430px}.sd115 th,.sd115 td{text-align:left;padding:11px 8px;border-bottom:1px solid var(--line)}.sd115 th{font-size:.77rem;color:#607267;text-transform:uppercase;letter-spacing:.04em}
+.sd115-muted{color:#62766b;font-size:.9rem}.sd115-panel{margin-bottom:16px}
+@media(max-width:980px){.sd115-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.sd115-grid{grid-template-columns:1fr}}
+@media(max-width:520px){.sd115-metrics,.sd115-links{grid-template-columns:1fr}.sd115-metric,.sd115-panel{padding:16px}}
+</style>
+<div class="sd115">
+  <div class="sd115-top"><div><p class="sd115-muted">SUMMITDESK / OVERVIEW · {{ today|date:"j F Y" }}</p><h1>Good day. Here's your hut overview.</h1><p class="sd115-sub">Your key numbers and next actions, together in one place.</p></div><a class="sd115-button" href="{% url 'bookings:manual_booking' %}{% if selected_slug %}?hut={{ selected_slug|urlencode }}{% endif %}">+ New reservation</a></div>
+  <section class="sd115-panel" aria-label="Hut selection"><form class="sd115-filter" method="get" action="{% url 'bookings:dashboard' %}"><label for="sd115-hut"><strong>Viewing hut</strong></label><select id="sd115-hut" name="hut">{% if not manager_mode %}<option value="">All huts</option>{% endif %}{% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_slug == hut.slug %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}</select><button class="sd115-button" type="submit">Apply</button></form></section>
+  <section class="sd115-metrics" aria-label="Today's operations"><div class="sd115-metric"><span>Beds occupied today</span><strong>{{ occupied }} / {{ capacity }}</strong></div><div class="sd115-metric"><span>Arrivals today</span><strong>{{ arrival_count }}</strong></div><div class="sd115-metric"><span>Departures today</span><strong>{{ departure_count }}</strong></div><div class="sd115-metric"><span>Pending bookings</span><strong>{{ pending_count }}</strong></div></section>
+  <div class="sd115-grid"><section class="sd115-panel"><h2>Upcoming arrivals</h2><div class="sd115-table"><table><thead><tr><th>Guest</th><th>Check-in</th><th>Beds</th><th>Status</th></tr></thead><tbody>{% for row in upcoming %}<tr><td>{{ row.reservation.name }}</td><td>{{ row.reservation.check_in|date:"j M Y" }}</td><td>{{ row.beds }}</td><td>{{ row.reservation.get_status_display }}</td></tr>{% empty %}<tr><td colspan="4">No upcoming arrivals.</td></tr>{% endfor %}</tbody></table></div></section>
+  <section class="sd115-panel"><h2>Quick access</h2><div class="sd115-links"><a href="{% url 'bookings:calendar_timeline' %}">Reservation calendar →</a><a href="{% url 'bookings:manager_reservations' %}">All reservations →</a><a href="{% url 'bookings:manager_stays' %}">Check-in / out →</a><a href="{% url 'bookings:room_calendar' %}">Room availability →</a><a href="{% url 'bookings:financial_dashboard' %}">Financial reports →</a><a href="{% url 'bookings:stay_history' %}">Stay history →</a></div><p class="sd115-muted" style="margin-top:16px">For hut-specific floor plans, cleaning and team management, open the hut workspace below.</p><div class="sd115-links">{% for hut in huts %}<a href="{% url 'floorplans:staff_hub' hut.pk %}">{{ hut.name }} workspace →</a>{% empty %}<span class="sd115-muted">No huts available.</span>{% endfor %}</div></section></div>
+  <section class="sd115-panel"><h2>{{ month|date:"F Y" }} at a glance</h2><section class="sd115-metrics" aria-label="Monthly summary"><div class="sd115-metric"><span>Occupancy</span><strong>{{ occupancy }}%</strong></div><div class="sd115-metric"><span>Booked bed-nights</span><strong>{{ booked_nights }}</strong></div><div class="sd115-metric"><span>Projected revenue</span><strong>{{ revenue|floatformat:2 }} {{ currency }}</strong></div></section><p class="sd115-muted">Monthly figures are based on reservations for the selected hut and month. For detailed dates, open the calendar or financial reports.</p></section>
+</div>
+{% endblock %}

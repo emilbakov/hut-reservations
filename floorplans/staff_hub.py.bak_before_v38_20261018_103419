@@ -1,0 +1,70 @@
+"""V27: unified, read-only, hut-scoped staff landing page."""
+from datetime import timedelta
+from django.contrib.auth.decorators import login_required
+from django.db.models import Q, Sum
+from django.http import HttpResponseForbidden
+from django.shortcuts import render
+from django.utils import timezone
+from django.views.decorators.http import require_GET
+from bookings.models import Room, ReservationItem
+from .staff_tasks import access
+from .housekeeping_tasks import HousekeepingTask
+from .hut_staff import HutCleaner
+
+
+@login_required
+@require_GET
+def staff_hub(request, hut_id):
+    hut, manager, cleaner = access(request, hut_id)
+    if not (manager or cleaner):
+        return HttpResponseForbidden('Not authorized for this hut')
+    today = timezone.localdate()
+    tomorrow = today + timedelta(days=1)
+    task_qs = HousekeepingTask.objects.filter(bed__room__hut=hut, day=today)
+    if not manager:
+        task_qs = task_qs.filter(assignee=request.user)
+    counts = {key: task_qs.filter(status=key).count() for key in ('open', 'in_progress', 'done')}
+    tasks = list(task_qs.select_related('bed__room', 'assignee').order_by('-priority', 'bed__room__name', 'bed__number')[:8])
+    context = {'hut': hut, 'manager': manager, 'today': today, 'counts': counts,
+               'tasks': tasks, 'task_total': sum(counts.values())}
+    if manager:
+        rooms = Room.objects.filter(hut=hut, is_active=True)
+        items = ReservationItem.objects.filter(
+            room__in=rooms, reservation__status__in=('confirmed', 'pending'),
+        ).filter(Q(reservation__check_in__lte=today, reservation__check_out__gt=today)
+                 | Q(reservation__check_in=today) | Q(reservation__check_out=today))
+        context.update({
+            'capacity': sum(rooms.values_list('capacity', flat=True)),
+            'occupied_beds': items.filter(reservation__check_in__lte=today,
+                                          reservation__check_out__gt=today).aggregate(total=Sum('beds'))['total'] or 0,
+            'arrivals': items.filter(reservation__check_in=today).aggregate(total=Sum('beds'))['total'] or 0,
+            'departures': items.filter(reservation__check_out=today).aggregate(total=Sum('beds'))['total'] or 0,
+            'cleaner_count': HutCleaner.objects.filter(hut=hut).count(),
+        })
+    # V37_MANAGER_OVERVIEW: stay-date figures for today, confirmed bookings only.
+    if manager:
+        from decimal import Decimal
+        daily_items = ReservationItem.objects.filter(
+            room__hut=hut,
+            room__is_active=True,
+            reservation__status='confirmed',
+        ).filter(
+            Q(reservation__check_in__lte=today, reservation__check_out__gt=today)
+            | Q(reservation__check_in=tomorrow)
+        ).select_related('reservation')
+        confirmed_today = 0
+        confirmed_value_today = Decimal('0.00')
+        arrivals_tomorrow = 0
+        for item in daily_items:
+            reservation = item.reservation
+            if reservation.check_in <= today < reservation.check_out:
+                confirmed_today += item.beds
+                confirmed_value_today += item.price_per_night * item.beds
+            if reservation.check_in == tomorrow:
+                arrivals_tomorrow += item.beds
+        context.update({
+            'v37_confirmed_beds_today': confirmed_today,
+            'v37_booking_value_today': confirmed_value_today,
+            'v37_arrivals_tomorrow': arrivals_tomorrow,
+        })
+    return render(request, 'floorplans/staff_hub.html', context)

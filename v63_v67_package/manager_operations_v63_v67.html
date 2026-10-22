@@ -1,0 +1,52 @@
+{% load summitdesk_nav %}
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SummitDesk | {{ hut.name }} Manager Operations</title>
+<style>
+:root{font-family:system-ui,-apple-system,sans-serif;color:#173d33;background:#f4f7f3}*{box-sizing:border-box}body{margin:0}
+main{max-width:1200px;margin:auto;padding:18px}.hero{background:#153f34;color:white;padding:22px;border-radius:18px}
+.hero a{color:#e2f1ce}.panel{background:white;border:1px solid #dce7dc;border-radius:14px;padding:18px;margin-top:16px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px}.number{font-size:28px;font-weight:750}
+.muted{color:#60736b;font-size:14px}.scroll{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:730px}
+th,td{text-align:left;padding:10px;border-bottom:1px solid #e4ebe3;vertical-align:top}th{background:#f1f5ee}
+.pill{display:inline-block;border-radius:8px;padding:4px 8px;font-size:12px;background:#e6f1dd}
+.over,.closed{background:#ffe2de}.full{background:#fce9c7}.limited{background:#fff4db}.available{background:#e5f2e6}
+ul{padding-left:20px}li{padding:8px 0;border-bottom:1px solid #edf0eb}li:last-child{border:0}
+input,button{font:inherit;padding:9px;border-radius:8px;border:1px solid #b6c8b6}button{background:#164537;color:white;cursor:pointer}
+a:focus-visible,button:focus-visible{outline:3px solid #91b951;outline-offset:2px}
+@media(max-width:550px){main{padding:10px}.panel{padding:12px}}
+</style></head><body>{% summitdesk_nav %}<main>
+<header class="hero"><div>SUMMITDESK · MANAGER OPERATIONS</div><h1>{{ hut.name }}</h1>
+<a href="{% url 'floorplans:staff_hub' hut.pk %}">← Back to Staff Hub</a></header>
+<section class="panel"><h2>Seven-day operations window</h2>
+<form method="get"><input type="hidden" name="operations" value="1"><label for="forecast_start">Start date</label>
+<input id="forecast_start" type="date" name="forecast_start" value="{{ forecast_start|date:'Y-m-d' }}" min="{{ today|date:'Y-m-d' }}" max="{{ forecast_max|date:'Y-m-d' }}">
+<button type="submit">Update</button></form>
+<p class="muted">Read-only planning information. Check individual reservations before taking action. Check-out dates are not occupied nights.</p></section>
+<section class="cards" aria-label="Operations summary">
+<div class="panel"><div class="muted">Active rooms</div><div class="number">{{ ops.room_count }}</div></div>
+<div class="panel"><div class="muted">Conflict warnings</div><div class="number">{{ ops.conflict_count }}</div></div>
+<div class="panel"><div class="muted">Arrival groups</div><div class="number">{{ ops.arrival_count }}</div></div>
+<div class="panel"><div class="muted">Action items</div><div class="number">{{ ops.action_count }}</div></div>
+</section>
+<section class="panel"><h2>v63 · Reservation conflict dashboard</h2>
+{% for w in ops.conflicts %}<p><strong>{{ w.day|date:"d M Y" }} · {{ w.room }} · {{ w.kind }}</strong><span class="muted"> — {{ w.detail }}</span></p>
+{% empty %}<p class="muted">No detected room-capacity or numbered-bed conflicts in this window.</p>{% endfor %}
+<p class="muted">Only assigned numbered beds can be checked for individual-bed overlaps; unassigned reservations are included in room-capacity checks.</p></section>
+<section class="panel"><h2>v64 · Room availability calendar</h2><div class="scroll"><table>
+<thead><tr><th>Room</th>{% for d in ops.dates %}<th>{{ d|date:"D d M" }}</th>{% endfor %}</tr></thead><tbody>
+{% for r in ops.calendar %}<tr><th>{{ r.room }}<div class="muted">Numbered beds: {{ r.numbered_beds|join:", "|default:"None configured" }}</div></th>
+{% for n in r.nights %}<td class="{{ n.status }}"><strong>{{ n.free }} free</strong><div class="muted">{{ n.confirmed }} confirmed · {{ n.pending }} pending</div><div class="muted">{{ n.closed }} closed · {{ n.usable }} usable</div></td>{% endfor %}</tr>
+{% empty %}<tr><td colspan="8">No active rooms.</td></tr>{% endfor %}
+</tbody></table></div><p class="muted">Room-level counts; not a claim that specific numbered beds are available.</p></section>
+<section class="panel"><h2>v65 · Arrival preparation board</h2>
+{% for a in ops.arrivals %}<p><strong>{{ a.day|date:"d M Y" }} · {{ a.room }}</strong><span class="muted"> — {{ a.beds }} arriving bed places · {{ a.unassigned }} unassigned · {{ a.open_tasks }} unfinished cleaning tasks</span></p>
+{% empty %}<p class="muted">No confirmed arrivals in this window.</p>{% endfor %}
+<p class="muted">Cleaning counts include tasks scheduled for the arrival day; absence of a task does not certify readiness.</p></section>
+<section class="panel"><h2>v66 · Manager action center</h2>
+<ol>{% for a in ops.actions %}<li><strong>{{ a.day|date:"d M Y" }} · {{ a.label }}</strong><div class="muted">{{ a.detail }}</div></li>
+{% empty %}<li>No detected action items for this window.</li>{% endfor %}</ol>
+<p class="muted">Prioritized by conflicts, bed assignment, then cleaning. No reservation changes are made automatically.</p></section>
+<section class="panel"><h2>v67 · Manager workspace</h2>
+<p>Use this dedicated, mobile-friendly operations page for the detailed forecast. Your original Staff Hub and analytics remain available.</p>
+<a href="{% url 'floorplans:staff_hub' hut.pk %}">Return to Staff Hub</a></section>
+</main></body></html>

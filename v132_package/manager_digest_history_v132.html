@@ -1,0 +1,89 @@
+{% extends "bookings/base.html" %}
+{% block title %}Reminder email history{% endblock %}
+{% block content %}
+<style>
+  .dh{max-width:1000px;margin:0 auto;padding:clamp(18px,3vw,38px) 0 65px;color:#17352a}
+  .dh *{box-sizing:border-box}
+  .dh-head{background:linear-gradient(125deg,#132f26,#2b5944);border-radius:22px;padding:clamp(22px,4vw,40px);color:#fff}
+  .dh-head small{color:#d6f485;font-size:.75rem;font-weight:850;letter-spacing:.15em}
+  .dh-head h1{font-size:clamp(1.7rem,3.6vw,2.5rem);color:#fff;margin:12px 0}
+  .dh-head p{color:#e0eae3;line-height:1.6;margin:0}
+  .dh-head a{display:inline-block;color:#fff;margin-top:18px;font-weight:750;text-underline-offset:4px}
+  .dh-panel{background:#fff;border:1px solid #dce8df;border-radius:18px;padding:clamp(18px,3vw,28px);margin-top:20px;box-shadow:0 7px 24px #183b290a}
+  .dh-controls{display:flex;gap:12px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap}
+  .dh-controls label{display:block;font-weight:750;font-size:.88rem;margin-bottom:7px}
+  .dh-controls select{min-height:44px;padding:8px 13px;border:1px solid #a6b9ab;border-radius:9px;background:#fff;color:#17352a;font:inherit}
+  .dh-button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:9px 17px;border:0;border-radius:10px;background:#1c503b;color:#fff!important;text-decoration:none;font:inherit;font-weight:800;cursor:pointer}
+  .dh-outline{background:#eaf2eb;color:#194831!important}
+  .dh-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:20px}
+  .dh-stat{border:1px solid #e3ede5;border-radius:12px;padding:16px}
+  .dh-stat strong{display:block;font-size:1.7rem;color:#1c503b}
+  .dh-stat span{color:#586f60;font-size:.85rem}
+  .dh-tablewrap{overflow-x:auto;margin-top:18px}
+  .dh-table{width:100%;border-collapse:collapse;text-align:left;font-size:.9rem;min-width:570px}
+  .dh-table th,.dh-table td{padding:13px 9px;border-bottom:1px solid #e7eee8}
+  .dh-table th{font-size:.79rem;color:#566d5e}
+  .dh-table td{overflow-wrap:anywhere}
+  .dh-muted{color:#617266;font-size:.88rem;line-height:1.6}
+  .dh-pages{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:20px}
+  .dh-pages a{color:#1c503b;font-weight:800;text-underline-offset:3px}
+  .dh a:focus-visible,.dh select:focus-visible,.dh button:focus-visible{outline:3px solid #90bd6e;outline-offset:3px}
+  @media(max-width:570px){.dh-stats{grid-template-columns:1fr}.dh-stat{display:flex;align-items:center;gap:14px}.dh-stat strong{font-size:1.3rem}}
+</style>
+<div class="dh">
+  <header class="dh-head">
+    <small>SUMMITDESK / EMAIL REMINDERS</small>
+    <h1>Your reminder email history</h1>
+    <p>Review daily summaries recorded as sent to your email address. You can filter by period and download the same records as CSV.</p>
+    <a href="{% url 'bookings:manager_digest_preferences' %}">← Back to reminder settings</a>
+  </header>
+
+  <section class="dh-panel" aria-label="Filter reminder history">
+    <div class="dh-controls">
+      <form method="get">
+        <label for="dh-period">History period</label>
+        <div style="display:flex;gap:9px;align-items:center;flex-wrap:wrap">
+          <select id="dh-period" name="days">
+            {% for value, label in periods %}
+              <option value="{{ value }}" {% if period == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+          <button class="dh-button" type="submit">Apply</button>
+        </div>
+      </form>
+      <a class="dh-button dh-outline" href="{% url 'bookings:manager_digest_history' %}?days={{ period|urlencode }}&amp;format=csv">Download CSV</a>
+    </div>
+    <div class="dh-stats" aria-label="History totals">
+      <div class="dh-stat"><strong>{{ record_count }}</strong><span>Recorded sends</span></div>
+      <div class="dh-stat"><strong>{{ total_huts }}</strong><span>Hut summaries included</span></div>
+      <div class="dh-stat"><strong>{{ total_requests }}</strong><span>Requests reported</span></div>
+    </div>
+    <p class="dh-muted" style="margin:17px 0 0">These records mean the mail backend accepted a message; they do not confirm delivery to an inbox. Preview runs and failed sends are not recorded.</p>
+  </section>
+
+  <section class="dh-panel" aria-label="Recorded reminder sends">
+    <h2 style="margin:0">Recorded emails</h2>
+    {% if page.object_list %}
+      <div class="dh-tablewrap">
+        <table class="dh-table">
+          <thead><tr><th scope="col">Date</th><th scope="col">Recorded at</th><th scope="col">Recipient</th><th scope="col">Huts</th><th scope="col">Requests</th></tr></thead>
+          <tbody>
+            {% for entry in page %}
+              <tr><td>{{ entry.digest_date|date:"d M Y" }}</td><td>{{ entry.sent_at|date:"H:i" }}</td><td>{{ entry.recipient }}</td><td>{{ entry.hut_count }}</td><td>{{ entry.request_count }}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% if page.has_other_pages %}
+        <nav class="dh-pages" aria-label="History pages">
+          <div>{% if page.has_previous %}<a href="?days={{ period|urlencode }}&amp;page={{ page.previous_page_number }}">← Previous</a>{% endif %}</div>
+          <span class="dh-muted">Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+          <div>{% if page.has_next %}<a href="?days={{ period|urlencode }}&amp;page={{ page.next_page_number }}">Next →</a>{% endif %}</div>
+        </nav>
+      {% endif %}
+    {% else %}
+      <p class="dh-muted">No reminder emails were recorded during this period. Try a longer period or check your email reminder settings.</p>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

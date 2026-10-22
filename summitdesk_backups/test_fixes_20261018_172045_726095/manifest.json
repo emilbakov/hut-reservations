@@ -1,0 +1,12 @@
+[
+  {
+    "path": "bookings/tests.py",
+    "before_sha256": "1d072dd2053be799ef846961c695fc2be5f7c59e4fe7653b6333a2649e1213d9",
+    "after_sha256": "f3a1e14dc5e833fc76904bcc03fb1755700d29da6c43dc6662ba1bd51c46eddb"
+  },
+  {
+    "path": "bookings/test_manual_booking.py",
+    "before_sha256": "5973ad8618e88b96698fa04278d5f3d1770a7a714bbd5a44c474affefde1e1ff",
+    "after_sha256": "e9032258ac698fa7857d6ab714d4abe08438b943bb8c830ef5ced192e55e0b83"
+  }
+]

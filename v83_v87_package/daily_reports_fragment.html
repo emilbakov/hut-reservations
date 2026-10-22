@@ -1,0 +1,28 @@
+<!-- DAILY_REPORTS_V83_V87 -->
+<section class="panel" id="issue-filters"><h2>Review critical issues</h2>
+<form method="get" aria-label="Filter critical issues">
+<input type="hidden" name="operations" value="1">
+<input type="hidden" name="forecast_start" value="{{ forecast_start|date:'Y-m-d' }}">
+<label for="issue_kind">Issue type</label>
+<select id="issue_kind" name="issue_kind">
+<option value="all" {% if issue_kind == 'all' %}selected{% endif %}>All issues</option>
+<option value="Conflict" {% if issue_kind == 'Conflict' %}selected{% endif %}>Reservation conflicts</option>
+<option value="Arrival" {% if issue_kind == 'Arrival' %}selected{% endif %}>Arrival preparation</option>
+</select><button type="submit">Filter issues</button></form>
+<p class="muted">Showing {{ visible_issues|length }} of {{ daily.urgent_count }} detected issues.</p>
+{% for issue in visible_issues %}<p><strong>{{ issue.day|date:'D d M' }} · {{ issue.title }}</strong> <span class="muted">{{ issue.detail }}</span></p>
+{% empty %}<p class="muted">No matching issues for this period.</p>{% endfor %}
+</section>
+<section class="panel" id="readiness-summary"><h2>Arrival readiness summary</h2>
+<p class="muted">A review aid, not a guarantee that a room or bed is ready. Counts are based on recorded assignments and scheduled cleaning tasks.</p>
+<div class="scroll"><table><thead><tr><th>Date</th><th>Arrival groups</th><th>Bed places</th><th>Unassigned</th><th>Cleaning tasks</th><th>Review</th></tr></thead><tbody>
+{% for row in readiness %}<tr><td>{{ row.day|date:'D d M' }}</td><td>{{ row.groups }}</td><td>{{ row.bed_places }}</td><td>{{ row.unassigned }}</td><td>{{ row.cleaning }}</td><td>{% if row.needs_review %}Needs review{% else %}No detected issues{% endif %}</td></tr>{% endfor %}
+</tbody></table></div></section>
+<section class="panel" id="report-exports"><h2>Operations reports</h2>
+<p><a href="?operations=1&amp;forecast_start={{ forecast_start|date:'Y-m-d' }}&amp;daily_export=beds">Export numbered-bed details CSV</a></p>
+<p><a href="?operations=1&amp;forecast_start={{ forecast_start|date:'Y-m-d' }}&amp;daily_export=checklist">Export daily checklist CSV</a></p>
+<p class="muted">Exports include the full selected seven-day period and are available only to hut managers. No reservations are modified.</p></section>
+<section class="panel" id="print-operations"><h2>Printable operations summary</h2>
+<p>Use your browser’s Print command to print or save this manager report as PDF. The print layout hides navigation, forms and export links.</p>
+<p class="muted">Period: {{ forecast_start|date:'d M Y' }} – {{ daily.days.6|date:'d M Y' }}. Detected issues: {{ daily.urgent_count }}. Numbered beds: {{ daily.beds_count }}.</p>
+</section>

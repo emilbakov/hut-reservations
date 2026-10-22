@@ -1,0 +1,120 @@
+{% extends "bookings/base.html" %}
+{% block title %}Operations dashboard{% endblock %}
+{% block content %}
+<style>
+  .adv-dashboard{--ink:#15211c;--forest:#183c31;--lime:#c5f277;--soft:#f4f6f1;--line:#dce4da;color:var(--ink)}
+  .adv-dashboard *{box-sizing:border-box}
+  .adv-dashboard .adv-hero{background:linear-gradient(120deg,#102b24,#295542);color:#fff;border-radius:22px;padding:clamp(24px,5vw,56px);margin:0 0 24px}
+  .adv-dashboard .adv-kicker{font-size:.76rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--lime)}
+  .adv-dashboard .adv-hero h1{color:#fff;font-size:clamp(2rem,5vw,3.5rem);line-height:1.05;margin:.6rem 0}
+  .adv-dashboard .adv-hero p{color:#e3ece4;max-width:54ch;margin:0}
+  .adv-dashboard .adv-tools{display:flex;gap:9px;flex-wrap:wrap;margin-top:24px}
+  .adv-dashboard .adv-tools a,.adv-dashboard .adv-actions a{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border:1px solid #a6b8a9;border-radius:12px;padding:10px 14px;font-weight:700;font-size:.9rem}
+  .adv-dashboard .adv-tools a{border-color:#6e8e7c;color:#fff}
+  .adv-dashboard .adv-tools a.adv-primary{background:var(--lime);border-color:var(--lime);color:#15211c}
+  .adv-dashboard .adv-panel{background:#fff;border:1px solid var(--line);border-radius:20px;padding:clamp(18px,3vw,28px);margin-bottom:22px;box-shadow:0 8px 25px rgba(21,33,28,.035)}
+  .adv-dashboard .adv-floorplan-link{display:inline-flex;align-items:center;gap:8px;background:#c5f277!important;border-color:#c5f277!important;color:#15211c!important}
+  .adv-dashboard .adv-floorplan-list{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+  .adv-dashboard .adv-floorplan-list a{display:inline-flex;padding:10px 14px;border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--forest);font-weight:750;background:#f7faf5}
+  .adv-dashboard .adv-floorplan-list a:hover,.adv-dashboard .adv-floorplan-list a:focus-visible{border-color:#538269;background:#eef8e7}
+  .adv-dashboard .adv-panel h2{font-size:clamp(1.2rem,2vw,1.65rem);margin:0}
+  .adv-dashboard .adv-filter{display:flex;align-items:end;gap:12px;flex-wrap:wrap}
+  .adv-dashboard .adv-filter label{display:block;font-weight:800;margin-bottom:6px}
+  .adv-dashboard select{min-width:210px;max-width:100%;padding:11px 13px;border:1px solid #bacbbb;border-radius:10px;background:#fff;color:var(--ink)}
+  .adv-dashboard button.adv-submit{background:var(--forest);color:white;border:0;border-radius:10px;padding:12px 18px;font-weight:800;cursor:pointer}
+  .adv-dashboard .adv-help{color:#66776a;font-size:.91rem;margin:12px 0 0}
+  .adv-dashboard .adv-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:0 0 22px}
+  .adv-dashboard .adv-metric{background:var(--soft);border:1px solid var(--line);border-radius:18px;padding:22px;min-width:0}
+  .adv-dashboard .adv-metric span{display:block;font-size:.85rem;color:#52675a;font-weight:700;margin-bottom:12px}
+  .adv-dashboard .adv-metric strong{display:block;font-size:clamp(1.35rem,2.6vw,2rem);line-height:1.2;overflow-wrap:anywhere}
+  .adv-dashboard .adv-section-head{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+  .adv-dashboard .adv-actions{display:flex;gap:8px;flex-wrap:wrap}
+  .adv-dashboard .adv-actions a{color:var(--forest);border-color:var(--line);padding:8px 12px}
+  .adv-dashboard .adv-calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:7px}
+  .adv-dashboard .adv-day{display:flex;flex-direction:column;gap:7px;min-width:0;min-height:90px;padding:12px 8px;border:1px solid var(--line);border-radius:12px;background:#f9fbf8;color:var(--ink);text-decoration:none}
+  .adv-dashboard .adv-day:hover,.adv-dashboard .adv-day:focus-visible{border-color:#538269;background:#f1f8ed}
+  .adv-dashboard .adv-day.is-today{border:2px solid #4b8a65}
+  .adv-dashboard .adv-day strong{font-size:.9rem}
+  .adv-dashboard .adv-day meter{width:100%;height:9px;accent-color:#3b7955}
+  .adv-dashboard .adv-table-wrap{overflow-x:auto}
+  .adv-dashboard table{width:100%;border-collapse:collapse;min-width:540px}
+  .adv-dashboard th,.adv-dashboard td{text-align:left;padding:13px 12px;border-bottom:1px solid var(--line)}
+  .adv-dashboard th{font-size:.76rem;text-transform:uppercase;letter-spacing:.07em;color:#617166}
+  .adv-dashboard td a{color:#245d43;font-weight:700}
+  .adv-dashboard .adv-day-details details{border:1px solid var(--line);border-radius:12px;margin:8px 0;overflow:hidden}
+  .adv-dashboard .adv-day-details summary{cursor:pointer;padding:15px;background:#f7faf5;line-height:1.5}
+  .adv-dashboard .adv-day-details details:target{border-color:#3f8060;box-shadow:0 0 0 2px #b8dbbc}
+  .adv-dashboard .adv-day-details details .adv-table-wrap{padding:0 12px 12px}
+  @media(max-width:850px){.adv-dashboard .adv-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media(max-width:560px){.adv-dashboard .adv-metrics{grid-template-columns:1fr}.adv-dashboard .adv-calendar{gap:3px}.adv-dashboard .adv-day{min-height:68px;padding:7px 3px;gap:4px;text-align:center}.adv-dashboard .adv-day strong{font-size:.7rem}.adv-dashboard .adv-day span{font-size:.82rem}.adv-dashboard .adv-day meter{height:6px}.adv-dashboard .adv-tools a{flex:1 1 auto}}
+</style>
+<div class="adv-dashboard">
+  <header class="adv-hero">
+    <div class="adv-kicker">STAFF OPERATIONS / {{ today|date:"j M Y" }}</div>
+    <h1>Basecamp control.</h1>
+    <p>Keep your mountain huts running smoothly. Track occupancy, arrivals, bookings and projected revenue from one place.</p>
+    <nav class="adv-tools" aria-label="Staff tools">
+      <a class="adv-primary" href="{% url 'bookings:manual_booking' %}{% if selected_slug %}?hut={{ selected_slug|urlencode }}{% endif %}">+ New reservation</a>
+      <a href="{% url 'bookings:room_calendar' %}{% if selected_slug %}?hut={{ selected_slug|urlencode }}{% endif %}">Room calendar</a>
+      {% if selected_hut %}<a class="adv-floorplan-link" href="{% url 'floorplans:editor' selected_hut.pk %}">▦ Edit floor plan ↗</a>{% endif %}
+      <a href="{% url 'bookings:manager_stays' %}?hut={{ selected_slug|urlencode }}">Check-in / out</a>
+      <a href="{% url 'bookings:manager_reservations' %}?hut={{ selected_slug|urlencode }}">Reservations</a>
+      <a href="{% url 'bookings:stay_history' %}?hut={{ selected_slug|urlencode }}">Stay history</a>
+      <a href="{% url 'bookings:yearly_performance' %}?hut={{ selected_slug|urlencode }}&amp;year={{ month.year }}">Annual performance</a>
+      <a href="{% url 'bookings:financial_dashboard' %}">Financial dashboard</a>
+    </nav>
+  </header>
+  <section class="adv-panel" aria-label="Hut filter">
+    <form class="adv-filter" method="get" action="{% url 'bookings:dashboard' %}">
+      <div><label for="hut-filter">Mountain hut</label><select id="hut-filter" name="hut">{% if not manager_mode %}<option value="">All huts</option>{% endif %}{% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_slug == hut.slug %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}</select></div>
+      <input type="hidden" name="year" value="{{ month.year }}"><input type="hidden" name="month" value="{{ month.month }}">
+      <button class="adv-submit" type="submit">Apply filter →</button>
+    </form>
+    <p class="adv-help">{% if selected_hut %}Showing {{ selected_hut.name }} only.{% else %}Showing all huts.{% endif %}</p>
+  </section>
+  <section class="adv-panel" aria-label="Floor plan management">
+    <div class="adv-section-head">
+      <div>
+        <h2>Floor plans</h2>
+        <p class="adv-help">Arrange rooms, stairs, corridors and beds for each hut. Select a hut to open its editor.</p>
+      </div>
+      {% if selected_hut %}<div class="adv-actions"><a class="adv-floorplan-link" href="{% url 'floorplans:editor' selected_hut.pk %}">Edit {{ selected_hut.name }} →</a></div>{% endif %}
+    </div>
+    {% if not selected_hut %}
+      <div class="adv-floorplan-list">
+        {% for hut in huts %}<a href="{% url 'floorplans:editor' hut.pk %}">{{ hut.name }} ↗</a>{% empty %}<p class="adv-help">No huts available.</p>{% endfor %}
+      </div>
+    {% endif %}
+  </section>
+  <section class="adv-metrics" aria-label="Key metrics">
+    <div class="adv-metric"><span>Beds occupied today</span><strong>{{ occupied }} / {{ capacity }}</strong></div>
+    <div class="adv-metric"><span>Arrivals / departures today</span><strong>{{ arrival_count }} / {{ departure_count }}</strong></div>
+    <div class="adv-metric"><span>Pending bookings</span><strong>{{ pending_count }}</strong></div>
+    <div class="adv-metric"><span>{{ month|date:"F Y" }} occupancy</span><strong>{{ occupancy }}%</strong></div>
+    <div class="adv-metric"><span>Booked bed-nights</span><strong>{{ booked_nights }}</strong></div>
+    <div class="adv-metric"><span>Projected monthly revenue</span><strong>{{ revenue|floatformat:2 }} {{ currency }}</strong></div>
+  </section>
+  <section class="adv-panel">
+    <div class="adv-section-head"><h2>Occupancy calendar · {{ month|date:"F Y" }}</h2><div class="adv-actions"><a href="?year={{ previous_year }}&amp;month={{ previous_month }}&amp;hut={{ selected_slug|urlencode }}" aria-label="Previous month">← Previous</a><a href="?year={{ next_year }}&amp;month={{ next_month }}&amp;hut={{ selected_slug|urlencode }}">Next →</a><a href="{% url 'bookings:dashboard_export' %}?year={{ month.year }}&amp;month={{ month.month }}&amp;hut={{ selected_slug|urlencode }}">Export CSV ↓</a></div></div>
+    <p class="adv-help">Beds occupied each night. Select a day to view its reservations below.</p>
+    <div class="adv-calendar" role="list" aria-label="Daily occupancy">{% for day in daily %}<a role="listitem" class="adv-day {% if day.date == today %}is-today{% endif %}" href="#day-{{ day.date|date:'Ymd' }}" title="{{ day.occupied }} occupied, {{ day.free }} free, {{ day.revenue }} {{ currency }}"><span>{{ day.date|date:"j" }}</span><strong>{{ day.occupied }}/{{ capacity }}</strong><meter min="0" max="{{ capacity|default:1 }}" value="{{ day.occupied }}">{{ day.occupied }}</meter></a>{% endfor %}</div>
+  </section>
+  <section class="adv-panel">
+    <div class="adv-section-head"><h2>Upcoming arrivals</h2>{% if not manager_mode %}<div class="adv-actions"><a href="{% url 'admin:bookings_reservation_changelist' %}">Manage reservations →</a></div>{% endif %}</div>
+    <div class="adv-table-wrap"><table><thead><tr><th>Guest</th><th>Arrival</th><th>Departure</th><th>Beds</th><th>Status</th></tr></thead><tbody>{% for row in upcoming %}<tr><td>{% if manager_mode %}{{ row.reservation.name }}{% else %}<a href="{% url 'admin:bookings_reservation_change' row.reservation.pk %}">{{ row.reservation.name }}</a>{% endif %}</td><td>{{ row.reservation.check_in|date:"j M Y" }}</td><td>{{ row.reservation.check_out|date:"j M Y" }}</td><td>{{ row.beds }}</td><td>{{ row.reservation.get_status_display }}</td></tr>{% empty %}<tr><td colspan="5">No upcoming arrivals.</td></tr>{% endfor %}</tbody></table></div>
+  </section>
+  <section class="adv-panel">
+    <h2>Daily reservation details</h2>
+    <p class="adv-help">Open any date to see its guest reservations.</p>
+    <div class="adv-day-details">{% for day in daily %}<details id="day-{{ day.date|date:'Ymd' }}"><summary><strong>{{ day.date|date:"D j M" }}</strong> · {{ day.occupied }} occupied · {{ day.free }} free · {{ day.revenue|floatformat:2 }} {{ currency }}</summary><div class="adv-table-wrap"><table><thead><tr><th>Guest</th><th>Dates</th><th>Beds</th><th>Status</th></tr></thead><tbody>{% for row in day.reservations %}<tr><td>{% if manager_mode %}{{ row.reservation.name }}{% else %}<a href="{% url 'admin:bookings_reservation_change' row.reservation.pk %}">{{ row.reservation.name }}</a>{% endif %}</td><td>{{ row.reservation.check_in }} – {{ row.reservation.check_out }}</td><td>{{ row.beds }}</td><td>{{ row.reservation.get_status_display }}</td></tr>{% empty %}<tr><td colspan="4">No reservations for this night.</td></tr>{% endfor %}</tbody></table></div></details>{% endfor %}</div>
+  </section>
+</div>
+<script>
+  document.querySelectorAll('.adv-dashboard .adv-calendar a[href^="#day-"]').forEach(link => {
+    link.addEventListener('click', () => {
+      const target = document.getElementById(link.hash.slice(1));
+      if (target) target.open = true;
+    });
+  });
+</script>
+{% endblock %}

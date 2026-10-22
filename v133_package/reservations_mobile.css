@@ -1,0 +1,34 @@
+/* v133: readable, touch-friendly reservation cards on phones. */
+@media (max-width: 720px) {
+  .mr-page { padding-top: 8px; }
+  .mr-hero { padding: 24px 20px; }
+  .mr-hero h1 { font-size: clamp(1.8rem, 8vw, 2.5rem); }
+  .mr-hero-actions { display: grid; grid-template-columns: 1fr; }
+  .mr-hero-actions .mr-btn { width: 100%; min-height: 46px; }
+  .mr-quicklinks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .mr-quicklinks a { border-radius: 11px; min-height: 44px; justify-content: center; text-align: center; line-height: 1.35; padding: 10px; }
+  .mr-panel { overflow: hidden; }
+  .mr-table-wrap { overflow: visible; }
+  .mr-table { display: block; width: 100%; min-width: 0; }
+  .mr-table thead { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+  .mr-table tbody { display: grid; gap: 12px; padding: 4px 12px 16px; }
+  .mr-table tbody tr { display: block; min-width: 0; background: #fff; border: 1px solid #dce7df; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 14px #153b2908; }
+  .mr-table td { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; border: 0; padding: 11px 13px; min-width: 0; overflow-wrap: anywhere; }
+  .mr-table td + td { border-top: 1px solid #edf2ed; }
+  .mr-table td[data-label]::before { content: attr(data-label); flex: 0 0 82px; font-size: .72rem; font-weight: 800; color: #627568; text-transform: uppercase; letter-spacing: .035em; padding-top: 3px; }
+  .mr-table td:first-child { display: block; background: #f6faf5; }
+  .mr-table td:first-child::before { display: none; }
+  .mr-table td:last-child { display: block; }
+  .mr-table td:last-child::before { display: block; margin-bottom: 10px; }
+  .mr-table .mr-dates { white-space: normal; }
+  .mr-table .mr-empty { display: block; padding: 25px 16px !important; }
+  .mr-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .mr-actions form { display: block; min-width: 0; }
+  .mr-actions a, .mr-actions button { display: flex; align-items: center; justify-content: center; min-height: 44px; width: 100%; text-align: center; white-space: normal; }
+  .mr-pagination { padding: 16px 12px; gap: 10px; }
+  .mr-pagination a { min-height: 44px; display: inline-flex; align-items: center; }
+}
+@media (max-width: 370px) {
+  .mr-quicklinks { grid-template-columns: 1fr; }
+  .mr-table td[data-label]::before { flex-basis: 72px; }
+}

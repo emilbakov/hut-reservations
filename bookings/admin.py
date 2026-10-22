@@ -15,8 +15,12 @@ from .services import free_beds, lock_rooms
 # ----------------------------------
 
 def is_hut_manager(request):
-    return (not request.user.is_superuser and
-            Hut.objects.filter(managers=request.user).exists())
+    user = request.user
+
+    if not user.is_authenticated:
+        return False
+
+    return Hut.objects.filter(managers=user).exists()
 
 
 class ProtectManagerAdmin:

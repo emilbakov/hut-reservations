@@ -1,62 +1,8 @@
-
 {% extends "bookings/base.html" %}
-
+{% block title %}Find your next adventure{% endblock %}
 {% block content %}
-<section class="py-12">
-    <div class="mx-auto max-w-6xl px-4">
-
-        <div class="mb-10 text-center">
-            <h1 class="text-4xl font-bold">
-                Choose Your Mountain Hut
-            </h1>
-
-            <p class="mt-4 text-gray-600">
-                Explore our mountain huts and book your stay.
-            </p>
-        </div>
-
-        <div class="grid gap-6 md:grid-cols-3">
-
-            {% for hut in huts %}
-            <article class="overflow-hidden rounded-2xl border bg-white shadow-sm">
-
-                {% if hut.image %}
-                <img
-                    src="{{ hut.image.url }}"
-                    alt="{{ hut.name }}"
-                    class="h-52 w-full object-cover"
-                >
-                {% endif %}
-
-                <div class="p-6">
-                    <h2 class="text-2xl font-semibold">
-                        {{ hut.name }}
-                    </h2>
-
-                    {% if hut.location %}
-                    <p class="mt-2 text-sm text-gray-500">
-                        {{ hut.location }}
-                    </p>
-                    {% endif %}
-
-                    <p class="mt-4 text-gray-600">
-                        {{ hut.description|truncatewords:25 }}
-                    </p>
-
-                    <a
-                        href="{% url 'bookings:hut_detail' hut.slug %}"
-                        class="mt-6 inline-block rounded-lg bg-green-700 px-5 py-3 font-semibold text-white hover:bg-green-800"
-                    >
-                        View Rooms &amp; Book
-                    </a>
-                </div>
-            </article>
-
-            {% empty %}
-            <p>No mountain huts are available yet.</p>
-            {% endfor %}
-
-        </div>
-    </div>
-</section>
+<section class="adventure-hero" aria-labelledby="adventure-title"><div class="adventure-hero-image"></div><div class="adventure-hero-shade"></div><div class="adventure-hero-content"><span class="adventure-kicker"><span class="kicker-dot"></span> YOUR BASECAMP STARTS HERE</span><h1 id="adventure-title">LESS SCROLLING.<br><span>MORE SUMMITS.</span></h1><p>Wake up closer to the trails. Discover mountain huts, find your place, and get out there.</p><div class="adventure-hero-actions"><a class="adventure-button" href="#explore">Explore mountain huts <span aria-hidden="true">↗</span></a><span class="hero-side-note">FRESH AIR / BIG VIEWS / GOOD STORIES</span></div></div><div class="hero-bottom"><span>01 / DISCOVER YOUR NEXT ESCAPE</span><a href="#explore">SCROLL TO EXPLORE ↓</a></div></section>
+<section class="adventure-intro" id="explore"><div><span class="adventure-label">THE WILD IS CALLING</span><h2>FIND YOUR <span>NEXT BASECAMP.</span></h2></div><p>From quiet forest hideaways to mountain trailheads, your next adventure starts with a place to stay.</p></section>
+<section class="adventure-hut-grid" aria-label="Available mountain huts">{% for hut in huts %}<article class="adventure-hut-card"><a class="hut-photo" href="{% url 'bookings:hut_detail' hut.slug %}" aria-label="Explore {{ hut.name }}">{% if hut.image %}<img src="{{ hut.image.url }}" alt="{{ hut.name }}" loading="lazy">{% else %}<div class="hut-photo-fallback" aria-hidden="true">▲</div>{% endif %}<span class="hut-photo-badge">MOUNTAIN STAY</span><span class="hut-photo-arrow" aria-hidden="true">↗</span></a><div class="hut-card-body"><div class="hut-card-location">⌁ {% if hut.location %}{{ hut.location }}{% else %}Mountain escape{% endif %}</div><h3><a href="{% url 'bookings:hut_detail' hut.slug %}">{{ hut.name }}</a></h3><p>{{ hut.description|default:"A great place to recharge between adventures."|truncatewords:23 }}</p><a class="hut-card-link" href="{% url 'bookings:hut_detail' hut.slug %}">Explore rooms &amp; availability <span aria-hidden="true">↗</span></a></div></article>{% empty %}<div class="adventure-empty">New mountain stays are coming soon. Check back for the next adventure.</div>{% endfor %}</section>
+<section class="adventure-steps" id="how-it-works"><div><span class="adventure-label">NO FUSS. JUST THE OUTDOORS.</span><h2>THREE STEPS.<br><span>ONE GREAT ESCAPE.</span></h2></div><div class="steps-grid"><div><span>01 /</span><h3>Pick your hut</h3><p>Explore the places that put you closer to nature.</p></div><div><span>02 /</span><h3>Choose your dates</h3><p>Check live bed availability and select your stay.</p></div><div><span>03 /</span><h3>Head outside</h3><p>Reserve your spot and start planning the adventure.</p></div></div></section>
 {% endblock %}

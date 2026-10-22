@@ -1,28 +1,44 @@
 {% extends "bookings/base.html" %}
 {% block title %}Arrivals and departures{% endblock %}
 {% block content %}
-<div class="eyebrow">STAFF / GUEST OPERATIONS</div>
-<h1>Arrivals &amp; departures</h1>
-<p class="lead">Record actual arrivals and departures for your hut.</p>
-<p><a href="{% url 'bookings:dashboard' %}">← Dashboard</a> · <a href="{% url 'bookings:manager_reservations' %}">Reservations</a></p>
-<section class="card">
-<form method="get">
-<label for="hut">Hut</label>
-<select id="hut" name="hut">
-{% if not manager_mode %}<option value="">All huts</option>{% endif %}
-{% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_slug == hut.slug %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}
-</select>
-<label for="date">Date</label><input type="date" id="date" name="date" value="{{ target_date|date:'Y-m-d' }}">
-<button type="submit">Show guests</button>
-</form>
-</section>
-<section class="card"><h2>Arriving · {{ target_date|date:"j M Y" }} ({{ arriving|length }})</h2>
-{% include "bookings/_stay_rows.html" with reservations=arriving %}
-</section>
-<section class="card"><h2>Departing · {{ target_date|date:"j M Y" }} ({{ departing|length }})</h2>
-{% include "bookings/_stay_rows.html" with reservations=departing %}
-</section>
-<section class="card"><h2>Currently in house ({{ in_house|length }})</h2>
-{% include "bookings/_stay_rows.html" with reservations=in_house %}
-</section>
+<style>
+.stays-page{--forest:#153d31;--deep:#102b24;--lime:#c7ed65;--muted:#65776e;--line:#dce7df;--paper:#fff;color:#1a3429;max-width:1240px;margin:0 auto;padding:12px 0 48px}
+.stays-page *{box-sizing:border-box}.stays-page a{color:inherit}.stays-page .stays-hero{background:linear-gradient(125deg,#123a2d,#235c43);border-radius:24px;color:white;padding:32px;position:relative;overflow:hidden}.stays-page .stays-eyebrow{color:var(--lime);font-size:.74rem;letter-spacing:.16em;font-weight:800}.stays-page h1{font-size:clamp(1.85rem,4vw,2.75rem);line-height:1.15;margin:10px 0}.stays-page .stays-hero p{color:#d7e8dd;max-width:640px;margin:0}.stays-page .stays-nav{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}.stays-page .stays-nav a{color:white;text-decoration:none;border:1px solid #ffffff4a;border-radius:999px;padding:9px 15px;font-weight:650;font-size:.9rem}.stays-page .stays-nav a:hover{background:#ffffff20}.stays-page .stays-filters{margin:22px 0;background:var(--paper);border:1px solid var(--line);border-radius:19px;padding:22px;box-shadow:0 7px 26px #153d310a}.stays-page .stays-filter-grid{display:grid;grid-template-columns:minmax(180px,1fr) minmax(180px,1fr) auto;gap:14px;align-items:end}.stays-page label{display:block;font-weight:750;font-size:.85rem;margin-bottom:7px}.stays-page select,.stays-page input[type=date]{width:100%;min-height:44px;border:1px solid #cddbd1;background:#fff;border-radius:11px;padding:10px 12px;color:#193b2e;font:inherit}.stays-page button{cursor:pointer;font:inherit;font-weight:750;border:0;border-radius:11px;padding:11px 18px;min-height:44px}.stays-page .stays-filter-btn{background:var(--forest);color:white}.stays-page .stays-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:0 0 22px}.stays-page .stays-stat{background:#f2f7ef;border:1px solid #e0eade;border-radius:17px;padding:18px}.stays-page .stays-stat strong{display:block;font-size:2rem;line-height:1.2;color:var(--forest)}.stays-page .stays-stat span{font-size:.86rem;color:#567264;font-weight:700}.stays-page .stays-section{background:white;border:1px solid var(--line);border-radius:20px;overflow:hidden;margin:18px 0;box-shadow:0 7px 26px #153d3108}.stays-page .stays-section-header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:21px 22px;border-bottom:1px solid var(--line)}.stays-page .stays-section-header h2{font-size:1.22rem;margin:0;color:var(--forest)}.stays-page .stays-section-header p{margin:5px 0 0;color:var(--muted);font-size:.86rem}.stays-page .stays-count{background:#eaf3df;border-radius:999px;color:#285039;padding:6px 12px;font-size:.84rem;font-weight:800}.stays-page .stays-section-body{padding:0 8px 8px}.stays-page .stays-section--arrival{border-top:4px solid #98c75e}.stays-page .stays-section--departure{border-top:4px solid #d9ad6e}.stays-page .stays-section--house{border-top:4px solid #72ad9d}
+@media(max-width:700px){.stays-page .stays-hero{padding:24px 20px;border-radius:18px}.stays-page .stays-filter-grid{grid-template-columns:1fr}.stays-page .stays-stats{gap:8px}.stays-page .stays-stat{padding:13px}.stays-page .stays-stat strong{font-size:1.5rem}.stays-page .stays-stat span{font-size:.73rem}.stays-page .stays-section-header{padding:18px 15px}.stays-page .stays-section-body{padding:0 6px 8px}}
+</style>
+<div class="stays-page">
+  <header class="stays-hero">
+    <div class="stays-eyebrow">STAFF / GUEST OPERATIONS</div>
+    <h1>Arrivals &amp; departures</h1>
+    <p>Keep every stay on track. Review expected guests, record actual check-ins and check-outs, and see who is currently in the hut.</p>
+    <nav class="stays-nav" aria-label="Staff navigation">
+      <a href="{% url 'bookings:dashboard' %}">← Dashboard</a>
+      <a href="{% url 'bookings:manager_reservations' %}">Reservations →</a>
+    </nav>
+  </header>
+  <section class="stays-filters" aria-label="Filter guest stays">
+    <form method="get" class="stays-filter-grid">
+      <div><label for="hut">Hut</label><select id="hut" name="hut">{% if not manager_mode %}<option value="">All huts</option>{% endif %}{% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_slug == hut.slug %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}</select></div>
+      <div><label for="date">View date</label><input type="date" id="date" name="date" value="{{ target_date|date:'Y-m-d' }}"></div>
+      <button type="submit" class="stays-filter-btn">Show guests</button>
+    </form>
+  </section>
+  <div class="stays-stats" aria-label="Guest overview">
+    <div class="stays-stat"><strong>{{ arriving|length }}</strong><span>Arriving</span></div>
+    <div class="stays-stat"><strong>{{ departing|length }}</strong><span>Departing</span></div>
+    <div class="stays-stat"><strong>{{ in_house|length }}</strong><span>In house</span></div>
+  </div>
+  <section class="stays-section stays-section--arrival" aria-labelledby="stays-arriving-title">
+    <div class="stays-section-header"><div><h2 id="stays-arriving-title">Arriving guests</h2><p>{{ target_date|date:"j M Y" }} · Expected arrivals</p></div><span class="stays-count">{{ arriving|length }} guests</span></div>
+    <div class="stays-section-body">{% include "bookings/_stay_rows.html" with reservations=arriving %}</div>
+  </section>
+  <section class="stays-section stays-section--departure" aria-labelledby="stays-departing-title">
+    <div class="stays-section-header"><div><h2 id="stays-departing-title">Departing guests</h2><p>{{ target_date|date:"j M Y" }} · Scheduled departures</p></div><span class="stays-count">{{ departing|length }} guests</span></div>
+    <div class="stays-section-body">{% include "bookings/_stay_rows.html" with reservations=departing %}</div>
+  </section>
+  <section class="stays-section stays-section--house" aria-labelledby="stays-house-title">
+    <div class="stays-section-header"><div><h2 id="stays-house-title">Currently in house</h2><p>Guests with an active stay</p></div><span class="stays-count">{{ in_house|length }} guests</span></div>
+    <div class="stays-section-body">{% include "bookings/_stay_rows.html" with reservations=in_house %}</div>
+  </section>
+</div>
 {% endblock %}

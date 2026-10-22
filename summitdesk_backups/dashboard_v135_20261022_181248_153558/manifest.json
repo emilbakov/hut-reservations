@@ -1,0 +1,13 @@
+{
+  "version": "v135",
+  "originals": {
+    "bookings/templates/bookings/dashboard.html": "8829ad2317f1686540d38c4f9ceee5f723ae961b8c5ed64948ac81c38817db85"
+  },
+  "installed": {
+    "bookings/templates/bookings/dashboard.html": "ec1d01def0e029d85606776ea05347e4f4ee554e40620efac3858bae642c5559",
+    "bookings/test_dashboard_ui_v135.py": "2d31366cf850f9bdd03732799451902462b17fb38fc438bc773a58cee3c2f963"
+  },
+  "created": [
+    "bookings/test_dashboard_ui_v135.py"
+  ]
+}

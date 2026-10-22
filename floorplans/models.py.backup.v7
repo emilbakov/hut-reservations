@@ -1,0 +1,26 @@
+from django.db import models
+
+class RoomPlacement(models.Model):
+    room = models.OneToOneField("bookings.Room", on_delete=models.CASCADE, related_name="floor_placement")
+    floor = models.SmallIntegerField(default=0)
+    x = models.PositiveSmallIntegerField(default=0)
+    y = models.PositiveSmallIntegerField(default=0)
+    width = models.PositiveSmallIntegerField(default=2)
+    height = models.PositiveSmallIntegerField(default=2)
+    bed_positions = models.JSONField(default=list, blank=True)  # Visual markers only, not individually reserved
+
+    class Meta:
+        ordering = ["floor", "y", "x"]
+
+class FloorFeature(models.Model):
+    TYPES = [("stairs", "Stairs"), ("corridor", "Corridor"), ("door", "Door")]
+    hut = models.ForeignKey("bookings.Hut", on_delete=models.CASCADE, related_name="floor_features")
+    floor = models.SmallIntegerField(default=0)
+    kind = models.CharField(max_length=12, choices=TYPES)
+    x = models.PositiveSmallIntegerField()
+    y = models.PositiveSmallIntegerField()
+    width = models.PositiveSmallIntegerField(default=1)
+    height = models.PositiveSmallIntegerField(default=1)
+
+    class Meta:
+        ordering = ["floor", "y", "x", "pk"]

@@ -1,0 +1,42 @@
+[
+  {
+    "path": "bookings/templates/bookings/manager_reservations.html",
+    "existed": true,
+    "installed_sha256": "5860ecb83be3fdea4d7a9637ee89413c1716e0bc033f8ec34b8103a74d02a65c"
+  },
+  {
+    "path": "bookings/templates/bookings/approval_dashboard_v127.html",
+    "existed": true,
+    "installed_sha256": "d255824cb9e3f36f6ec00aaee990293d16fe0925c507302e9e13326f79fb0f5d"
+  },
+  {
+    "path": "bookings/templates/bookings/dashboard.html",
+    "existed": true,
+    "installed_sha256": "8829ad2317f1686540d38c4f9ceee5f723ae961b8c5ed64948ac81c38817db85"
+  },
+  {
+    "path": "bookings/templates/bookings/calendar_timeline.html",
+    "existed": true,
+    "installed_sha256": "4856f49431b3a6c6461898b200114ef3ab1db52c9f84e3341c99acf17a8843dc"
+  },
+  {
+    "path": "floorplans/static/floorplans/summitdesk_shell_v116.css",
+    "existed": true,
+    "installed_sha256": "3f2b8d267f6f697020dc9f4cf7c38087ca7566339df1a53f7dd4c65cdc595a4a"
+  },
+  {
+    "path": "floorplans/static/floorplans/summitdesk_shell_v116.js",
+    "existed": true,
+    "installed_sha256": "c421139a7a7e3657ee0b209df1e64cf4566ae14aa149c2c7c3ee7663291f9a44"
+  },
+  {
+    "path": "floorplans/templatetags/summitdesk_nav.py",
+    "existed": true,
+    "installed_sha256": "c3eaf7b7269e16d71a5189407b31ef0a5f771b8958b65ffc5e6db83a937fbe56"
+  },
+  {
+    "path": "bookings/test_mobile_v133.py",
+    "existed": false,
+    "installed_sha256": "76ff7e0c57d7cd96b54fe29fa09667a2bb9bf123f9df1fbb7f44aa2f4eb51e2a"
+  }
+]

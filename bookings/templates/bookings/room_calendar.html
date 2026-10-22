@@ -1,51 +1,161 @@
 {% extends "bookings/base.html" %}
-{% block title %}Room availability calendar{% endblock %}
+{% block title %}Room availability | Mountain Operations{% endblock %}
 {% block content %}
-<div class="eyebrow">STAFF / ROOM AVAILABILITY</div>
-<h1>Room availability calendar</h1>
-<p class="lead">Beds available per room and night. Select a day to inspect reservations or start a new booking.</p>
-<p><a href="{% url 'bookings:dashboard' %}">← Operations dashboard</a> · <a href="{% url 'bookings:manager_reservations' %}">Reservations</a></p>
-<section class="card">
-  <form method="get" style="display:flex;gap:1rem;flex-wrap:wrap;align-items:end">
-    <div><label for="hut">Mountain hut</label><select id="hut" name="hut">
-      {% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_hut.pk == hut.pk %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}
-    </select></div>
-    <div><label for="month">Month</label><input id="month" type="month" value="{{ month|date:'Y-m' }}" min="2000-01" max="2100-12"></div>
-    <input type="hidden" name="year" id="calendar-year" value="{{ month.year }}">
-    <input type="hidden" name="month" id="calendar-month" value="{{ month.month }}">
-    <button type="submit">Show availability</button>
-  </form>
-  <p><a href="?hut={{ selected_hut.slug|urlencode }}&amp;year={{ prev.year }}&amp;month={{ prev.month }}">← Previous month</a> · <strong>{{ month|date:'F Y' }}</strong> · <a href="?hut={{ selected_hut.slug|urlencode }}&amp;year={{ next.year }}&amp;month={{ next.month }}">Next month →</a></p>
-</section>
-{% if selected_hut %}
-<section class="card">
-  <p><strong>{{ selected_hut.name }}</strong> · Green: empty · Amber: partially booked · Red: full · Grey: inactive room</p>
-  <div style="overflow-x:auto;max-width:100%">
-    <table style="border-collapse:separate;border-spacing:3px;min-width:1050px;width:100%">
-      <thead><tr><th scope="col" style="position:sticky;left:0;background:var(--card-bg,#fff);z-index:1;min-width:130px">Room</th>
-        {% for day in days %}<th scope="col" style="text-align:center;min-width:42px">{{ day|date:'D'|slice:':1' }}<br>{{ day|date:'j' }}</th>{% endfor %}
-      </tr></thead>
-      <tbody>{% for row in rows %}<tr>
-        <th scope="row" style="position:sticky;left:0;background:var(--card-bg,#fff);z-index:1;text-align:left">{{ row.room.name }}<br><a href="{% url 'bookings:bed_management' row.room.pk %}?day={{ today|date:'Y-m-d' }}">Manage beds</a><br><small>{{ row.room.capacity }} beds{% if not row.room.is_active %} · Inactive{% endif %}</small></th>
-        {% for cell in row.cells %}<td style="padding:0;text-align:center">
-          <button type="button" class="room-cell" data-room="{{ row.room.name }}" data-day="{{ cell.date|date:'Y-m-d' }}" data-free="{{ cell.free }}" data-capacity="{{ row.room.capacity }}"
-            style="width:100%;min-width:39px;padding:9px 2px;border:1px solid #aaa;border-radius:5px;cursor:pointer;background:{% if not row.room.is_active %}#e5e7eb{% elif cell.is_full %}#fecaca{% elif cell.is_empty %}#bbf7d0{% else %}#fde68a{% endif %};color:#111827"
-            aria-label="{{ row.room.name }}, {{ cell.date|date:'j F Y' }}, {{ cell.free }} beds free">
-            <strong>{{ cell.free }}</strong>
-          </button>
-          <template class="room-detail"><ul>{% for booking in cell.details %}<li>{{ booking.name }} · {{ booking.beds }} bed(s) · {{ booking.status }} · {{ booking.code }}</li>{% empty %}<li>No viewable guest details for this date.</li>{% endfor %}</ul></template>
-        </td>{% endfor %}
-      </tr>{% empty %}<tr><td colspan="32">No rooms in this hut.</td></tr>{% endfor %}</tbody>
-    </table>
-  </div>
-</section>
-<section class="card" id="selected-day" aria-live="polite">
-  <h2 id="selected-heading">Select a room and date</h2>
-  <p id="selected-count">Click a calendar cell to see availability.</p>
-  <div id="selected-details"></div>
-  <p><a id="book-link" href="{% url 'bookings:manual_booking' %}?hut={{ selected_hut.pk }}" hidden>+ New reservation for this date →</a></p>
-</section>
-{% endif %}
+<style>
+  .adventure-calendar{--ac-ink:#17231d;--ac-forest:#163d31;--ac-lime:#c8f568;--ac-muted:#62716b;--ac-border:#dfe8e1;--ac-bg:#f4f7f2;color:var(--ac-ink);padding-bottom:3rem}
+  .adventure-calendar *{box-sizing:border-box}
+  .ac-hero{background:linear-gradient(125deg,#102820,#214b3b);color:white;border-radius:24px;padding:clamp(1.5rem,4vw,3rem);margin-bottom:1.3rem;position:relative;overflow:hidden}
+  .ac-hero:after{content:"";position:absolute;width:280px;height:280px;border:1px solid #ffffff30;border-radius:50%;right:-80px;top:-130px;pointer-events:none;box-shadow:0 0 0 65px #ffffff08,0 0 0 130px #ffffff05}
+  .ac-eyebrow{font-size:.76rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--ac-lime);margin:0 0 .8rem}
+  .ac-hero h1{font-size:clamp(2rem,5vw,3.7rem);line-height:1.05;letter-spacing:-.045em;color:#fff;margin:0 0 .85rem}
+  .ac-hero p{max-width:55ch;color:#d2e4d9;margin:0}
+  .ac-links{display:flex;gap:.65rem;flex-wrap:wrap;margin-top:1.5rem;position:relative;z-index:1}
+  .ac-links a,.ac-button{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;border-radius:12px;padding:.78rem 1rem;font-weight:750;text-decoration:none;line-height:1.2}
+  .ac-links a{border:1px solid #ffffff50;color:#fff;background:#ffffff0e}
+  .ac-links a:hover{background:#ffffff25}
+  .ac-panel{background:#fff;border:1px solid var(--ac-border);border-radius:20px;padding:clamp(1rem,2.5vw,1.65rem);margin-bottom:1.2rem;box-shadow:0 9px 30px #193a2310}
+  .ac-toolbar{display:flex;gap:1rem;flex-wrap:wrap;align-items:flex-end}
+  .ac-field{display:flex;flex-direction:column;gap:.4rem;min-width:180px;flex:1}
+  .ac-field label{font-weight:750;font-size:.87rem}
+  .ac-field select,.ac-field input{width:100%;min-height:44px;border:1px solid #cbd8cf;border-radius:10px;padding:.6rem .75rem;background:#fff;color:var(--ac-ink);font:inherit}
+  .ac-button{background:var(--ac-forest);color:white;border:0;min-height:44px;cursor:pointer;font:inherit}
+  .ac-button:hover{background:#245846}
+  .ac-month-nav{display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--ac-border)}
+  .ac-month-nav strong{font-size:1.15rem}
+  .ac-month-nav a{font-weight:750;text-decoration:none;color:var(--ac-forest);padding:.5rem .7rem;border:1px solid var(--ac-border);border-radius:10px}
+  .ac-panel-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1rem}
+  .ac-panel-heading h2{margin:0;font-size:clamp(1.2rem,2.6vw,1.65rem);letter-spacing:-.02em;color:var(--ac-ink)}
+  .ac-subtitle{color:var(--ac-muted);font-size:.9rem;margin:.35rem 0 0}
+  .ac-legend{display:flex;flex-wrap:wrap;gap:.55rem 1rem;font-size:.83rem;color:#3c4c44}
+  .ac-legend span{display:inline-flex;align-items:center;gap:.4rem}
+  .ac-dot{width:.75rem;height:.75rem;border-radius:3px;display:inline-block;border:1px solid #00000012}
+  .ac-dot.free{background:#c8efd2}.ac-dot.partial{background:#ffdf9b}.ac-dot.full{background:#ffc7c7}.ac-dot.inactive{background:#e1e5e5}
+  .ac-scroll{overflow:auto;max-width:100%;border:1px solid var(--ac-border);border-radius:14px;scrollbar-color:#9cbaa8 #edf2ed}
+  .ac-table{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%;font-variant-numeric:tabular-nums}
+  .ac-table th,.ac-table td{border-bottom:1px solid #e8eee9;border-right:1px solid #edf1ee;padding:.28rem;text-align:center}
+  .ac-table thead th{position:sticky;top:0;z-index:2;background:#edf3ed;color:#3a4d42;font-size:.76rem;min-width:46px;padding:.6rem .25rem}
+  .ac-table .ac-room-head{position:sticky;left:0;z-index:3;background:#fff;min-width:190px;max-width:230px;text-align:left;padding:.85rem .9rem;box-shadow:3px 0 8px #1b362012}
+  .ac-table thead .ac-room-head{z-index:4;background:#edf3ed}
+  .ac-room-head strong{display:block;font-size:.93rem;line-height:1.3}
+  .ac-room-head small{display:block;color:var(--ac-muted);font-size:.77rem;margin-top:.25rem}
+  .ac-room-head a{display:inline-block;margin-top:.35rem;color:#216047;font-weight:700;font-size:.77rem}
+  .ac-day{width:39px;min-width:39px;min-height:40px;padding:.45rem .1rem;border:1px solid transparent;border-radius:8px;cursor:pointer;font-weight:800;font:inherit;color:#15231b}
+  .ac-day.is-free{background:#c8efd2}.ac-day.is-partial{background:#ffdf9b}.ac-day.is-full{background:#ffc7c7}.ac-day.is-inactive{background:#e1e5e5;color:#697570}
+  .ac-day:hover{outline:2px solid #2e6b50;outline-offset:1px}
+  .ac-day:focus-visible{outline:3px solid #1b704d;outline-offset:2px}
+  .ac-day[aria-pressed="true"]{outline:3px solid #153e30;outline-offset:1px}
+  .ac-empty{padding:1.5rem;text-align:left;color:var(--ac-muted)}
+  .ac-selection{border-left:5px solid var(--ac-lime)}
+  .ac-selection h2{margin:0 0 .45rem;font-size:1.4rem;color:var(--ac-ink)}
+  .ac-selection p{color:var(--ac-muted);margin:.35rem 0 1rem}
+  .ac-selection ul{padding-left:1.2rem;margin:.75rem 0 1rem}
+  .ac-selection li{margin:.4rem 0;overflow-wrap:anywhere}
+  .ac-selection .ac-button{background:var(--ac-forest);color:#fff}
+  .ac-selection .ac-button[hidden]{display:none}
+  @media(max-width:640px){.ac-hero{border-radius:16px}.ac-panel{border-radius:15px}.ac-field{min-width:100%}.ac-toolbar .ac-button{width:100%}.ac-table .ac-room-head{min-width:155px;max-width:170px}.ac-month-nav strong{order:-1;width:100%;text-align:center}}
+</style>
+<div class="adventure-calendar">
+  <header class="ac-hero">
+    <p class="ac-eyebrow">Mountain operations / Room planning</p>
+    <h1>Room availability<span style="color:#c8f568">.</span></h1>
+    <p>Plan stays at a glance. Explore available beds by room and date, inspect reservations, and start new bookings.</p>
+    <nav class="ac-links" aria-label="Staff navigation">
+      <a href="{% url 'bookings:dashboard' %}">← Operations dashboard</a>
+      <a href="{% url 'bookings:manager_reservations' %}">View reservations →</a>
+    </nav>
+  </header>
+
+  <section class="ac-panel" aria-label="Calendar filters">
+    <form method="get" class="ac-toolbar">
+      <div class="ac-field">
+        <label for="hut">Mountain hut</label>
+        <select id="hut" name="hut">
+          {% for hut in huts %}
+            <option value="{{ hut.slug }}" {% if selected_hut.pk == hut.pk %}selected{% endif %}>{{ hut.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="ac-field">
+        <label for="month">Choose month</label>
+        <input id="month" type="month" value="{{ month|date:'Y-m' }}" min="2000-01" max="2100-12">
+      </div>
+      <input type="hidden" name="year" id="calendar-year" value="{{ month.year }}">
+      <input type="hidden" name="month" id="calendar-month" value="{{ month.month }}">
+      <button class="ac-button" type="submit">Show availability →</button>
+    </form>
+    <div class="ac-month-nav">
+      <a href="?hut={{ selected_hut.slug|urlencode }}&amp;year={{ prev.year }}&amp;month={{ prev.month }}" aria-label="Previous month">← Previous</a>
+      <strong>{{ month|date:'F Y' }}</strong>
+      <a href="?hut={{ selected_hut.slug|urlencode }}&amp;year={{ next.year }}&amp;month={{ next.month }}" aria-label="Next month">Next →</a>
+    </div>
+  </section>
+
+  {% if selected_hut %}
+    <section class="ac-panel" aria-label="Room availability grid">
+      <div class="ac-panel-heading">
+        <div>
+          <p class="ac-eyebrow" style="color:#367355">Live room overview</p>
+          <h2>{{ selected_hut.name }}</h2>
+          <p class="ac-subtitle">Each cell shows beds available that night. Scroll sideways to see the whole month.</p>
+        </div>
+        <div class="ac-legend" aria-label="Availability legend">
+          <span><i class="ac-dot free"></i>Empty</span>
+          <span><i class="ac-dot partial"></i>Partially booked</span>
+          <span><i class="ac-dot full"></i>Full</span>
+          <span><i class="ac-dot inactive"></i>Inactive room</span>
+        </div>
+      </div>
+      <div class="ac-scroll" tabindex="0" aria-label="Scrollable room calendar">
+        <table class="ac-table">
+          <thead>
+            <tr>
+              <th scope="col" class="ac-room-head">Room / night</th>
+              {% for day in days %}
+                <th scope="col"><span>{{ day|date:'D'|slice:':1' }}</span><br><strong>{{ day|date:'j' }}</strong></th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in rows %}
+              <tr>
+                <th scope="row" class="ac-room-head">
+                  <strong>{{ row.room.name }}</strong>
+                  <small>{{ row.room.capacity }} beds{% if not row.room.is_active %} · Inactive{% endif %}</small>
+                  <a href="{% url 'bookings:bed_management' row.room.pk %}?day={{ today|date:'Y-m-d' }}">Manage beds ↗</a>
+                </th>
+                {% for cell in row.cells %}
+                  <td>
+                    <button type="button"
+                      class="ac-day room-cell {% if not row.room.is_active %}is-inactive{% elif cell.is_full %}is-full{% elif cell.is_empty %}is-free{% else %}is-partial{% endif %}"
+                      data-room="{{ row.room.name }}"
+                      data-day="{{ cell.date|date:'Y-m-d' }}"
+                      data-free="{{ cell.free }}"
+                      data-capacity="{{ row.room.capacity }}"
+                      aria-label="{{ row.room.name }}, {{ cell.date|date:'j F Y' }}, {{ cell.free }} beds free"
+                      aria-pressed="false"
+                      title="{{ cell.free }} of {{ row.room.capacity }} beds free on {{ cell.date|date:'j M Y' }}">
+                      {{ cell.free }}
+                    </button>
+                    <template class="room-detail"><ul>{% for booking in cell.details %}<li>{{ booking.name }} · {{ booking.beds }} bed(s) · {{ booking.status }} · {{ booking.code }}</li>{% empty %}<li>No viewable guest details for this date.</li>{% endfor %}</ul></template>
+                  </td>
+                {% endfor %}
+              </tr>
+            {% empty %}
+              <tr><td class="ac-empty" colspan="32">No rooms in this hut.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section class="ac-panel ac-selection" id="selected-day" aria-live="polite">
+      <p class="ac-eyebrow" style="color:#367355">Selected night</p>
+      <h2 id="selected-heading">Select a room and date</h2>
+      <p id="selected-count">Click any calendar cell to inspect availability and reservation details.</p>
+      <div id="selected-details"></div>
+      <a class="ac-button" id="book-link" href="{% url 'bookings:manual_booking' %}?hut={{ selected_hut.pk }}" hidden>+ New reservation for this date →</a>
+    </section>
+  {% endif %}
+</div>
 <script>
 (function () {
   const monthInput = document.getElementById('month');
@@ -56,19 +166,26 @@
       document.getElementById('calendar-month').value = Number(parts[1]);
     }
   });
+
   const bookLink = document.getElementById('book-link');
   if (!bookLink) return;
-  document.querySelectorAll('.room-cell').forEach(function (button) {
+  const heading = document.getElementById('selected-heading');
+  const count = document.getElementById('selected-count');
+  const detailTarget = document.getElementById('selected-details');
+  const buttons = document.querySelectorAll('.room-cell');
+  buttons.forEach(function (button) {
     button.addEventListener('click', function () {
-      document.getElementById('selected-heading').textContent = button.dataset.room + ' · ' + button.dataset.day;
-      document.getElementById('selected-count').textContent = button.dataset.free + ' free of ' + button.dataset.capacity + ' beds';
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
+      button.setAttribute('aria-pressed', 'true');
+      heading.textContent = button.dataset.room + ' · ' + button.dataset.day;
+      count.textContent = button.dataset.free + ' free of ' + button.dataset.capacity + ' beds';
       const details = button.parentElement.querySelector('.room-detail');
-      document.getElementById('selected-details').replaceChildren(details.content.cloneNode(true));
+      detailTarget.replaceChildren(details.content.cloneNode(true));
       const start = button.dataset.day;
       const endDate = new Date(start + 'T12:00:00');
       endDate.setDate(endDate.getDate() + 1);
-      const end = [endDate.getFullYear(), String(endDate.getMonth()+1).padStart(2,'0'), String(endDate.getDate()).padStart(2,'0')].join('-');
-      const params = new URLSearchParams({hut:'{{ selected_hut.pk }}', check_in:start, check_out:end});
+      const end = [endDate.getFullYear(), String(endDate.getMonth() + 1).padStart(2, '0'), String(endDate.getDate()).padStart(2, '0')].join('-');
+      const params = new URLSearchParams({hut: '{{ selected_hut.pk }}', check_in: start, check_out: end});
       bookLink.href = '{% url "bookings:manual_booking" %}?' + params.toString();
       bookLink.hidden = Number(button.dataset.free) === 0 || start < '{{ today|date:"Y-m-d" }}';
     });

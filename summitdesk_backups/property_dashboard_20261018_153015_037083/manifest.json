@@ -1,0 +1,18 @@
+[
+  {
+    "path": "floorplans/templates/floorplans/staff_hub.html",
+    "existed": true
+  },
+  {
+    "path": "floorplans/templates/floorplans/includes/hub_advanced_v119.html",
+    "existed": false
+  },
+  {
+    "path": "floorplans/static/floorplans/property_dashboard_v119.css",
+    "existed": false
+  },
+  {
+    "path": "floorplans/test_property_dashboard_v119.py",
+    "existed": false
+  }
+]

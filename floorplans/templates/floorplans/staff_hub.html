@@ -1,0 +1,177 @@
+{% load static summitdesk_nav %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>{{ hut.name }} · Property dashboard | SummitDesk</title>
+  <link rel="stylesheet" href="{% static 'floorplans/property_dashboard_v119.css' %}">
+</head>
+<body class="sd116-active sd119-page">
+  {% summitdesk_nav %}
+  <main id="main-content" class="sd119-dashboard">
+    <div class="sd119-heading">
+      <div class="sd119-heading-copy">
+        <div class="sd119-eyebrow"><span class="sd119-eyebrow-dot" aria-hidden="true"></span> PROPERTY OVERVIEW <span aria-hidden="true">/</span> {{ today|date:"l, j F Y" }}</div>
+        <h1>{{ hut.name }}</h1>
+        <p>{% if manager %}Your front desk at a glance. Everything important for today's operations.{% else %}Your housekeeping workspace for today.{% endif %}</p>
+      </div>
+      <div class="sd119-heading-actions">
+        {% if manager %}
+          <a class="sd119-button sd119-button-outline" href="{% url 'floorplans:staff_calendar' hut.pk %}"><span aria-hidden="true">▦</span> View calendar</a>
+          <a class="sd119-button sd119-button-primary" href="{% url 'floorplans:staff_new_booking' hut.pk %}"><span aria-hidden="true">＋</span> New reservation</a>
+        {% else %}
+          <a class="sd119-button sd119-button-primary" href="{% url 'floorplans:staff_tasks' hut.pk %}">My cleaning tasks <span aria-hidden="true">↗</span></a>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if manager and alert_summary_v40.counts.urgent %}
+    <div class="sd119-notice sd119-notice-warning" role="status">
+      <span class="sd119-notice-icon" aria-hidden="true">!</span>
+      <span><strong>{{ alert_summary_v40.counts.urgent }} urgent operations alert{{ alert_summary_v40.counts.urgent|pluralize }}</strong><small>Review the next seven days before making changes.</small></span>
+      <a href="#sd119-priorities">Review alerts <span aria-hidden="true">→</span></a>
+    </div>
+    {% endif %}
+
+    <section class="sd119-metrics" aria-label="Today's property statistics">
+      {% if manager %}
+        <article class="sd119-metric">
+          <div class="sd119-metric-top"><span>Reserved beds tonight</span><span class="sd119-metric-icon sd119-icon-green" aria-hidden="true">▥</span></div>
+          <div class="sd119-metric-number">{{ occupied_beds }} <span>/ {{ capacity }}</span></div>
+          <div class="sd119-progress" role="img" aria-label="{{ occupied_beds }} of {{ capacity }} beds reserved tonight"><span style="width:min(100%, {% widthratio occupied_beds capacity 100 %}%);"></span></div>
+          <div class="sd119-metric-foot">Confirmed bookings + pending holds</div>
+        </article>
+        <article class="sd119-metric">
+          <div class="sd119-metric-top"><span>Arrivals today</span><span class="sd119-metric-icon sd119-icon-blue" aria-hidden="true">↘</span></div>
+          <div class="sd119-metric-number">{{ arrivals }}</div>
+          <div class="sd119-metric-foot">Reserved bed places arriving</div>
+        </article>
+        <article class="sd119-metric">
+          <div class="sd119-metric-top"><span>Departures today</span><span class="sd119-metric-icon sd119-icon-orange" aria-hidden="true">↗</span></div>
+          <div class="sd119-metric-number">{{ departures }}</div>
+          <div class="sd119-metric-foot">Reserved bed places leaving</div>
+        </article>
+        <article class="sd119-metric">
+          <div class="sd119-metric-top"><span>Cleaning to do</span><span class="sd119-metric-icon sd119-icon-violet" aria-hidden="true">✧</span></div>
+          <div class="sd119-metric-number">{{ counts.open }}</div>
+          <div class="sd119-metric-foot">{{ counts.in_progress }} in progress · {{ counts.done }} done</div>
+        </article>
+      {% else %}
+        <article class="sd119-metric"><div class="sd119-metric-top"><span>My open tasks</span><span class="sd119-metric-icon sd119-icon-orange" aria-hidden="true">☷</span></div><div class="sd119-metric-number">{{ counts.open }}</div><div class="sd119-metric-foot">Ready to start</div></article>
+        <article class="sd119-metric"><div class="sd119-metric-top"><span>In progress</span><span class="sd119-metric-icon sd119-icon-blue" aria-hidden="true">↗</span></div><div class="sd119-metric-number">{{ counts.in_progress }}</div><div class="sd119-metric-foot">Currently being cleaned</div></article>
+        <article class="sd119-metric"><div class="sd119-metric-top"><span>Completed today</span><span class="sd119-metric-icon sd119-icon-green" aria-hidden="true">✓</span></div><div class="sd119-metric-number">{{ counts.done }}</div><div class="sd119-metric-foot">Marked as done</div></article>
+      {% endif %}
+    </section>
+
+    <div class="sd119-columns">
+      {% if manager %}
+      <section class="sd119-panel sd119-forecast" aria-labelledby="sd119-forecast-title">
+        <div class="sd119-panel-header">
+          <div><span class="sd119-section-kicker">CAPACITY</span><h2 id="sd119-forecast-title">The next 7 nights</h2><p>Room-level reserved places across your property</p></div>
+          <a class="sd119-text-link" href="{% url 'floorplans:staff_calendar' hut.pk %}">Open calendar <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="sd119-legend" aria-label="Forecast legend"><span><i class="sd119-key sd119-key-confirmed"></i> Confirmed</span><span><i class="sd119-key sd119-key-pending"></i> Pending</span><span><i class="sd119-key sd119-key-free"></i> Free capacity</span></div>
+        <div class="sd119-forecast-rows">
+          {% for day in forecast_v38 %}
+          <div class="sd119-forecast-row{% if day.over_capacity %} sd119-forecast-over{% endif %}">
+            <div class="sd119-day"><strong>{{ day.day|date:"D" }}</strong><span>{{ day.day|date:"j M" }}</span></div>
+            <div class="sd119-bar" role="img" aria-label="{{ day.day|date:'j F' }}: {{ day.occupied }} confirmed, {{ day.pending }} pending, {{ day.free }} free bed places">
+              <div class="sd119-bar-confirmed" style="width:min(100%, {% widthratio day.occupied day.available_capacity 100 %}%);"></div>
+              <div class="sd119-bar-pending" style="width:min(100%, {% widthratio day.pending day.available_capacity 100 %}%);"></div>
+            </div>
+            <div class="sd119-day-total">{{ day.occupied|add:day.pending }} <span>/ {{ day.available_capacity }}</span></div>
+            {% if day.over_capacity %}<span class="sd119-row-warning" title="Reservations and holds exceed usable capacity">!</span>{% endif %}
+          </div>
+          {% empty %}
+          <p class="sd119-empty">No forecast data available.</p>
+          {% endfor %}
+        </div>
+        <div class="sd119-panel-footer">Availability reflects room capacity minus closures and holds; it does not guarantee a specific numbered bed.</div>
+      </section>
+      {% else %}
+      <section class="sd119-panel sd119-cleaner-intro" aria-labelledby="sd119-cleaner-title">
+        <div class="sd119-panel-header"><div><span class="sd119-section-kicker">TODAY'S PLAN</span><h2 id="sd119-cleaner-title">Ready for your shift</h2><p>Focus on assigned beds and update progress as you work.</p></div></div>
+        <div class="sd119-cleaner-feature"><span aria-hidden="true">✧</span><div><strong>{{ task_total }} task{{ task_total|pluralize }} assigned today</strong><p>Open your task list to see instructions, priority and status.</p></div></div>
+        <a class="sd119-button sd119-button-primary" href="{% url 'floorplans:staff_tasks' hut.pk %}">View my tasks <span aria-hidden="true">↗</span></a>
+      </section>
+      {% endif %}
+
+      <section class="sd119-panel sd119-tasks" aria-labelledby="sd119-tasks-title">
+        <div class="sd119-panel-header">
+          <div><span class="sd119-section-kicker">HOUSEKEEPING</span><h2 id="sd119-tasks-title">{% if manager %}Today's cleaning tasks{% else %}My assigned tasks{% endif %}</h2><p>{{ task_total }} scheduled today</p></div>
+          <a class="sd119-text-link" href="{% url 'floorplans:staff_tasks' hut.pk %}">View all <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="sd119-task-list">
+          {% for task in tasks %}
+          <div class="sd119-task-row">
+            <span class="sd119-task-avatar" aria-hidden="true">{{ task.bed.room.name|slice:':1'|upper }}</span>
+            <div class="sd119-task-info"><strong>{{ task.bed.room.name }} · Bed {{ task.bed.number }}</strong><span>{{ task.get_priority_display }} priority{% if manager and task.assignee %} · {{ task.assignee.get_username }}{% endif %}</span></div>
+            <span class="sd119-status sd119-status-{{ task.status }}">{{ task.get_status_display }}</span>
+          </div>
+          {% empty %}
+          <div class="sd119-tasks-empty"><span aria-hidden="true">✓</span><strong>No tasks scheduled for today</strong><p>New assignments will appear here.</p></div>
+          {% endfor %}
+        </div>
+        {% if task_total > 8 %}<div class="sd119-panel-footer">Showing 8 of {{ task_total }} tasks. Open the task board for the full list.</div>{% endif %}
+      </section>
+    </div>
+
+    {% if manager %}
+    <div class="sd119-lower">
+      <section class="sd119-panel sd119-priorities" id="sd119-priorities" aria-labelledby="sd119-priorities-title">
+        <div class="sd119-panel-header"><div><span class="sd119-section-kicker">NEEDS ATTENTION</span><h2 id="sd119-priorities-title">Operations alerts</h2><p>Priority checks for the coming week</p></div><a class="sd119-text-link" href="?operations=1">Manager operations <span aria-hidden="true">↗</span></a></div>
+        <div class="sd119-alert-list">
+          {% for alert in alert_summary_v40.top|slice:':3' %}
+          <div class="sd119-alert-row"><span class="sd119-alert-symbol sd119-alert-{{ alert.level }}" aria-hidden="true">{% if alert.level == 'urgent' %}!{% elif alert.level == 'warning' %}△{% else %}i{% endif %}</span><div><strong>{{ alert.title }}</strong><p>{{ alert.day|date:"D, j M" }} · {{ alert.detail|truncatechars:110 }}</p></div></div>
+          {% empty %}
+          <div class="sd119-alert-empty"><span aria-hidden="true">✓</span><div><strong>No operations alerts</strong><p>No alerts detected in the current seven-day check.</p></div></div>
+          {% endfor %}
+        </div>
+      </section>
+      <section class="sd119-panel sd119-snapshot" aria-labelledby="sd119-snapshot-title">
+        <div class="sd119-panel-header"><div><span class="sd119-section-kicker">QUICK SNAPSHOT</span><h2 id="sd119-snapshot-title">Looking ahead</h2><p>Confirmed bookings only</p></div></div>
+        <div class="sd119-snapshot-line"><span>Confirmed beds tonight</span><strong>{{ v37_confirmed_beds_today }}</strong></div>
+        <div class="sd119-snapshot-line"><span>Tomorrow's arriving bed places</span><strong>{{ v37_arrivals_tomorrow }}</strong></div>
+        <div class="sd119-snapshot-line"><span>Estimated booking value tonight</span><strong>{{ v37_booking_value_today|floatformat:2 }}</strong></div>
+        <div class="sd119-snapshot-foot">Booking value is an estimate, not payments received.</div>
+      </section>
+    </div>
+    {% endif %}
+
+    <section class="sd119-shortcuts" aria-labelledby="sd119-shortcuts-title">
+      <div class="sd119-shortcuts-heading"><div><span class="sd119-section-kicker">YOUR WORKSPACE</span><h2 id="sd119-shortcuts-title">Manage your property</h2></div><span class="sd119-shortcuts-note">Everything you need, in one place</span></div>
+      <div class="sd119-shortcut-grid">
+        {% if manager %}
+        <a class="sd119-shortcut" href="{% url 'floorplans:staff_calendar' hut.pk %}"><span class="sd119-shortcut-icon sd119-icon-green" aria-hidden="true">▦</span><span><strong>Reservation calendar</strong><small>Availability and bookings</small></span><span class="sd119-shortcut-arrow" aria-hidden="true">↗</span></a>
+        <a class="sd119-shortcut" href="{% url 'floorplans:staff_arrivals' hut.pk %}"><span class="sd119-shortcut-icon sd119-icon-blue" aria-hidden="true">⇄</span><span><strong>Arrivals & departures</strong><small>Manage today's guests</small></span><span class="sd119-shortcut-arrow" aria-hidden="true">↗</span></a>
+        <a class="sd119-shortcut" href="{% url 'floorplans:visual_beds' hut.pk %}"><span class="sd119-shortcut-icon sd119-icon-violet" aria-hidden="true">▥</span><span><strong>Rooms & beds</strong><small>Assignments and layout</small></span><span class="sd119-shortcut-arrow" aria-hidden="true">↗</span></a>
+        <a class="sd119-shortcut" href="{% url 'floorplans:staff_housekeeping' hut.pk %}"><span class="sd119-shortcut-icon sd119-icon-orange" aria-hidden="true">✧</span><span><strong>Housekeeping board</strong><small>Readiness and maintenance</small></span><span class="sd119-shortcut-arrow" aria-hidden="true">↗</span></a>
+        <a class="sd119-shortcut" href="{% url 'floorplans:staff_analytics' hut.pk %}"><span class="sd119-shortcut-icon sd119-icon-green" aria-hidden="true">▥</span><span><strong>Reservation analytics</strong><small>Occupancy and performance</small></span><span class="sd119-shortcut-arrow" aria-hidden="true">↗</span></a>
+        <a class="sd119-shortcut" href="{% url 'floorplans:cleaner_team' hut.pk %}"><span class="sd119-shortcut-icon sd119-icon-blue" aria-hidden="true">♙</span><span><strong>Staff & cleaning team</strong><small>{{ cleaner_count }} memberships</small></span><span class="sd119-shortcut-arrow" aria-hidden="true">↗</span></a>
+        {% else %}
+        <a class="sd119-shortcut" href="{% url 'floorplans:staff_tasks' hut.pk %}"><span class="sd119-shortcut-icon sd119-icon-green" aria-hidden="true">☷</span><span><strong>My cleaning tasks</strong><small>Assignments and progress</small></span><span class="sd119-shortcut-arrow" aria-hidden="true">↗</span></a>
+        {% endif %}
+      </div>
+    </section>
+
+    {% if manager %}
+    <details class="sd119-advanced" {% if request.GET %}open{% endif %}>
+      <summary><span class="sd119-advanced-icon" aria-hidden="true">▤</span><span><strong>Advanced reports &amp; exports</strong><small>Forecasts, capacity warnings, comparisons and CSV tools</small></span><span class="sd119-advanced-chevron" aria-hidden="true">⌄</span></summary>
+      <div class="sd119-advanced-body">
+        <p class="sd119-advanced-intro">These are the original management reports. They're still available whenever you need more detail.</p>
+        <div class="sd119-advanced-links">
+          <a href="?operations=1">Full manager operations ↗</a>
+          <a href="{% url 'floorplans:staff_financial_analytics' hut.pk %}">Financial analytics ↗</a>
+          <a href="{% url 'floorplans:staff_audit_dashboard' hut.pk %}">Reservation audit ↗</a>
+          <a href="{% url 'floorplans:cleaner_invitations' hut.pk %}">Team invitations ↗</a>
+        </div>
+        {% include 'floorplans/includes/hub_advanced_v119.html' %}
+      </div>
+    </details>
+    {% endif %}
+    <footer class="sd119-footer">SummitDesk · Property management</footer>
+  </main>
+</body>
+</html>

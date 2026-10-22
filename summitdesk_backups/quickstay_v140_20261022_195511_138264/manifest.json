@@ -1,0 +1,19 @@
+{
+  "version": "v140",
+  "original": {
+    "floorplans/templates/floorplans/property_calendar_v138.html": "9e4ac571f101765970c40a003b3192024a9e8992635ab0f8a9e53c4abde2a50f",
+    "floorplans/property_calendar_v138.py": "ded23956be73a88d7e3286523ee5586bef0958328be55e80576bcd482e1f92bb",
+    "floorplans/urls.py": "209976005748521be424a385e5ae0d31301316b107752aac94c8703af026ec01"
+  },
+  "installed": {
+    "floorplans/templates/floorplans/property_calendar_v138.html": "f8ab9d7733c18c088b74b59e42025bde069499a446b0fff914edb1cc978f96f8",
+    "floorplans/property_calendar_v138.py": "fed4c2bfc1ec25776750707e5645883a09139c0a3f3553d1188df6cf88ec79ce",
+    "floorplans/urls.py": "6770d4cfeff425774edd8e9b9169e98c792384981f897e81c42ac2a20ec8d974",
+    "floorplans/property_quickstay_v140.py": "8b0dd85916b8830b483516aefd10311e0f583d9e539f7c4b4ce64c20bfce3b68",
+    "floorplans/test_quickstay_v140.py": "b2d5846909b3b8449782efb5408f9e17c0b73c30ac98f74872bd83b25eef5eda"
+  },
+  "created": [
+    "floorplans/property_quickstay_v140.py",
+    "floorplans/test_quickstay_v140.py"
+  ]
+}

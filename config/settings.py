@@ -23,7 +23,10 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
     "bookings",
+    
+    "floorplans.reservation_audit_apps.FloorplansV31Config",
 ]
 
 MIDDLEWARE = [
@@ -32,6 +35,8 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "bookings.staff_auth_v117.StaffLoginRedirectMiddleware",
+    "floorplans.audit_actor.ReservationAuditActorMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -84,6 +89,9 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = "/var/www/hut-static"
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 CSRF_COOKIE_SECURE = not DEBUG
 SESSION_COOKIE_SECURE = not DEBUG
 SECURE_SSL_REDIRECT = not DEBUG and os.environ.get("DJANGO_SSL_REDIRECT", "1") == "1"
@@ -109,3 +117,20 @@ BOOKING_MAX_DAYS_AHEAD = 365      # how far in advance bookings open
 BOOKING_INITIAL_STATUS = "confirmed"  # use "pending" once you add payments
 BOOKING_PENDING_MINUTES = 15      # unpaid holds older than this are released
 BOOKING_NOTIFY_EMAIL = os.environ.get("BOOKING_NOTIFY_EMAIL", "")         # the hut keeper's address, optional
+
+# Staff and cleaner authentication entry point.
+LOGIN_URL = "/staff/login/"
+
+
+# v129: optional SMTP configuration via the production environment.
+# Existing email settings are unchanged unless these variables are provided.
+# Gmail SMTP configuration
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+
+EMAIL_HOST_USER = os.environ.get("DJANGO_EMAIL_USER", "")
+EMAIL_HOST_PASSWORD = os.environ.get("DJANGO_EMAIL_APP_PASSWORD", "")
+
+EMAIL_TIMEOUT = 20

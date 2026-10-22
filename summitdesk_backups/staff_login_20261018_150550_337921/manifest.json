@@ -1,0 +1,38 @@
+[
+  {
+    "path": "bookings/urls.py",
+    "existed": true
+  },
+  {
+    "path": "config/settings.py",
+    "existed": true
+  },
+  {
+    "path": "bookings/templates/bookings/role_landing.html",
+    "existed": true
+  },
+  {
+    "path": "bookings/templates/bookings/base.html",
+    "existed": true
+  },
+  {
+    "path": "floorplans/templates/floorplans/includes/summitdesk_nav.html",
+    "existed": true
+  },
+  {
+    "path": "bookings/staff_auth_v117.py",
+    "existed": false
+  },
+  {
+    "path": "bookings/templates/bookings/staff_login.html",
+    "existed": false
+  },
+  {
+    "path": "bookings/static/bookings/staff_login_v117.css",
+    "existed": false
+  },
+  {
+    "path": "bookings/test_staff_auth_v117.py",
+    "existed": false
+  }
+]

@@ -1,26 +1,123 @@
 {% extends "bookings/base.html" %}
-{% block title %}Guest change requests{% endblock %}
+{% block title %}Guest change & cancellation requests{% endblock %}
 {% block content %}
-<h1>Guest change and cancellation requests</h1>
-<p>Approval records a decision only. Update booking dates, beds, and status separately using your reservation tools.</p>
-<form method="get"><label>Hut <select name="hut">
-{% if request.user.is_superuser %}<option value="">All huts</option>{% endif %}
-{% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_slug == hut.slug %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}
-</select></label><button type="submit">Filter</button></form>
-{% for change in requests %}
-<section class="card">
-<h2>{{ change.reservation.code }} — {{ change.get_request_type_display }}</h2>
-<p>{{ change.reservation.name }} · {{ change.created_at }} · {{ change.get_status_display }}</p>
-{% if change.requested_check_in %}<p>Requested dates: {{ change.requested_check_in }} to {{ change.requested_check_out }}</p>{% endif %}
-<p>{{ change.details }}</p>
-{% if change.status == "pending" %}
-<form method="post">{% csrf_token %}
-<input type="hidden" name="request_id" value="{{ change.pk }}">
-<label>Manager note <textarea name="manager_note" maxlength="2000"></textarea></label>
-<button name="decision" value="approved" type="submit">Approve for manual processing</button>
-<button name="decision" value="rejected" type="submit">Reject</button>
-</form>
-{% else %}<p>Reviewed by {{ change.reviewed_by }}{% if change.manager_note %} · {{ change.manager_note }}{% endif %}</p>{% endif %}
-</section>
-{% empty %}<p>No requests.</p>{% endfor %}
+<style>
+  .gr-wrap{--gr-forest:#163b32;--gr-ink:#18352d;--gr-muted:#60756d;--gr-lime:#d5f28b;--gr-line:#dce7df;--gr-surface:#fff;color:var(--gr-ink);max-width:1250px;margin:0 auto;padding:clamp(12px,2.5vw,30px) 0 55px}
+  .gr-wrap *{box-sizing:border-box}
+  .gr-wrap .gr-hero{background:linear-gradient(115deg,#102e27,#245849);color:#fff;border-radius:24px;padding:clamp(24px,4vw,46px);position:relative;overflow:hidden}
+  .gr-wrap .gr-hero:after{content:"";position:absolute;right:-60px;top:-95px;width:310px;height:310px;border:1px solid #ffffff28;border-radius:50%;box-shadow:0 0 0 45px #ffffff09,0 0 0 90px #ffffff07;pointer-events:none}
+  .gr-wrap .gr-kicker{font-size:.75rem;letter-spacing:.16em;font-weight:800;text-transform:uppercase;color:var(--gr-lime);margin:0 0 12px}
+  .gr-wrap h1{font-size:clamp(1.85rem,3.7vw,3rem);line-height:1.12;margin:0 0 12px;color:inherit}
+  .gr-wrap .gr-hero p:not(.gr-kicker){max-width:680px;line-height:1.65;color:#e0ede6;margin:0}
+  .gr-wrap .gr-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:23px}
+  .gr-wrap .gr-link{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border-radius:12px;padding:10px 15px;font-size:.9rem;font-weight:750;background:#ffffff19;border:1px solid #ffffff4d;color:#fff}
+  .gr-wrap .gr-link:hover{background:#ffffff2d}
+  .gr-wrap .gr-notice{display:flex;gap:13px;align-items:flex-start;background:#f4f9e8;border:1px solid #d9e9ba;border-radius:17px;padding:18px 20px;margin:22px 0;color:#385124;line-height:1.55}
+  .gr-wrap .gr-notice strong{display:block;margin-bottom:3px}
+  .gr-wrap .gr-notice p{margin:0}
+  .gr-wrap .gr-panel{background:var(--gr-surface);border:1px solid var(--gr-line);border-radius:20px;padding:clamp(17px,2.4vw,26px);box-shadow:0 10px 30px #163b3208;margin-top:20px}
+  .gr-wrap .gr-panel-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+  .gr-wrap h2{font-size:1.15rem;line-height:1.35;margin:0;color:var(--gr-ink)}
+  .gr-wrap .gr-filter{display:flex;align-items:end;gap:12px;flex-wrap:wrap}
+  .gr-wrap .gr-field{display:flex;flex-direction:column;gap:7px;flex:1 1 260px}
+  .gr-wrap label{font-weight:750;font-size:.88rem;color:var(--gr-ink)}
+  .gr-wrap select,.gr-wrap textarea{width:100%;border:1px solid #cad9cf;border-radius:12px;background:#fff;color:var(--gr-ink);padding:11px 13px;font:inherit;min-height:46px}
+  .gr-wrap select:focus,.gr-wrap textarea:focus{outline:3px solid #d5f28b8c;border-color:#3c755e}
+  .gr-wrap textarea{min-height:98px;resize:vertical}
+  .gr-wrap button{font:inherit;cursor:pointer;font-weight:750;border-radius:12px;padding:11px 17px;min-height:45px;border:1px solid transparent}
+  .gr-wrap .gr-primary{background:var(--gr-forest);color:#fff}
+  .gr-wrap .gr-primary:hover{background:#255844}
+  .gr-wrap .gr-danger{background:#fff;color:#a33939;border-color:#e9b7b7}
+  .gr-wrap .gr-danger:hover{background:#fff1f1}
+  .gr-wrap .gr-list-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:27px 0 0}
+  .gr-wrap .gr-list-head p{margin:0;color:var(--gr-muted);font-size:.9rem}
+  .gr-wrap .gr-request{background:#fff;border:1px solid var(--gr-line);border-radius:20px;padding:clamp(18px,2.5vw,27px);margin-top:15px;box-shadow:0 8px 24px #163b3207}
+  .gr-wrap .gr-request-top{display:flex;justify-content:space-between;align-items:flex-start;gap:15px;flex-wrap:wrap}
+  .gr-wrap .gr-ref{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gr-muted);font-weight:800;margin-bottom:6px}
+  .gr-wrap .gr-request h3{margin:0;font-size:1.22rem;line-height:1.3;color:var(--gr-ink)}
+  .gr-wrap .gr-pill{display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border-radius:999px;font-size:.78rem;font-weight:800;background:#edf1ef;color:#456256;text-transform:capitalize}
+  .gr-wrap .gr-pill.pending{background:#fff2d8;color:#925b0b}
+  .gr-wrap .gr-pill.approved{background:#e5f6e9;color:#1d7442}
+  .gr-wrap .gr-pill.rejected{background:#fde9e9;color:#a33838}
+  .gr-wrap .gr-meta{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:13px;color:var(--gr-muted);font-size:.89rem}
+  .gr-wrap .gr-detail{margin-top:20px;padding:17px 19px;border:1px solid #e4ebe5;background:#f8faf8;border-radius:14px}
+  .gr-wrap .gr-detail-label{font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--gr-muted);font-weight:800;margin-bottom:7px}
+  .gr-wrap .gr-detail p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6}
+  .gr-wrap .gr-date{font-weight:750;margin:0 0 13px}
+  .gr-wrap .gr-decision{border-top:1px solid var(--gr-line);margin-top:20px;padding-top:20px}
+  .gr-wrap .gr-decision .gr-field{max-width:850px}
+  .gr-wrap .gr-button-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:13px}
+  .gr-wrap .gr-reviewed{margin-top:20px;padding:14px 16px;border-radius:13px;background:#f2f7f3;color:#456256;line-height:1.55}
+  .gr-wrap .gr-reviewed p{margin:5px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}
+  .gr-wrap .gr-empty{text-align:center;padding:48px 20px;background:#fff;border:1px dashed #cbdcd0;border-radius:20px;margin-top:15px}
+  .gr-wrap .gr-empty h3{margin:0 0 8px}
+  .gr-wrap .gr-empty p{margin:0;color:var(--gr-muted)}
+  @media(max-width:650px){.gr-wrap .gr-hero{border-radius:17px}.gr-wrap .gr-filter button{width:100%}.gr-wrap .gr-button-row button{width:100%}.gr-wrap .gr-request{border-radius:16px}}
+</style>
+<div class="gr-wrap">
+  <header class="gr-hero">
+    <p class="gr-kicker">Staff / Guest services</p>
+    <h1>Change &amp; cancellation requests</h1>
+    <p>Review guest requests, record your decision, and keep a clear history of manager responses.</p>
+    <nav class="gr-actions" aria-label="Staff navigation">
+      <a class="gr-link" href="{% url 'bookings:dashboard' %}">← Operations dashboard</a>
+      <a class="gr-link" href="{% url 'bookings:manager_reservations' %}">Manage reservations ↗</a>
+    </nav>
+  </header>
+
+  <aside class="gr-notice" role="note">
+    <span aria-hidden="true">ⓘ</span>
+    <div><strong>Approval is a decision, not a booking change</strong><p>Approving a request records your decision only. Update reservation dates, beds, or cancellation status separately using your reservation management tools.</p></div>
+  </aside>
+
+  <section class="gr-panel" aria-labelledby="gr-filter-title">
+    <div class="gr-panel-head"><h2 id="gr-filter-title">Filter requests</h2></div>
+    <form method="get" class="gr-filter">
+      <div class="gr-field"><label for="gr-hut">Mountain hut</label>
+        <select name="hut" id="gr-hut">
+          {% if request.user.is_superuser %}<option value="">All huts</option>{% endif %}
+          {% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_slug == hut.slug %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="gr-primary">Apply filter</button>
+    </form>
+  </section>
+
+  <div class="gr-list-head"><h2>Guest requests</h2><p>Review and respond to incoming requests</p></div>
+  {% for change in requests %}
+  <article class="gr-request">
+    <div class="gr-request-top">
+      <div>
+        <div class="gr-ref">Reservation {{ change.reservation.code }}</div>
+        <h3>{{ change.get_request_type_display }}</h3>
+        <div class="gr-meta"><span>Guest: <strong>{{ change.reservation.name }}</strong></span><span>Received: {{ change.created_at|date:"j M Y, H:i" }}</span></div>
+      </div>
+      <span class="gr-pill {% if change.status == 'pending' %}pending{% elif change.status == 'approved' %}approved{% elif change.status == 'rejected' %}rejected{% endif %}">{{ change.get_status_display }}</span>
+    </div>
+    <div class="gr-detail">
+      {% if change.requested_check_in %}
+        <div class="gr-detail-label">Requested stay dates</div>
+        <p class="gr-date">{{ change.requested_check_in|date:"j M Y" }} → {{ change.requested_check_out|date:"j M Y" }}</p>
+      {% endif %}
+      <div class="gr-detail-label">Guest request</div>
+      <p>{{ change.details|default:"No additional details provided." }}</p>
+    </div>
+    {% if change.status == "pending" %}
+      <form method="post" class="gr-decision">
+        {% csrf_token %}
+        <input type="hidden" name="request_id" value="{{ change.pk }}">
+        <div class="gr-field"><label for="gr-note-{{ change.pk }}">Manager note (optional)</label><textarea id="gr-note-{{ change.pk }}" name="manager_note" maxlength="2000" placeholder="Add context or instructions for processing this request..."></textarea></div>
+        <div class="gr-button-row">
+          <button class="gr-primary" name="decision" value="approved" type="submit" onclick="return confirm('Approve this request for manual processing? This will not change the reservation automatically.');">Approve for manual processing</button>
+          <button class="gr-danger" name="decision" value="rejected" type="submit" onclick="return confirm('Reject this guest request?');">Reject request</button>
+        </div>
+      </form>
+    {% else %}
+      <div class="gr-reviewed"><strong>Reviewed by {{ change.reviewed_by|default:"Staff" }}</strong>{% if change.manager_note %}<p>{{ change.manager_note }}</p>{% endif %}</div>
+    {% endif %}
+  </article>
+  {% empty %}
+    <div class="gr-empty"><h3>No requests found</h3><p>There are no guest change or cancellation requests for the selected hut.</p></div>
+  {% endfor %}
+</div>
 {% endblock %}

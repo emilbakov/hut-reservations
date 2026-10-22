@@ -1,0 +1,23 @@
+SummitDesk v131 — Local verification
+====================================
+Source baseline: user-uploaded summitdesk_v126(1).zip (contained v127),
+reconstructed with the provided v128, v129, and v130 installers.
+
+Local environment: Python 3.13, Django 6.1.2 extracted from the uploaded
+project's virtualenv, SQLite test database. The archived Django installation
+lacked django.contrib.staticfiles, so a local test-only compatibility shim
+was used. The shim is NOT included in the upgrade package.
+
+- python manage.py check: PASS (0 issues)
+- Targeted tests:
+  bookings.test_manager_digest_preview_v131
+  bookings.test_manager_digest_preferences_v130
+  PASS: 31 tests (0 failures)
+- v129/v130 baseline tests before v131: PASS (32 tests)
+- Installer preflight and installation: PASS
+- Rollback and reinstallation: PASS
+- Second installation safely refused: PASS
+
+Not run against the user's production PostgreSQL database; please run the
+provided targeted tests after installation on Ubuntu. No full suite run is
+required for this upgrade.

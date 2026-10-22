@@ -1,0 +1,22 @@
+[
+  {
+    "path": "bookings/views.py",
+    "existed": true
+  },
+  {
+    "path": "bookings/templates/bookings/public_hut_v125.html",
+    "existed": false
+  },
+  {
+    "path": "bookings/static/bookings/public_hut_v125.css",
+    "existed": false
+  },
+  {
+    "path": "bookings/static/bookings/public_hut_v125.js",
+    "existed": false
+  },
+  {
+    "path": "bookings/test_public_hut_v125.py",
+    "existed": false
+  }
+]

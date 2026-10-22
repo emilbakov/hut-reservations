@@ -1,0 +1,37 @@
+[
+  {
+    "path": "bookings/urls.py",
+    "existed": true,
+    "installed_sha256": "cfdb5f7fcdba301093b898e779a377cabd7c47e399d695c83ff3a1e0cc79109b"
+  },
+  {
+    "path": "bookings/views.py",
+    "existed": true,
+    "installed_sha256": "6e84740a55045355ea73066e9e725baa38ca27293a506a25fd961071fd29ad07"
+  },
+  {
+    "path": "bookings/templates/bookings/manager_reservations.html",
+    "existed": true,
+    "installed_sha256": "8709eae8613140a11bf04b7e2184b3ef6da2098a7fcca5f510faa03fdd65c305"
+  },
+  {
+    "path": "bookings/guest_requests_v126.py",
+    "existed": true,
+    "installed_sha256": "1a4f5ca70b78a74178c109424fdb8bffd06ce58e75aa999c765de0a711f77049"
+  },
+  {
+    "path": "bookings/approval_dashboard_v127.py",
+    "existed": false,
+    "installed_sha256": "77e0c7b790bc81c0eae14035a49444123228d02d4a558c9c2f06a1efe68a8bec"
+  },
+  {
+    "path": "bookings/templates/bookings/approval_dashboard_v127.html",
+    "existed": false,
+    "installed_sha256": "ffb2926104267e29f8d1a7340ef0ff577cb2ef79e96fc03643cd6164a6dcafa1"
+  },
+  {
+    "path": "bookings/test_approval_dashboard_v127.py",
+    "existed": false,
+    "installed_sha256": "68aed34ae24321780d55524c666b7379148d4bcd37f758c008ab65178eb47fe6"
+  }
+]

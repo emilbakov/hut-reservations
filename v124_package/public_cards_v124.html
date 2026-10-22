@@ -1,0 +1,35 @@
+<div class="pub-hut-grid">
+  {% for card in cards %}
+    <article class="pub-hut-card">
+      <a class="pub-hut-photo" href="{% url 'bookings:hut_detail' card.hut.slug %}{% if dates_valid %}?check_in={{ check_in|date:'Y-m-d' }}&amp;check_out={{ check_out|date:'Y-m-d' }}{% endif %}" aria-label="Explore {{ card.hut.name }}">
+        {% if card.hut.image %}
+          <img src="{{ card.hut.image.url }}" alt="{{ card.hut.name }} mountain hut" loading="lazy">
+        {% else %}
+          <div class="pub-photo-placeholder" aria-hidden="true"><svg viewBox="0 0 160 100" fill="none"><path d="m0 100 55-79 27 40 19-25 59 64H0Z" fill="#a2c4ac"/><path d="m30 100 53-58 24 30 16-20 37 48H30Z" fill="#37634b"/><path d="m45 35 10-14 12 18-12-5-10 1Z" fill="#e9f3eb"/></svg></div>
+        {% endif %}
+        <span class="pub-card-arrow" aria-hidden="true">↗</span>
+      </a>
+      <div class="pub-hut-body">
+        <p class="pub-hut-location"><span aria-hidden="true">⌖</span> {{ card.hut.location|default:"Mountain retreat" }}</p>
+        <h3><a href="{% url 'bookings:hut_detail' card.hut.slug %}{% if dates_valid %}?check_in={{ check_in|date:'Y-m-d' }}&amp;check_out={{ check_out|date:'Y-m-d' }}{% endif %}">{{ card.hut.name }}</a></h3>
+        <p class="pub-hut-description">{{ card.hut.description|default:"A comfortable base for your next mountain adventure."|truncatewords:19 }}</p>
+        <div class="pub-hut-meta">
+          {% if dates_valid %}
+            <span class="pub-free-count">{{ card.free }} bed{{ card.free|pluralize }} free for your stay</span>
+          {% else %}
+            <span>{{ card.room_count }} room{{ card.room_count|pluralize }} · {{ card.capacity }} bed{{ card.capacity|pluralize }}</span>
+          {% endif %}
+          {% if card.starting_price is not None %}<span class="pub-price">From <strong>{{ card.starting_price|floatformat:2 }} {{ CURRENCY }}</strong><small> / bed / night</small></span>{% endif %}
+        </div>
+        <a class="pub-card-link" href="{% url 'bookings:hut_detail' card.hut.slug %}{% if dates_valid %}?check_in={{ check_in|date:'Y-m-d' }}&amp;check_out={{ check_out|date:'Y-m-d' }}{% endif %}">View hut &amp; availability <span aria-hidden="true">→</span></a>
+      </div>
+    </article>
+  {% empty %}
+    <div class="pub-no-results">
+      <span class="pub-no-results-icon" aria-hidden="true">⌕</span>
+      <h3>No matching huts found</h3>
+      <p>{% if dates_valid %}No huts have {{ beds }} bed{{ beds|pluralize }} available for the selected stay. Try different dates or fewer beds.{% else %}Try another destination or clear your search.{% endif %}</p>
+      <a href="{% url 'bookings:hut_list' %}">See all huts →</a>
+    </div>
+  {% endfor %}
+</div>

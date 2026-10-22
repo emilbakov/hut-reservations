@@ -1,0 +1,47 @@
+[
+  {
+    "path": "bookings/models.py",
+    "existed": true,
+    "installed_sha256": "6ec5509d00b4dd14af723f9fd234e3a26eebf05d22139acbb22a53c4304ad7ea"
+  },
+  {
+    "path": "bookings/manager_digest_v129.py",
+    "existed": true,
+    "installed_sha256": "4c0e76a16e10c327a30bfef87653b8ce874a9e66f60da9c0fdd610c2ff46bcc8"
+  },
+  {
+    "path": "bookings/management/commands/send_manager_request_digest.py",
+    "existed": true,
+    "installed_sha256": "b16d8b11860fe5b7ee4f687172fe7b8322b4cd54d0d50df7197427300daa478e"
+  },
+  {
+    "path": "bookings/urls.py",
+    "existed": true,
+    "installed_sha256": "850d6335bfd44daee114836e99cb1db3b581569ca6d470b0cf34fe3b5789dddf"
+  },
+  {
+    "path": "bookings/templates/bookings/approval_dashboard_v127.html",
+    "existed": true,
+    "installed_sha256": "81fd26424abf28925eef8f771fd1ca58dd9d00f30a61606fd930b40c36759e02"
+  },
+  {
+    "path": "bookings/manager_digest_preferences_v130.py",
+    "existed": false,
+    "installed_sha256": "bf299af8ed5ac7a473d6002015801df06d20a90e76d6da7581ffe2c3133eb8cc"
+  },
+  {
+    "path": "bookings/templates/bookings/manager_digest_preferences_v130.html",
+    "existed": false,
+    "installed_sha256": "5d1a4b67d30854e815a5e18e5d960650308624af23dfa5c6f68a23a60b056a7b"
+  },
+  {
+    "path": "bookings/migrations/0015_managerdigestpreference.py",
+    "existed": false,
+    "installed_sha256": "15823b5a89ddc025bba6d64bc4e32d2ac12ca3b0ec14807b264e1418760367a5"
+  },
+  {
+    "path": "bookings/test_manager_digest_preferences_v130.py",
+    "existed": false,
+    "installed_sha256": "32a636e793a6f09f00c8c6763eaf258d8e5ee2394bd4e64ed52133889ae59040"
+  }
+]

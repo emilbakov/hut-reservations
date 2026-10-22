@@ -1,0 +1,97 @@
+{% extends "bookings/base.html" %}
+{% block title %}Guest requests{% endblock %}
+{% block content %}
+<style>
+  .aq{--pine:#193d31;--deep:#102a22;--lime:#d8f47c;--muted:#617468;--line:#dbe7de;--paper:#f7faf5;color:var(--deep);max-width:1380px;margin:0 auto;padding:clamp(16px,3vw,34px) 0 70px}
+  .aq *{box-sizing:border-box}.aq a{color:inherit}.aq-header{border-radius:23px;background:linear-gradient(120deg,#102b25,#275743);color:#fff;padding:clamp(24px,4vw,44px);display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+  .aq-kicker{font-size:.72rem;letter-spacing:.18em;font-weight:800;color:var(--lime);margin:0 0 10px}.aq-header h1{font-size:clamp(1.9rem,4vw,3.2rem);line-height:1.12;margin:0 0 10px;color:#fff}.aq-header p{color:#d9e8df;margin:0;max-width:620px;line-height:1.6}
+  .aq-back{display:inline-flex;align-items:center;min-height:42px;padding:11px 16px;border:1px solid #ffffff55;border-radius:11px;text-decoration:none;color:#fff!important;font-size:.87rem;font-weight:750;white-space:nowrap}
+  .aq-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:20px 0}.aq-stat{border:1px solid var(--line);border-radius:17px;background:#fff;padding:20px;text-decoration:none!important;box-shadow:0 6px 20px #183b2908;display:flex;flex-direction:column;gap:7px}.aq-stat[aria-current=page]{border-color:#76a67d;box-shadow:0 0 0 2px #bde3a8}.aq-stat span{font-size:.82rem;font-weight:800;color:var(--muted)}.aq-stat strong{font-size:2rem;letter-spacing:-.045em;line-height:1.2}.aq-stat small{color:var(--muted);font-size:.78rem}
+  .aq-panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px 22px;margin-bottom:20px}.aq-filter{display:grid;grid-template-columns:minmax(170px,1fr) minmax(180px,2fr) minmax(170px,1fr) auto;gap:12px;align-items:end}.aq-field label{display:block;font-size:.77rem;font-weight:800;margin-bottom:7px}.aq-field input,.aq-field select{width:100%;height:45px;min-width:0;padding:0 12px;border:1px solid #cbdace;border-radius:10px;background:#fcfefb;font:inherit;color:var(--deep)}.aq-field :is(input,select):focus-visible,.aq button:focus-visible,.aq a:focus-visible{outline:3px solid #90bd6e;outline-offset:2px}
+  .aq-btn{border:0;border-radius:10px;padding:11px 16px;min-height:44px;font:inherit;font-size:.88rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none!important}.aq-btn-dark{background:var(--pine);color:#fff!important}.aq-btn-approve{background:#d7eddf;color:#1a6338}.aq-btn-decline{background:#fff;border:1px solid #e9bfc0;color:#a3383e}.aq-btn:hover{filter:brightness(.97)}
+  .aq-results-heading{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:26px 0 15px}.aq-results-heading h2{font-size:1.3rem;margin:0}.aq-results-heading p{color:var(--muted);margin:0;font-size:.85rem}
+  .aq-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.aq-card{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 5px 18px #1436240a;min-width:0}.aq-card-top{padding:19px 21px 15px;display:flex;justify-content:space-between;gap:14px;align-items:start;border-bottom:1px solid #edf2ec}.aq-card h3{margin:0;font-size:1.17rem;line-height:1.3;overflow-wrap:anywhere}.aq-card small{display:block;color:var(--muted);margin-top:5px;font-size:.79rem}.aq-pill{font-size:.73rem;font-weight:800;border-radius:999px;padding:7px 10px;white-space:nowrap;background:#fff0d4;color:#916009}.aq-pill-confirmed{background:#def1e4;color:#25623e}.aq-pill-cancelled{background:#f8e6e6;color:#a53c3c}
+  .aq-card-body{padding:18px 21px}.aq-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.aq-label{display:block;font-size:.7rem;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:800;margin-bottom:4px}.aq-value{font-size:.91rem;font-weight:700;overflow-wrap:anywhere}.aq-value a{color:#226447;text-decoration:underline;text-underline-offset:3px}.aq-rooms{border-top:1px solid #edf2ec;margin-top:16px;padding-top:15px}.aq-rooms strong{font-size:.8rem}.aq-rooms ul{padding:0;list-style:none;margin:9px 0 0;display:grid;gap:6px}.aq-rooms li{display:flex;justify-content:space-between;gap:12px;font-size:.83rem}.aq-rooms li span:last-child{font-weight:750;white-space:nowrap}.aq-note{background:var(--paper);border-radius:10px;padding:12px;margin-top:15px;font-size:.84rem;overflow-wrap:anywhere;white-space:pre-wrap;line-height:1.5}.aq-card-foot{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;border-top:1px solid #edf2ec;padding:15px 21px;background:#fcfdfb}.aq-ref{font-size:.72rem;color:var(--muted);overflow-wrap:anywhere}.aq-actions{display:flex;gap:8px;flex-wrap:wrap}.aq-actions form{margin:0}.aq-actions .aq-btn{min-height:39px;padding:9px 13px;font-size:.79rem}
+  .aq-empty{text-align:center;padding:52px 20px;border:1px dashed #c9d9cc;border-radius:18px;background:#fff}.aq-empty h3{margin:0 0 8px}.aq-empty p{margin:0;color:var(--muted)}.aq-pagination{display:flex;gap:12px;align-items:center;justify-content:center;margin:24px 0;flex-wrap:wrap}.aq-pagination a{border:1px solid var(--line);border-radius:9px;padding:9px 13px;text-decoration:none;font-weight:800}.aq-pagination span{color:var(--muted);font-size:.83rem}
+  .aq-priority-summary{display:flex;gap:12px;flex-wrap:wrap;margin:0 0 20px}.aq-priority-summary a{background:#fff;border:1px solid var(--line);border-radius:13px;padding:13px 17px;text-decoration:none;display:flex;align-items:center;gap:10px;min-height:48px;font-size:.84rem;font-weight:750}.aq-priority-summary strong{font-size:1.18rem;color:#9b5d0b}.aq-alerts{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}.aq-alert{font-size:.7rem;font-weight:800;background:#fff1d6;color:#88520c;padding:5px 8px;border-radius:7px}.aq-alert-due{background:#fbe1df;color:#973e39}.aq-download{display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;min-height:42px;border:1px solid #aecab5;border-radius:10px;background:#f6faf6;text-decoration:none!important;font-size:.83rem;font-weight:800;color:var(--pine)!important}.aq-heading-actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}  @media(max-width:1050px){.aq-list{grid-template-columns:1fr}}@media(max-width:650px){.aq-stats{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.aq-stat{padding:14px 11px}.aq-stat strong{font-size:1.6rem}.aq-stat span{font-size:.71rem}.aq-stat small{display:none}.aq-filter{grid-template-columns:1fr}.aq-panel{padding:17px}.aq-card-top,.aq-card-body,.aq-card-foot{padding-left:16px;padding-right:16px}.aq-grid{gap:12px}.aq-card-foot{align-items:stretch}.aq-actions{width:100%}.aq-actions form{flex:1}.aq-actions .aq-btn{width:100%}}
+</style>
+<div class="aq">
+  <header class="aq-header">
+    <div><p class="aq-kicker">SUMMITDESK / FRONT DESK</p><h1>Guest reservation requests</h1><p>Review new requests, check room and bed details, and respond with confidence. Beds are held while requests await a decision.</p></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <a class="aq-back" href="{% url 'bookings:manager_digest_preferences' %}">Email reminders</a>
+      <a class="aq-back" href="{% url 'bookings:manager_reservations' %}">← All reservations</a>
+    </div>
+  </header>
+
+  <nav class="aq-stats" aria-label="Request status filters">
+    <a class="aq-stat" href="?status=pending{% if selected_slug %}&amp;hut={{ selected_slug|urlencode }}{% endif %}" {% if status_filter == 'pending' %}aria-current="page"{% endif %}><span>Needs review</span><strong>{{ counts.pending }}</strong><small>Oldest first</small></a>
+    <a class="aq-stat" href="?status=confirmed{% if selected_slug %}&amp;hut={{ selected_slug|urlencode }}{% endif %}" {% if status_filter == 'confirmed' %}aria-current="page"{% endif %}><span>Approved</span><strong>{{ counts.confirmed }}</strong><small>Confirmed stays</small></a>
+    <a class="aq-stat" href="?status=cancelled{% if selected_slug %}&amp;hut={{ selected_slug|urlencode }}{% endif %}" {% if status_filter == 'cancelled' %}aria-current="page"{% endif %}><span>Declined</span><strong>{{ counts.cancelled }}</strong><small>Cancelled requests</small></a>
+  </nav>
+
+  <section class="aq-priority-summary" aria-label="Pending request priorities">
+    <a href="?status=pending&amp;priority=waiting24{% if selected_slug %}&amp;hut={{ selected_slug|urlencode }}{% endif %}"><strong>{{ priority_counts.waiting24 }}</strong> Waiting over 24 hours ↗</a>
+    <a href="?status=pending&amp;priority=arrival48{% if selected_slug %}&amp;hut={{ selected_slug|urlencode }}{% endif %}"><strong>{{ priority_counts.arrival48 }}</strong> Arrival due within 2 days or overdue ↗</a>
+  </section>
+
+  <section class="aq-panel" aria-label="Filter guest requests">
+    <form method="get" class="aq-filter">
+      <input type="hidden" name="status" value="{{ status_filter }}">
+      <div class="aq-field"><label for="aq-hut">Mountain hut</label><select name="hut" id="aq-hut">
+        {% if not manager_mode %}<option value="">All huts</option>{% endif %}
+        {% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_slug == hut.slug %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}
+      </select></div>
+      <div class="aq-field"><label for="aq-query">Guest, email, phone or reference</label><input type="search" name="q" id="aq-query" value="{{ q }}" maxlength="120" placeholder="Search requests"></div>
+      <div class="aq-field"><label for="aq-priority">Review priority</label><select name="priority" id="aq-priority">
+        <option value="all" {% if priority_filter == 'all' %}selected{% endif %}>All priorities</option>
+        <option value="waiting24" {% if priority_filter == 'waiting24' %}selected{% endif %}>Waiting over 24 hours</option>
+        <option value="arrival48" {% if priority_filter == 'arrival48' %}selected{% endif %}>Arrival due / overdue</option>
+      </select></div>
+      <button type="submit" class="aq-btn aq-btn-dark">Apply filters →</button>
+    </form>
+  </section>
+
+  <div class="aq-results-heading"><h2>{% if status_filter == 'pending' %}Awaiting your decision{% elif status_filter == 'confirmed' %}Approved requests{% elif status_filter == 'cancelled' %}Declined requests{% else %}All public requests{% endif %}</h2><div class="aq-heading-actions"><p>{{ page.paginator.count }} matching request{{ page.paginator.count|pluralize }}</p><a class="aq-download" href="{% url 'bookings:request_export' %}?status={{ status_filter|urlencode }}&amp;hut={{ selected_slug|urlencode }}&amp;q={{ q|urlencode }}&amp;priority={{ priority_filter|urlencode }}">↓ Download CSV (all matches)</a></div></div>
+  {% if page.object_list %}
+  <div class="aq-list">
+    {% for reservation in page %}
+    <article class="aq-card">
+      <div class="aq-card-top"><div><h3>{{ reservation.name }}</h3><small>Requested {{ reservation.created|date:"j M Y, H:i" }}</small>{% if reservation.waiting_over_24h or reservation.arrival_due %}<div class="aq-alerts">{% if reservation.waiting_over_24h %}<span class="aq-alert">Waiting over 24 hours</span>{% endif %}{% if reservation.arrival_due %}<span class="aq-alert aq-alert-due">Arrival due</span>{% endif %}</div>{% endif %}</div><span class="aq-pill {% if reservation.status == 'confirmed' %}aq-pill-confirmed{% elif reservation.status == 'cancelled' %}aq-pill-cancelled{% endif %}">{% if reservation.status == 'pending' %}Awaiting approval{% elif reservation.status == 'confirmed' %}Approved{% else %}Declined / cancelled{% endif %}</span></div>
+      <div class="aq-card-body">
+        <div class="aq-grid">
+          <div><span class="aq-label">Stay dates</span><span class="aq-value">{{ reservation.check_in|date:"j M" }} – {{ reservation.check_out|date:"j M Y" }} ({{ reservation.nights }} night{{ reservation.nights|pluralize }})</span></div>
+          <div><span class="aq-label">Beds requested</span><span class="aq-value">{{ reservation.total_beds }} bed{{ reservation.total_beds|pluralize }}</span></div>
+          <div><span class="aq-label">Email</span><span class="aq-value"><a href="mailto:{{ reservation.email }}">{{ reservation.email|default:"Not provided" }}</a></span></div>
+          <div><span class="aq-label">Phone</span><span class="aq-value">{% if reservation.phone %}<a href="tel:{{ reservation.phone }}">{{ reservation.phone }}</a>{% else %}Not provided{% endif %}</span></div>
+        </div>
+        <div class="aq-rooms"><strong>Rooms &amp; pricing</strong><ul>
+          {% for item in reservation.items.all %}<li><span>{{ item.room.hut.name }} · {{ item.room.name }} ({{ item.beds }} bed{{ item.beds|pluralize }})</span><span>{{ item.subtotal|floatformat:2 }} €</span></li>{% endfor %}
+          <li><span><strong>Estimated total</strong></span><span>{{ reservation.total_price|floatformat:2 }} €</span></li>
+        </ul></div>
+        {% if reservation.notes %}<div class="aq-note"><strong>Guest notes</strong>
+{{ reservation.notes }}</div>{% endif %}
+      </div>
+      <div class="aq-card-foot">
+        <span class="aq-ref">Reference: {{ reservation.code }}</span>
+        {% if reservation.reviewable_here %}
+        <div class="aq-actions">
+          <form method="post" action="{% url 'bookings:manager_reservation_action' reservation.code %}">{% csrf_token %}<input type="hidden" name="action" value="confirm"><input type="hidden" name="source" value="approvals"><button class="aq-btn aq-btn-approve" type="submit" onclick="return confirm('Approve this guest reservation request?');">✓ Approve</button></form>
+          <form method="post" action="{% url 'bookings:manager_reservation_action' reservation.code %}">{% csrf_token %}<input type="hidden" name="action" value="cancel"><input type="hidden" name="source" value="approvals"><button class="aq-btn aq-btn-decline" type="submit" onclick="return confirm('Decline this request and release the held beds?');">Decline</button></form>
+        </div>
+        {% elif reservation.status == 'pending' %}<span class="aq-ref">Requires administrator review</span>{% endif %}
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="aq-empty"><h3>No requests found</h3><p>{% if status_filter == 'pending' and not q and priority_filter == 'all' %}You're up to date. New guest requests will appear here.{% else %}Try a different status or search term.{% endif %}</p></div>
+  {% endif %}
+
+  {% if page.has_other_pages %}<nav class="aq-pagination" aria-label="Request pages">
+    {% if page.has_previous %}<a href="?status={{ status_filter|urlencode }}&amp;hut={{ selected_slug|urlencode }}&amp;q={{ q|urlencode }}&amp;priority={{ priority_filter|urlencode }}&amp;page={{ page.previous_page_number }}">← Previous</a>{% endif %}
+    <span>Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+    {% if page.has_next %}<a href="?status={{ status_filter|urlencode }}&amp;hut={{ selected_slug|urlencode }}&amp;q={{ q|urlencode }}&amp;priority={{ priority_filter|urlencode }}&amp;page={{ page.next_page_number }}">Next →</a>{% endif %}
+  </nav>{% endif %}
+</div>
+{% endblock %}

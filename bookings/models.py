@@ -130,6 +130,11 @@ class Reservation(models.Model):
         default=Status.CONFIRMED,
     )
 
+    guest_request = models.BooleanField(
+        default=False,
+        help_text="Public request awaiting manual hut approval; not a short payment hold.",
+    )
+
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -460,3 +465,138 @@ class GuestChangeRequest(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+
+
+class ManagerRequestDigestLog(models.Model):
+    """At most one successfully submitted manager digest per local day."""
+    manager = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+        related_name='request_digest_logs',
+    )
+    digest_date = models.DateField()
+    recipient = models.EmailField()
+    hut_count = models.PositiveIntegerField(default=0)
+    request_count = models.PositiveIntegerField(default=0)
+    sent_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-digest_date', '-sent_at']
+        constraints = [models.UniqueConstraint(
+            fields=['manager', 'digest_date'],
+            name='unique_manager_request_digest_day',
+        )]
+
+
+class ManagerDigestPreference(models.Model):
+    """Manager's personal daily email reminder preferences (v130)."""
+    manager = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+        related_name='digest_preference',
+    )
+    enabled = models.BooleanField(default=True)
+    urgent_only = models.BooleanField(default=False)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+class HutQuickReply(models.Model):
+    """Reusable, manager-editable reply for a single hut (v134)."""
+    hut = models.ForeignKey(Hut, on_delete=models.CASCADE, related_name='quick_replies')
+    title = models.CharField(max_length=80)
+    subject = models.CharField(max_length=200)
+    body = models.TextField()
+    enabled = models.BooleanField(default=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['title', 'pk']
+        constraints = [models.UniqueConstraint(fields=['hut', 'title'], name='unique_hut_quick_reply')]
+
+    def __str__(self):
+        return f'{self.hut}: {self.title}'
+
+
+class GuestConversationMessage(models.Model):
+    """Reservation-scoped guest/manager conversation, independent of email replies."""
+    class Sender(models.TextChoices):
+        GUEST = 'guest', 'Guest'
+        MANAGER = 'manager', 'Manager'
+
+    class Delivery(models.TextChoices):
+        RECEIVED = 'received', 'Received in SummitDesk'
+        IN_APP = 'in_app', 'In-app only'
+        SENDING = 'sending', 'Email sending'
+        SENT = 'sent', 'Email submitted'
+        FAILED = 'failed', 'Email failed (in-app delivered)'
+
+    reservation = models.ForeignKey(
+        Reservation, on_delete=models.CASCADE, related_name='conversation_messages')
+    hut = models.ForeignKey(Hut, on_delete=models.PROTECT, related_name='conversation_messages')
+    sender = models.CharField(max_length=10, choices=Sender.choices)
+    sent_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name='sent_guest_conversation_messages')
+    subject = models.CharField(max_length=200, blank=True)
+    body = models.TextField()
+    recipient = models.EmailField(blank=True)
+    delivery = models.CharField(max_length=12, choices=Delivery.choices)
+    error = models.CharField(max_length=120, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    email_message_id = models.CharField(
+    max_length=255,
+    null=True,
+    blank=True,
+    unique=True,
+    help_text="Unique Message-ID of an imported email.",
+    )
+
+    email_received_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Timestamp of an incoming email.",
+    )
+
+
+    class Meta:
+        ordering = ['created_at', 'pk']
+        indexes = [models.Index(fields=['reservation', 'created_at'], name='guest_conversation_idx')]
+
+class EmailSyncState(models.Model):
+    """Track Gmail IMAP synchronization progress."""
+
+    mailbox = models.EmailField(unique=True)
+
+    uidvalidity = models.BigIntegerField(
+        default=0,
+    )
+
+    last_uid = models.BigIntegerField(
+        default=0,
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True,
+    )
+
+    def __str__(self):
+        return f"{self.mailbox} (UID {self.last_uid})"   
+
+
+class PreArrivalReminder(models.Model):
+    reservation = models.OneToOneField(
+        Reservation,
+        on_delete=models.CASCADE,
+        related_name="pre_arrival_reminder",
+    )
+
+    sent_at = models.DateTimeField(
+        null=True,
+        blank=True,
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    def __str__(self):
+        return f"Pre-arrival reminder for {self.reservation.code}"             

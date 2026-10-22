@@ -1,0 +1,84 @@
+{% extends "bookings/base.html" %}
+{% block title %}Reservation calendar{% endblock %}
+{% block content %}
+<style>
+.sd-timeline{--ink:#173b30;--muted:#63786d;--line:#dce8df;--green:#195b42;--lime:#d7efbd;color:var(--ink);font-family:'DM Sans',system-ui,sans-serif;max-width:1500px;margin:0 auto;padding:12px 0 40px}
+.sd-head{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;margin:12px 0 22px}
+.sd-eyebrow{text-transform:uppercase;letter-spacing:.14em;font-size:11px;font-weight:800;color:#59816c;margin:0 0 6px}
+.sd-head h1{font-family:Outfit,sans-serif;font-size:clamp(1.7rem,3vw,2.6rem);margin:0;line-height:1.12}
+.sd-sub{color:var(--muted);font-size:14px;margin:9px 0 0;max-width:650px}
+.sd-actions{display:flex;gap:8px;flex-wrap:wrap}
+.sd-button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 16px;background:#fff;color:var(--ink);border:1px solid #bdd1c3;border-radius:11px;text-decoration:none;font-weight:750;font-size:13px;cursor:pointer}
+.sd-button.primary{background:var(--green);border-color:var(--green);color:#fff}
+.sd-button:hover{filter:brightness(.96)}.sd-button:focus-visible,.sd-booking:focus-visible{outline:3px solid #9ccf4e;outline-offset:3px}
+.sd-toolbar{background:#f7faf6;border:1px solid var(--line);border-radius:16px;padding:14px 16px;display:flex;gap:14px;align-items:end;flex-wrap:wrap;margin-bottom:16px}
+.sd-field{display:grid;gap:5px;font-size:12px;font-weight:750}.sd-field input,.sd-field select{height:44px;padding:9px 12px;border:1px solid #c5d7c9;border-radius:10px;background:#fff;color:var(--ink);font:inherit;min-width:160px}
+.sd-nav{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-left:auto}.sd-nav strong{font-size:13px;white-space:nowrap;padding:0 8px}
+.sd-legend{display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin:0 0 14px;color:var(--muted);font-size:12px}
+.sd-legend span{display:flex;align-items:center;gap:6px}.sd-dot{width:11px;height:11px;border-radius:4px;background:#b9e1c5}.sd-dot.pending{background:#ffe0a6}.sd-dot.over{background:#f2b1a7}
+.sd-board{border:1px solid var(--line);border-radius:16px;overflow:auto;background:#fff;box-shadow:0 9px 30px #143a2410}
+.sd-grid{min-width:900px;display:grid;grid-template-columns:185px repeat(7,minmax(98px,1fr));position:relative}
+.sd-corner{position:sticky;left:0;z-index:5;background:#edf4ed;padding:17px 14px;font-size:12px;font-weight:800;border-bottom:1px solid var(--line);border-right:1px solid var(--line)}
+.sd-dayhead{background:#edf4ed;border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:10px 5px;text-align:center;font-size:12px;color:#577064}.sd-dayhead strong{display:block;font-size:17px;color:var(--ink);margin-top:2px}.sd-dayhead.today{background:#e1efce}
+.sd-room{position:sticky;left:0;z-index:4;background:#fff;border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:15px 12px;display:flex;flex-direction:column;justify-content:center;gap:4px}
+.sd-room strong{font-size:14px}.sd-room small{font-size:12px;color:var(--muted)}.sd-room .hut{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#7b8c80}
+.sd-track{position:relative;grid-column:2 / 9;border-bottom:1px solid var(--line);min-height:74px;display:grid;grid-template-columns:repeat(7,minmax(98px,1fr));grid-auto-rows:42px;align-content:center;padding:10px 0;isolation:isolate}
+.sd-bg{grid-row:1/-1;min-height:100%;border-right:1px solid #edf1eb;background:#fff;z-index:0}
+.sd-bg.weekend{background:#fafbf8}.sd-bg.over{background:#fff1ed}
+.sd-free{font-size:10px;text-align:center;color:#6b7c70;padding-top:5px;white-space:nowrap;pointer-events:none}
+.sd-booking{position:relative;align-self:center;display:flex;align-items:center;gap:8px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding:9px 11px;height:34px;margin:3px 4px;background:#d9eddf;border:1px solid #b1d7be;border-left:4px solid #2d885c;border-radius:9px;color:#164a32;text-decoration:none;font-size:12px;font-weight:750;z-index:2;cursor:grab}
+.sd-booking.pending{background:#fff0d2;border-color:#edcb8a;border-left-color:#ca8729;color:#68450e}
+.sd-booking small{font-size:11px;font-weight:550;opacity:.8}.sd-booking:hover{filter:brightness(.96);box-shadow:0 3px 12px #1c513024}
+.sd-booking:active{cursor:grabbing}.sd-drop{outline:3px dashed #3c8d64;outline-offset:-4px}
+.sd-empty{padding:32px;color:var(--muted);grid-column:1/-1;text-align:center}
+.sd-help{font-size:12px;color:var(--muted);margin-top:13px;line-height:1.6}
+.sd-summary{margin:12px 0;color:#5c7766;font-size:12px;font-weight:650}
+@media(max-width:650px){.sd-toolbar{padding:12px}.sd-field{flex:1 1 100%}.sd-field input,.sd-field select{width:100%}.sd-nav{width:100%;justify-content:space-between}.sd-head{margin-top:6px}.sd-grid{grid-template-columns:132px repeat(7,minmax(104px,1fr))}.sd-corner,.sd-room{padding:12px 9px}.sd-booking small{display:none}}
+@media(prefers-reduced-motion:reduce){.sd-button,.sd-booking{transition:none}}
+</style>
+<div class="sd-timeline">
+<header class="sd-head"><div><p class="sd-eyebrow">SummitDesk / Reservations</p><h1>Reservation calendar</h1><p class="sd-sub">A clear view of who is staying, in which room, and for how long. Select a booking to review it.</p></div>
+<div class="sd-actions"><a class="sd-button" href="{% url 'bookings:manager_reservations' %}">All reservations</a><a class="sd-button primary" href="{% url 'bookings:manual_booking' %}">+ New reservation</a></div></header>
+<form class="sd-toolbar" method="get">
+<label class="sd-field" for="sd-start">Week starting<input id="sd-start" type="date" name="start" value="{{ start|date:'Y-m-d' }}"></label>
+<label class="sd-field" for="sd-hut">Mountain hut<select id="sd-hut" name="hut">{% if request.user.is_superuser %}<option value="">All huts</option>{% endif %}{% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_slug == hut.slug %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}</select></label>
+<button class="sd-button primary" type="submit">Show dates</button>
+<nav class="sd-nav" aria-label="Calendar navigation"><a class="sd-button" href="?start={{ prev|date:'Y-m-d' }}{% if selected_slug %}&amp;hut={{ selected_slug|urlencode }}{% endif %}">← Previous</a><strong>{{ start|date:'d M' }} – {{ last_day|date:'d M Y' }}</strong><a class="sd-button" href="?start={{ next|date:'Y-m-d' }}{% if selected_slug %}&amp;hut={{ selected_slug|urlencode }}{% endif %}">Next →</a></nav>
+</form>
+<div class="sd-legend"><span><i class="sd-dot"></i>Confirmed</span><span><i class="sd-dot pending"></i>Pending</span><span><i class="sd-dot over"></i>Over capacity</span><span>Bars represent booked nights; departure day is excluded.</span></div>
+<div class="sd-board" role="region" aria-label="Scrollable seven-day reservation timeline" tabindex="0">
+<div class="sd-grid">
+<div class="sd-corner">ROOM / NIGHT</div>{% for day in days %}<div class="sd-dayhead {% if day == today %}today{% endif %}">{{ day|date:'D' }}<strong>{{ day|date:'d' }}</strong></div>{% endfor %}
+{% for row in rows %}
+<div class="sd-room"><span class="hut">{{ row.room.hut.name }}</span><strong>{{ row.room.name }}</strong><small>{{ row.room.capacity }} beds</small></div>
+<div class="sd-track" style="grid-template-rows:repeat({{ row.track_count }},42px)" data-room="{{ row.room.pk }}" data-hut="{{ row.room.hut_id }}">
+{% for cell in row.cells %}<div class="sd-bg {% if cell.free < 0 %}over{% endif %}" style="grid-column:{{ forloop.counter }};grid-row:1 / {{ row.grid_end }}" data-room="{{ row.room.pk }}" data-day="{{ cell.day|date:'Y-m-d' }}" data-hut="{{ row.room.hut_id }}" title="{{ cell.free }} free beds on {{ cell.day|date:'d M Y' }}"></div>{% endfor %}
+{% for bar in row.bars %}<a class="sd-booking {% if bar.status == 'pending' %}pending{% endif %}" draggable="true" href="{% url 'bookings:calendar_edit' bar.code %}" style="grid-column:{{ bar.first }} / span {{ bar.span }};grid-row:{{ bar.track }}" data-code="{{ bar.code }}" data-start="{{ bar.check_in|date:'Y-m-d' }}" data-hut="{{ row.room.hut_id }}" title="{{ bar.guest }} · {{ bar.beds }} beds · {{ bar.check_in|date:'d M' }} to {{ bar.check_out|date:'d M' }} · Select to edit"><span>{{ bar.guest }}</span><small>· {{ bar.beds }} bed{{ bar.beds|pluralize }}</small></a>{% endfor %}
+</div>
+{% empty %}<div class="sd-empty">No rooms available for this hut.</div>{% endfor %}
+</div></div>
+<p class="sd-summary">{{ rows|length }} rooms · {{ booking_count }} booking entries in this week</p>
+<p id="sd-move-status" class="sd-help" role="status" aria-live="polite">Drag a booking to another room or night to preview a move. You must confirm the change, and the system validates availability. You can also open the booking and edit it directly.</p>
+</div>
+<script>
+(function(){
+'use strict';let moving=null;
+function addDays(value,offset){const p=value.split('-').map(Number),d=new Date(Date.UTC(p[0],p[1]-1,p[2]+offset));return d.toISOString().slice(0,10)}
+const status=document.getElementById('sd-move-status');
+document.querySelectorAll('.sd-booking').forEach(el=>{
+ el.addEventListener('dragstart',event=>{moving={code:el.dataset.code,start:el.dataset.start,hut:el.dataset.hut};event.dataTransfer.setData('text/plain',moving.code);event.dataTransfer.effectAllowed='move'});
+ el.addEventListener('dragend',()=>{moving=null;document.querySelectorAll('.sd-drop').forEach(x=>x.classList.remove('sd-drop'))});
+});
+document.querySelectorAll('.sd-bg').forEach(cell=>{
+ cell.addEventListener('dragover',event=>{if(moving&&moving.hut===cell.dataset.hut){event.preventDefault();cell.classList.add('sd-drop')}});
+ cell.addEventListener('dragleave',()=>cell.classList.remove('sd-drop'));
+ cell.addEventListener('drop',event=>{event.preventDefault();cell.classList.remove('sd-drop');if(!moving||moving.hut!==cell.dataset.hut)return;
+ const offset=Math.round((Date.parse(cell.dataset.day+'T00:00:00Z')-Date.parse(moving.start+'T00:00:00Z'))/86400000);
+ const target=addDays(moving.start,offset);
+ const params=new URLSearchParams({code:moving.code,room:cell.dataset.room,check_in:target});
+ window.location.assign('{% url "bookings:calendar_move" %}?'+params.toString());moving=null;
+ });
+});
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,13 @@
+<!-- V41_ALERT_FILTERS_START -->
+<form method="get" action="" style="display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin:14px 0" aria-label="Filter operations alerts">
+  <label for="v41-level" class="muted">Alert severity</label>
+  <select id="v41-level" name="alert_level" style="padding:9px;border:1px solid #dce7dc;border-radius:9px;background:white">
+    <option value="all" {% if alert_filter_v41.selected == 'all' %}selected{% endif %}>All alerts</option>
+    <option value="urgent" {% if alert_filter_v41.selected == 'urgent' %}selected{% endif %}>Urgent</option>
+    <option value="warning" {% if alert_filter_v41.selected == 'warning' %}selected{% endif %}>Warnings</option>
+    <option value="info" {% if alert_filter_v41.selected == 'info' %}selected{% endif %}>Information</option>
+  </select>
+  <button type="submit" style="padding:9px 15px;border:0;border-radius:9px;background:#153f34;color:white;cursor:pointer">Apply filter</button>
+  <span class="muted" aria-live="polite">Showing {{ alert_filter_v41.shown }} of {{ alert_filter_v41.total }} alerts</span>
+</form>
+<!-- V41_ALERT_FILTERS_END -->

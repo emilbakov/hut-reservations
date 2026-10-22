@@ -1,5 +1,103 @@
-{% extends "bookings/base.html" %}{% block title %}Modify reservation{% endblock %}{% block content %}
-<section class="hero compact"><div class="eyebrow">MANAGE YOUR STAY</div><h1>Change your reservation</h1><p>Update dates and bed quantities. Your original reservation remains intact if new dates are unavailable.</p></section>
-<section class="card"><h2>Choose new dates</h2><form method="get"><div class="date-grid"><div class="field">{{ search.check_in.label_tag }}{{ search.check_in }}{{ search.check_in.errors }}</div><div class="field">{{ search.check_out.label_tag }}{{ search.check_out }}{{ search.check_out.errors }}</div><button type="submit">Check new dates →</button></div></form></section>
-{% if booking %}<section class="card"><h2>Update beds</h2><form method="post">{% csrf_token %}<input type="hidden" name="check_in" value="{{ check_in|date:'Y-m-d' }}"><input type="hidden" name="check_out" value="{{ check_out|date:'Y-m-d' }}">{{ booking.non_field_errors }}<p class="muted">{{ nights }} night{{ nights|pluralize }}. Prices are recalculated at current rates when you save.</p><div class="room-list">{% for room, free, field in booking.rows %}<div class="room"><div class="room-main"><h3>{{ room.name }}</h3><p class="muted">{{ free }} beds available · {{ room.price_per_night }} {{ CURRENCY }} per bed/night</p></div><div class="room-select">{% if field %}{{ field.label_tag }}{{ field }}{{ field.errors }}{% else %}Fully booked{% endif %}</div></div>{% endfor %}</div><button class="primary" type="submit">Save changes →</button></form></section>{% endif %}<p><a href="{{ reservation.get_absolute_url }}">← Back to reservation</a></p>
+{% extends "bookings/base.html" %}
+{% block title %}Modify reservation{% endblock %}
+{% block content %}
+<style>
+  .modify-adventure{--forest:#173d31;--forest-deep:#102c25;--lime:#c9ee74;--ink:#1b3028;--muted:#64756c;--line:#e1e9e1;--surface:#fff;max-width:1120px;margin:0 auto;padding:22px 0 55px;color:var(--ink)}
+  .modify-adventure *{box-sizing:border-box}
+  .modify-adventure .ma-back{display:inline-flex;align-items:center;gap:8px;color:var(--forest);font-weight:700;text-decoration:none;margin-bottom:20px}
+  .modify-adventure .ma-back:hover{text-decoration:underline}
+  .modify-adventure .ma-hero{background:linear-gradient(125deg,#102c25,#20513d);border-radius:24px;padding:clamp(25px,5vw,48px);color:white;position:relative;overflow:hidden;margin-bottom:24px}
+  .modify-adventure .ma-hero:after{content:"";position:absolute;width:240px;height:240px;border:42px solid rgba(201,238,116,.09);border-radius:50%;right:-90px;top:-95px;pointer-events:none}
+  .modify-adventure .ma-eyebrow{color:var(--lime);font-size:.75rem;font-weight:800;letter-spacing:.17em;text-transform:uppercase;margin:0 0 12px}
+  .modify-adventure .ma-hero h1{color:#fff;font-size:clamp(1.85rem,4vw,2.9rem);line-height:1.12;margin:0 0 12px}
+  .modify-adventure .ma-hero p{color:#e0ece5;max-width:650px;margin:0;line-height:1.65}
+  .modify-adventure .ma-card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:clamp(18px,3vw,30px);box-shadow:0 10px 28px rgba(21,51,37,.045);margin-bottom:20px}
+  .modify-adventure .ma-section-head{display:flex;align-items:flex-start;gap:14px;margin-bottom:23px}
+  .modify-adventure .ma-step{flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--forest);color:var(--lime);font-weight:900}
+  .modify-adventure h2{font-size:1.3rem;color:var(--forest-deep);margin:0 0 5px}
+  .modify-adventure .ma-sub{color:var(--muted);font-size:.93rem;margin:0;line-height:1.5}
+  .modify-adventure .ma-date-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr)) auto;gap:16px;align-items:end}
+  .modify-adventure .ma-field{min-width:0}
+  .modify-adventure label{display:block;font-weight:700;font-size:.88rem;margin-bottom:8px;color:var(--ink)}
+  .modify-adventure input:not([type=hidden]),.modify-adventure select{width:100%;max-width:100%;min-height:47px;padding:11px 13px;border:1px solid #cbd9ce;border-radius:11px;background:#fff;color:var(--ink);font:inherit}
+  .modify-adventure input:focus,.modify-adventure select:focus{outline:3px solid rgba(148,194,84,.22);border-color:#65963c}
+  .modify-adventure .ma-button{border:0;border-radius:11px;background:var(--forest);color:white;font:inherit;font-weight:800;min-height:47px;padding:12px 21px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:9px;text-align:center}
+  .modify-adventure .ma-button:hover{background:#255942}
+  .modify-adventure .ma-button-lime{background:var(--lime);color:var(--forest-deep)}
+  .modify-adventure .ma-button-lime:hover{background:#b9df61}
+  .modify-adventure .ma-notice{border-radius:13px;padding:14px 16px;background:#f1f7e9;border:1px solid #d8e7c5;color:#355439;font-size:.92rem;line-height:1.55;margin:0 0 20px}
+  .modify-adventure .ma-notice strong{color:#23452b}
+  .modify-adventure .ma-errors,.modify-adventure .errorlist{color:#9d3030;font-size:.9rem;margin:7px 0 0;padding-left:19px}
+  .modify-adventure .ma-rooms{display:grid;gap:12px;margin:20px 0 24px}
+  .modify-adventure .ma-room{display:flex;align-items:center;justify-content:space-between;gap:20px;background:#fafcf9;border:1px solid var(--line);border-radius:14px;padding:18px}
+  .modify-adventure .ma-room h3{font-size:1.06rem;margin:0 0 7px;color:var(--forest-deep)}
+  .modify-adventure .ma-room p{margin:0;color:var(--muted);font-size:.9rem;line-height:1.5}
+  .modify-adventure .ma-room-control{width:190px;max-width:100%;flex:none}
+  .modify-adventure .ma-unavailable{display:inline-block;background:#f4eae6;color:#9c4932;border-radius:30px;padding:8px 12px;font-size:.82rem;font-weight:800}
+  .modify-adventure .ma-footer{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:22px}
+  .modify-adventure .ma-footer p{margin:0;color:var(--muted);font-size:.87rem;max-width:480px}
+  @media(max-width:720px){.modify-adventure{padding-top:12px}.modify-adventure .ma-date-grid{grid-template-columns:1fr}.modify-adventure .ma-date-grid .ma-button{width:100%}.modify-adventure .ma-room{align-items:stretch;flex-direction:column;gap:14px}.modify-adventure .ma-room-control{width:100%}.modify-adventure .ma-footer .ma-button{width:100%}}
+</style>
+
+<div class="modify-adventure">
+  <a class="ma-back" href="{{ reservation.get_absolute_url }}">← Back to reservation</a>
+  <header class="ma-hero">
+    <p class="ma-eyebrow">Manage your stay</p>
+    <h1>Change your reservation</h1>
+    <p>Explore different dates and update your bed selection. Your original reservation stays intact if the new dates are unavailable.</p>
+  </header>
+
+  <section class="ma-card" aria-labelledby="ma-dates-heading">
+    <div class="ma-section-head">
+      <span class="ma-step" aria-hidden="true">01</span>
+      <div><h2 id="ma-dates-heading">Choose new dates</h2><p class="ma-sub">Check availability for your preferred arrival and departure.</p></div>
+    </div>
+    <form method="get">
+      <div class="ma-date-grid">
+        <div class="ma-field">{{ search.check_in.label_tag }}{{ search.check_in }}{{ search.check_in.errors }}</div>
+        <div class="ma-field">{{ search.check_out.label_tag }}{{ search.check_out }}{{ search.check_out.errors }}</div>
+        <button class="ma-button" type="submit">Check new dates <span aria-hidden="true">→</span></button>
+      </div>
+    </form>
+  </section>
+
+  {% if booking %}
+  <section class="ma-card" aria-labelledby="ma-beds-heading">
+    <div class="ma-section-head">
+      <span class="ma-step" aria-hidden="true">02</span>
+      <div><h2 id="ma-beds-heading">Update your beds</h2><p class="ma-sub">Select the number of beds you need for your new stay.</p></div>
+    </div>
+    <div class="ma-notice"><strong>{{ nights }} night{{ nights|pluralize }} selected.</strong> Prices are recalculated at current rates when you save your changes.</div>
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="check_in" value="{{ check_in|date:'Y-m-d' }}">
+      <input type="hidden" name="check_out" value="{{ check_out|date:'Y-m-d' }}">
+      {% if booking.non_field_errors %}<div class="ma-errors" role="alert">{{ booking.non_field_errors }}</div>{% endif %}
+      <div class="ma-rooms">
+        {% for room, free, field in booking.rows %}
+        <div class="ma-room">
+          <div>
+            <h3>{{ room.name }}</h3>
+            <p>{{ free }} beds available · {{ room.price_per_night }} {{ CURRENCY }} per bed/night</p>
+          </div>
+          <div class="ma-room-control">
+            {% if field %}
+              {{ field.label_tag }}
+              {{ field }}
+              {% if field.errors %}<div class="ma-errors" role="alert">{{ field.errors }}</div>{% endif %}
+            {% else %}
+              <span class="ma-unavailable">Fully booked</span>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="ma-footer">
+        <p>Review your selected dates and beds before saving. Changes are subject to availability.</p>
+        <button class="ma-button ma-button-lime" type="submit">Save changes <span aria-hidden="true">→</span></button>
+      </div>
+    </form>
+  </section>
+  {% endif %}
+</div>
 {% endblock %}

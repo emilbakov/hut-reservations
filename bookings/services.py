@@ -190,15 +190,14 @@ def create_reservation(
     reservation.full_clean()
     reservation.save()
 
-    ReservationItem.objects.bulk_create(
-        ReservationItem(
+    # Individual saves emit post_save signals for reservation audit history.
+    for room in rooms:
+        ReservationItem.objects.create(
             reservation=reservation,
             room=room,
             beds=beds_by_room[room.pk],
             price_per_night=room.price_per_night,
         )
-        for room in rooms
-    )
 
     return reservation
 
@@ -210,10 +209,35 @@ def expire_pending():
         minutes=settings.BOOKING_PENDING_MINUTES
     )
 
-    return Reservation.objects.filter(
-        status=Reservation.Status.PENDING,
-        created__lt=cutoff,
-    ).update(status=Reservation.Status.CANCELLED)
+    # QuerySet.update() bypasses signals. Save each expired reservation so
+    # automatic cancellations appear in the reservation audit history.
+    candidate_ids = list(
+        Reservation.objects.filter(
+            status=Reservation.Status.PENDING,
+            guest_request=False,
+            created__lt=cutoff,
+        ).values_list("pk", flat=True)
+    )
+    cancelled_count = 0
+    for reservation_id in candidate_ids:
+        with transaction.atomic():
+            reservation = (
+                Reservation.objects.select_for_update()
+                .filter(
+                    pk=reservation_id,
+                    status=Reservation.Status.PENDING,
+                    guest_request=False,
+                    created__lt=cutoff,
+                )
+                .first()
+            )
+            if reservation is None:
+                continue
+            reservation.status = Reservation.Status.CANCELLED
+            reservation.save(update_fields=["status"])
+            cancelled_count += 1
+
+    return cancelled_count
 
 
 @transaction.atomic
@@ -273,12 +297,10 @@ def modify_reservation(
             "Choose at least one bed."
         )
 
-    old_room_ids = list(
-        reservation.items.values_list(
-            "room_id",
-            flat=True,
-        )
+    existing_items = list(
+        reservation.items.select_related("room").order_by("pk")
     )
+    old_room_ids = [item.room_id for item in existing_items]
 
     rooms = lock_rooms(
         set(old_room_ids) | set(beds_by_room)
@@ -326,24 +348,37 @@ def modify_reservation(
     if shortages:
         raise NotAvailable(shortages)
 
+    dates_changed = (
+        reservation.check_in != check_in
+        or reservation.check_out != check_out
+    )
     reservation.check_in = check_in
     reservation.check_out = check_out
 
     reservation.full_clean()
-    reservation.save(
-        update_fields=["check_in", "check_out"]
-    )
+    if dates_changed:
+        reservation.save(update_fields=["check_in", "check_out"])
 
-    reservation.items.all().delete()
+    # Preserve unchanged allocation rows and their related records. Changes
+    # to individual rows trigger the existing ReservationItem audit signals.
+    existing_by_room = {item.room_id: item for item in existing_items}
 
-    ReservationItem.objects.bulk_create([
-        ReservationItem(
-            reservation=reservation,
-            room=room,
-            beds=beds_by_room[room.pk],
-            price_per_night=room.price_per_night,
-        )
-        for room in chosen
-    ])
+    for item in existing_items:
+        if item.room_id not in beds_by_room:
+            item.delete()
+
+    for room in chosen:
+        requested_beds = beds_by_room[room.pk]
+        item = existing_by_room.get(room.pk)
+        if item is None:
+            ReservationItem.objects.create(
+                reservation=reservation,
+                room=room,
+                beds=requested_beds,
+                price_per_night=room.price_per_night,
+            )
+        elif item.beds != requested_beds:
+            item.beds = requested_beds
+            item.save(update_fields=["beds"])
 
     return reservation

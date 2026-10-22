@@ -1,0 +1,26 @@
+{% extends 'bookings/base.html' %}
+{% block title %}Numbered bed layout · {{ hut.name }}{% endblock %}
+{% block content %}
+<style>
+.bl{max-width:920px;margin:28px auto 65px;color:#193d2a}.bl header{padding:24px;border-radius:16px;background:#193d2a;color:white}.bl header h1{color:white}.bl-tools{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:18px 0}.bl select,.bl button{padding:10px;border-radius:9px;border:1px solid #9fb6a4;font:inherit}.bl button{background:#c9f27c;cursor:pointer;font-weight:700}.bl-grid{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px;margin:18px 0}.bl-cell{min-height:70px;background:#f0f6ed;border:1px solid #c7d9c8;border-radius:8px}.bl-cell.filled{background:#c9f27c;border:2px solid #3c774c}.bl-cell.selected{outline:3px solid #b96a25}.bl-help{color:#526a59}
+</style>
+<div class="bl"><header><h1>Numbered bed layout · {{ hut.name }}</h1><p>Choose a bed, then choose a grid cell. Physical bed IDs stay fixed when markers move.</p></header>
+<div class="bl-tools"><label>Room <select id="bl-room"></select></label><label>Bed <select id="bl-bed"></select></label><button id="bl-remove" type="button">Remove marker</button><button id="bl-save" type="button">Save positions</button><a href="{% url 'floorplans:visual_beds' hut.pk %}">Visual assignments</a></div>
+<p class="bl-help">Only numbered bed records can be positioned. Initialize missing bed numbers from V6 bed management first. Removing a marker does not delete the bed or its bookings.</p><p id="bl-status" role="status"></p><div class="bl-grid" id="bl-grid"></div></div>
+<script>
+(()=>{
+const base='/staff/floorplans/{{ hut.pk }}/',roomEl=document.getElementById('bl-room'),bedEl=document.getElementById('bl-bed'),grid=document.getElementById('bl-grid'),status=document.getElementById('bl-status');
+let rooms=[],beds=[],dirty=false;
+const token=()=>decodeURIComponent(document.cookie.split('; ').find(s=>s.startsWith('csrftoken='))?.split('=')[1]||'');
+async function api(url,opts){const r=await fetch(url,{credentials:'same-origin',...opts});const d=await r.json();if(!r.ok)throw Error(d.error||`HTTP ${r.status}`);return d}
+const url=(action)=>`${base}rooms/${roomEl.value}/markers/${action}`;
+function draw(){grid.replaceChildren();for(let y=0;y<6;y++)for(let x=0;x<8;x++){const b=beds.find(b=>b.position?.x===x&&b.position?.y===y),el=document.createElement('button');el.type='button';el.className='bl-cell'+(b?' filled':'')+(b&&String(b.id)===bedEl.value?' selected':'');el.textContent=b?`Bed ${b.number}`:'+';el.onclick=()=>{const selected=beds.find(b=>String(b.id)===bedEl.value);if(!selected)return;if(b&&b.id!==selected.id){status.textContent='Cell already belongs to another bed.';return}selected.position={x,y};dirty=true;status.textContent='Unsaved changes';draw()};grid.append(el)}}
+async function load(){if(!roomEl.value)return;try{const d=await api(url(''));beds=d.beds;bedEl.replaceChildren();for(const b of beds)bedEl.add(new Option(`Bed ${b.number}`,String(b.id)));dirty=false;draw();status.textContent=`${beds.length} numbered beds loaded.`}catch(e){status.textContent=e.message}}
+roomEl.onchange=()=>{if(dirty&&!confirm('Discard unsaved positions?'))return;load()};bedEl.onchange=draw;
+document.getElementById('bl-remove').onclick=()=>{const b=beds.find(b=>String(b.id)===bedEl.value);if(b){b.position=null;dirty=true;draw();status.textContent='Unsaved changes'}};
+document.getElementById('bl-save').onclick=async()=>{try{const positions=beds.filter(b=>b.position).map(b=>({bed_id:b.id,...b.position}));await api(url('save/'),{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':token()},body:JSON.stringify({positions})});dirty=false;status.textContent='Bed positions saved.'}catch(e){status.textContent=e.message}};
+window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue=''}});
+api('{% url "floorplans:data" hut.pk %}').then(d=>{rooms=d.rooms||[];for(const r of rooms)roomEl.add(new Option(r.name,String(r.id)));load()}).catch(e=>status.textContent=e.message);
+})();
+</script>
+{% endblock %}

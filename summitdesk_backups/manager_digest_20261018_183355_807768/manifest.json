@@ -1,0 +1,32 @@
+[
+  {
+    "path": "bookings/models.py",
+    "existed": true,
+    "installed_sha256": "550ab982e7321f597fbd3463486654c60f0f3017cb7f40757effe4888d47d3ef"
+  },
+  {
+    "path": "config/settings.py",
+    "existed": true,
+    "installed_sha256": "3358177abd66c0cf751704edaf313fc8c18cf7bf882931da75a8bf7730d3841f"
+  },
+  {
+    "path": "bookings/manager_digest_v129.py",
+    "existed": false,
+    "installed_sha256": "4f513dc5c58f5f944e49b3dbcd2a3fb424e6a81a1f82a520bb487326263c538b"
+  },
+  {
+    "path": "bookings/management/commands/send_manager_request_digest.py",
+    "existed": false,
+    "installed_sha256": "3279c1806d0f3c565a5f90c045fa088f7e5ed79f678e63a6a736e2d318c65945"
+  },
+  {
+    "path": "bookings/migrations/0014_managerrequestdigestlog.py",
+    "existed": false,
+    "installed_sha256": "8d20e0cff15bde9bfbbd9de0688b18632076be10d1d5fc352597d9f0812e9877"
+  },
+  {
+    "path": "bookings/test_manager_digest_v129.py",
+    "existed": false,
+    "installed_sha256": "053a254f58119d8f9d8100aa093b28463e47a62827ea5ef4d0e49aa5ed9144e5"
+  }
+]

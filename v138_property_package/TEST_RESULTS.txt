@@ -1,0 +1,10 @@
+SummitDesk v138 Property Calendar — Book button revision (2026-10-22)
+
+PASS — Local Django system check.
+PASS — 10 targeted property-calendar tests (Django local SQLite).
+PASS — Installer read-only preflight on uploaded v126 baseline.
+PASS — Booking links include room, hut, and date.
+PASS — No Book button for full, inactive, or past room/date cells.
+
+Production PostgreSQL and Gunicorn not tested.
+Run packaged tests and production checks on Ubuntu before restart.

@@ -1,0 +1,12 @@
+Hello {{ reservation.name }},
+
+Your reservation request for {{ hut_name }} ({{ reservation.code }}) has been declined or cancelled.
+The requested beds have been released.
+
+Arrival: {{ reservation.check_in|date:"j F Y" }}
+Departure: {{ reservation.check_out|date:"j F Y" }}
+
+You can check your request status here:
+{{ link }}
+
+If you still wish to stay, please make a new request for available dates.

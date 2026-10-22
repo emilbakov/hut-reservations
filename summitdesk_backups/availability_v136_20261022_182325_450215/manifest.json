@@ -1,0 +1,13 @@
+{
+  "version": "v136",
+  "originals": {
+    "bookings/templates/bookings/availability_calendar.html": "9a40d17e88757d9832c93abcb30809088edb739434bb9bf623b24e7fcc40ca02"
+  },
+  "installed": {
+    "bookings/templates/bookings/availability_calendar.html": "82a60dc70dd23d6461d4fb9de1e98052e32c8e5f0d519f69faa3d384649ae81b",
+    "bookings/test_availability_ui_v136.py": "16d4c8ffb5e3040b8e6f3abf2d5c90f57cbcc680ab11d6fdf00ad57b0a21ffc8"
+  },
+  "created": [
+    "bookings/test_availability_ui_v136.py"
+  ]
+}

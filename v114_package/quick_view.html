@@ -1,0 +1,31 @@
+<!-- SUMMITDESK_QUICKVIEW_V114: details for the selected staff-visible booking. -->
+<dialog class="sd-quickview" id="sd-quickview" aria-labelledby="sd-quickview-title" aria-describedby="sd-quick-description">
+  <div class="sd-quick-inner">
+    <div class="sd-quick-head">
+      <div>
+        <p class="sd-quick-eyebrow">Reservation</p>
+        <h2 id="sd-quickview-title" class="sd-quick-title">Reservation details</h2>
+        <p class="sd-quick-code">Booking reference: <strong id="sd-quick-code"></strong></p>
+      </div>
+      <form method="dialog" class="sd-quick-close-form">
+        <button class="sd-quick-close" type="submit" aria-label="Close reservation details">&times;</button>
+      </form>
+    </div>
+    <div class="sd-quick-badge" id="sd-quick-badge"><span class="sd-quick-dot" aria-hidden="true"></span><span id="sd-quick-status"></span></div>
+    <hr class="sd-quick-divider">
+    <dl class="sd-quick-details">
+      <div class="wide"><dt>Guest</dt><dd id="sd-quick-guest"></dd></div>
+      <div><dt>Check-in</dt><dd id="sd-quick-checkin"></dd></div>
+      <div><dt>Check-out</dt><dd id="sd-quick-checkout"></dd></div>
+      <div><dt>Room</dt><dd id="sd-quick-room"></dd></div>
+      <div><dt>Hut</dt><dd id="sd-quick-hut"></dd></div>
+      <div><dt>Beds in this room</dt><dd id="sd-quick-beds"></dd></div>
+      <div><dt>Nights</dt><dd id="sd-quick-nights"></dd></div>
+    </dl>
+    <p id="sd-quick-description" class="sd-quick-note">Review the reservation here without leaving the calendar. Editing opens the existing booking page, where changes are checked before they are saved.</p>
+    <div class="sd-quick-actions">
+      <a href="#" id="sd-quick-edit" class="sd-quick-edit">Edit reservation &rarr;</a>
+      <button type="button" id="sd-quick-return" class="sd-quick-return">Back to calendar</button>
+    </div>
+  </div>
+</dialog>

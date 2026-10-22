@@ -1,0 +1,16 @@
+{% extends "bookings/base.html" %}
+{% block title %}Calendar booking{% endblock %}
+{% block content %}
+<h1>{% if mode == 'edit' %}Edit reservation {{ reservation.code }}{% else %}New reservation from calendar{% endif %}</h1>
+<p><a href="{% url 'bookings:availability_calendar' %}">← Availability calendar</a></p>
+<p>Availability is checked again under a database lock when saving. Departure does not occupy a bed.</p>
+{% if mode == 'edit' %}<p>Only dates, room and bed count can be changed here. Guest details shown below are read-only for edits; use existing reservation management for other actions.</p>{% endif %}
+{% if available is not None %}<p>Currently available beds across selected dates: {{ available }}</p>{% endif %}
+<form method="post">{% csrf_token %}
+{{ form.non_field_errors }}
+{% for field in form %}<p><label for="{{ field.id_for_label }}">{{ field.label }}</label><br>
+{% if mode == 'edit' and field.name == 'name' or mode == 'edit' and field.name == 'email' or mode == 'edit' and field.name == 'phone' or mode == 'edit' and field.name == 'notes' %}{{ field.value|default:'—' }}{% else %}{{ field }}{% endif %}
+{{ field.errors }}</p>{% endfor %}
+<button type="submit">{% if mode == 'edit' %}Save dates and beds{% else %}Create reservation{% endif %}</button>
+</form>
+{% endblock %}

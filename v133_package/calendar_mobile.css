@@ -1,0 +1,15 @@
+/* v133: make sideways scrolling explicit without changing calendar booking logic. */
+.sd-mobile-scroll-hint { display: none; }
+@media (max-width: 720px) {
+  .sd-actions { display: grid; grid-template-columns: 1fr 1fr; width: 100%; }
+  .sd-actions .sd-button { min-height: 44px; padding: 10px 8px; text-align: center; }
+  .sd-toolbar > .sd-button.primary { width: 100%; }
+  .sd-mobile-scroll-hint { display: block; margin: 0 0 9px; font-size: .8rem; font-weight: 750; color: #4c6e59; }
+  .sd-board { max-width: 100%; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
+  .sd-quickview { max-height: 92dvh; }
+}
+@media (max-width: 390px) {
+  .sd-actions { grid-template-columns: 1fr; }
+  .sd-nav { justify-content: space-between; }
+  .sd-nav strong { width: 100%; order: -1; text-align: center; }
+}

@@ -1,52 +1,74 @@
 {% extends "bookings/base.html" %}
 {% block title %}Financial dashboard{% endblock %}
 {% block content %}
-<p><a href="{% url 'bookings:expense_dashboard' %}">Expenses &amp; cash flow →</a></p>
-<div class="eyebrow">STAFF / FINANCES</div>
-<h1>Financial dashboard</h1>
-<p class="lead">Actual cash movements and current outstanding balances for your hut.</p>
-<p><a href="{% url 'bookings:dashboard' %}">← Dashboard</a> · <a href="{% url 'bookings:manager_reservations' %}">Reservations</a></p>
-<section class="card">
-<form method="get">
-<label for="hut">Mountain hut</label>
-<select id="hut" name="hut">
-{% if not manager_mode %}<option value="">All permitted huts</option>{% endif %}
-{% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_slug == hut.slug %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}
-</select>
-<label for="month">Month</label><select id="month" name="month">
-{% for value,label in month_options %}<option value="{{ value }}" {% if month.month == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
-</select>
-<label for="year">Year</label><input id="year" type="number" name="year" value="{{ month.year }}" min="2000" max="2100">
-<button type="submit">Show report</button>
-</form>
-<p><a href="?hut={{ selected_slug|urlencode }}&amp;year={{ previous.year }}&amp;month={{ previous.month }}">← Previous month</a> ·
-<a href="?hut={{ selected_slug|urlencode }}&amp;year={{ next.year }}&amp;month={{ next.month }}">Next month →</a> ·
-<a href="{% url 'bookings:financial_export' %}?hut={{ selected_slug|urlencode }}&amp;year={{ month.year }}&amp;month={{ month.month }}">Export CSV</a></p>
-</section>
-<section class="card"><h2>Cash movements · {{ month|date:"F Y" }}</h2>
-<table><tbody>
-<tr><th>Payments + deposits received</th><td>{{ receipts|floatformat:2 }} {{ currency }}</td></tr>
-<tr><th>Of which deposits</th><td>{{ deposits|floatformat:2 }} {{ currency }}</td></tr>
-<tr><th>Refunds</th><td>{{ refunds|floatformat:2 }} {{ currency }}</td></tr>
-<tr><th>Net cash received</th><td><strong>{{ net_cash|floatformat:2 }} {{ currency }}</strong></td></tr>
-</tbody></table>
-<p><small>Based on transaction recording dates. Deposits are included in receipts, not added again.</small></p>
-</section>
-<section class="card"><h2>Bookings arriving · {{ month|date:"F Y" }}</h2>
-<table><tbody>
-<tr><th>Active reservations</th><td>{{ arrival_count }}</td></tr>
-<tr><th>Current booking value</th><td>{{ booked|floatformat:2 }} {{ currency }}</td></tr>
-<tr><th>Net paid for these bookings</th><td>{{ paid_for_arrivals|floatformat:2 }} {{ currency }}</td></tr>
-<tr><th>Outstanding balance</th><td><strong>{{ outstanding|floatformat:2 }} {{ currency }}</strong></td></tr>
-<tr><th>Overpayments</th><td>{{ overpaid|floatformat:2 }} {{ currency }}</td></tr>
-</tbody></table>
-<p><small>Current snapshot for non-cancelled bookings with check-in during this month; includes payments recorded outside this month. Not a historical month-end balance.</small></p>
-</section>
-<section class="card"><h2>Transactions recorded this month</h2>
-<div class="table-wrap"><table><thead><tr><th>Date</th><th>Guest</th><th>Type</th><th>Method</th><th>Amount</th></tr></thead><tbody>
-{% for tx in transactions %}
-<tr><td>{{ tx.created|date:"j M Y H:i" }}</td><td><a href="{% url 'bookings:reservation_payments' tx.reservation.code %}">{{ tx.reservation.name }}</a></td><td>{{ tx.get_kind_display }}</td><td>{{ tx.get_method_display }}</td><td>{% if tx.kind == 'refund' %}−{% endif %}{{ tx.amount|floatformat:2 }} {{ currency }}</td></tr>
-{% empty %}<tr><td colspan="5">No transactions recorded this month.</td></tr>{% endfor %}
-</tbody></table></div>
-</section>
+<style>
+.fin-adventure{--pine:#143c32;--deep:#102a25;--lime:#d8ef83;--ink:#182d27;--muted:#61716a;--line:#e0e8e2;--surface:#fff;--mist:#f2f6f0;color:var(--ink);max-width:1400px;margin:0 auto;padding:clamp(12px,2vw,28px) 0 48px}
+.fin-adventure *{box-sizing:border-box}.fin-adventure a{color:inherit}.fin-adventure .fin-hero{background:linear-gradient(120deg,#102a25,#235547);border-radius:24px;padding:clamp(22px,4vw,42px);color:#fff;position:relative;overflow:hidden}.fin-adventure .fin-hero:after{content:"";position:absolute;width:250px;height:250px;border:1px solid #ffffff22;border-radius:50%;right:-90px;top:-130px;pointer-events:none}.fin-adventure .fin-kicker{letter-spacing:.18em;text-transform:uppercase;font-size:.73rem;font-weight:800;color:var(--lime)}.fin-adventure h1{font-size:clamp(2rem,4vw,3.25rem);line-height:1.1;color:#fff;margin:10px 0}.fin-adventure .fin-hero p{color:#d9e9e0;max-width:650px;margin:0}.fin-adventure .fin-nav{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}.fin-adventure .fin-link{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border-radius:12px;padding:10px 14px;font-size:.9rem;font-weight:700;background:#ffffff19;border:1px solid #ffffff35;color:#fff}.fin-adventure .fin-link:hover{background:#ffffff2a}.fin-adventure .fin-link--accent{background:var(--lime);color:var(--deep);border-color:var(--lime)}
+.fin-adventure .fin-panel{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:clamp(18px,2.5vw,26px);box-shadow:0 10px 30px #173f2810;margin-top:20px}.fin-adventure .fin-section-head{display:flex;justify-content:space-between;align-items:start;gap:16px;flex-wrap:wrap;margin-bottom:18px}.fin-adventure h2{font-size:1.25rem;color:var(--ink);margin:0}.fin-adventure .fin-sub{color:var(--muted);font-size:.9rem;margin:7px 0 0}.fin-adventure .fin-filters{display:grid;grid-template-columns:minmax(180px,2fr) minmax(140px,1fr) minmax(110px,.7fr) auto;gap:14px;align-items:end}.fin-adventure .fin-field label{display:block;font-size:.8rem;font-weight:750;margin-bottom:7px;color:#38534a}.fin-adventure .fin-field select,.fin-adventure .fin-field input{width:100%;min-height:44px;padding:10px 12px;border:1px solid #cddbd0;border-radius:11px;background:#fff;color:var(--ink);font:inherit}.fin-adventure .fin-button{min-height:44px;background:var(--pine);color:white;border:0;border-radius:11px;padding:10px 19px;font:inherit;font-weight:750;cursor:pointer}.fin-adventure .fin-button:hover{background:#215b49}.fin-adventure .fin-toolbar{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}.fin-adventure .fin-month-nav{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.fin-adventure .fin-text-link{color:#23654d;text-decoration:none;font-weight:750;font-size:.9rem}.fin-adventure .fin-text-link:hover{text-decoration:underline}.fin-adventure .fin-export{display:inline-flex;gap:8px;align-items:center;background:var(--mist);padding:10px 14px;border-radius:10px;color:#1b533f;text-decoration:none;font-weight:750;font-size:.9rem}
+.fin-adventure .fin-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:20px}.fin-adventure .fin-metric{background:#fff;border:1px solid var(--line);border-radius:18px;padding:21px;min-width:0}.fin-adventure .fin-metric--primary{background:var(--pine);border-color:var(--pine);color:#fff}.fin-adventure .fin-metric--soft{background:#eff5e4}.fin-adventure .fin-metric-label{font-size:.82rem;font-weight:750;color:var(--muted)}.fin-adventure .fin-metric--primary .fin-metric-label{color:#c8e2d4}.fin-adventure .fin-metric-value{font-size:clamp(1.35rem,2.3vw,2rem);font-weight:850;line-height:1.2;margin-top:13px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}.fin-adventure .fin-metric-note{font-size:.77rem;margin-top:8px;color:var(--muted)}.fin-adventure .fin-metric--primary .fin-metric-note{color:#d3e5d9}.fin-adventure .fin-two{display:grid;grid-template-columns:1fr 1fr;gap:20px}.fin-adventure .fin-list{margin:0}.fin-adventure .fin-list-row{display:flex;justify-content:space-between;gap:16px;align-items:baseline;padding:13px 0;border-bottom:1px solid var(--line)}.fin-adventure .fin-list-row:last-child{border-bottom:0}.fin-adventure .fin-list-row dt{color:#52685e}.fin-adventure .fin-list-row dd{margin:0;text-align:right;font-weight:750;font-variant-numeric:tabular-nums}.fin-adventure .fin-list-row--total dt,.fin-adventure .fin-list-row--total dd{font-weight:850;color:#194c3a}.fin-adventure .fin-footnote{margin:16px 0 0;padding:13px 15px;background:var(--mist);border-radius:10px;font-size:.82rem;line-height:1.5;color:#51645a}.fin-adventure .fin-table-scroll{overflow-x:auto;max-width:100%}.fin-adventure .fin-table{border-collapse:collapse;width:100%;min-width:680px;font-size:.9rem}.fin-adventure .fin-table th{text-align:left;background:var(--mist);font-size:.77rem;text-transform:uppercase;letter-spacing:.07em;color:#526b5d;padding:14px 13px}.fin-adventure .fin-table td{padding:15px 13px;border-bottom:1px solid var(--line);vertical-align:middle}.fin-adventure .fin-table tbody tr:hover{background:#f8fbf7}.fin-adventure .fin-table .fin-amount{text-align:right;white-space:nowrap;font-weight:800;font-variant-numeric:tabular-nums}.fin-adventure .fin-table th:last-child{text-align:right}.fin-adventure .fin-guest{font-weight:750;color:#215a46;text-decoration:none}.fin-adventure .fin-guest:hover{text-decoration:underline}.fin-adventure .fin-refund{color:#a24735}.fin-adventure .fin-empty{text-align:center;color:var(--muted);padding:30px 14px!important}
+@media(max-width:1050px){.fin-adventure .fin-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:760px){.fin-adventure .fin-filters{grid-template-columns:repeat(2,minmax(0,1fr))}.fin-adventure .fin-two{grid-template-columns:1fr}.fin-adventure .fin-hero{border-radius:18px}}@media(max-width:480px){.fin-adventure .fin-filters,.fin-adventure .fin-grid{grid-template-columns:1fr}.fin-adventure .fin-button{width:100%}.fin-adventure .fin-toolbar{align-items:stretch}.fin-adventure .fin-export{justify-content:center}.fin-adventure .fin-list-row{font-size:.9rem}}
+</style>
+<div class="fin-adventure">
+  <header class="fin-hero">
+    <div class="fin-kicker">STAFF / FINANCIAL OPERATIONS</div>
+    <h1>Financial dashboard</h1>
+    <p>Follow cash movements, booking balances, and transactions across your permitted mountain huts.</p>
+    <nav class="fin-nav" aria-label="Financial dashboard navigation">
+      <a class="fin-link" href="{% url 'bookings:dashboard' %}">← Operations dashboard</a>
+      <a class="fin-link" href="{% url 'bookings:manager_reservations' %}">Reservations</a>
+      <a class="fin-link fin-link--accent" href="{% url 'bookings:expense_dashboard' %}">Expenses &amp; cash flow ↗</a>
+    </nav>
+  </header>
+
+  <section class="fin-panel" aria-labelledby="fin-filters-heading">
+    <div class="fin-section-head"><div><h2 id="fin-filters-heading">Report filters</h2><p class="fin-sub">Choose a hut and reporting month.</p></div></div>
+    <form method="get" class="fin-filters">
+      <div class="fin-field"><label for="hut">Mountain hut</label><select id="hut" name="hut">{% if not manager_mode %}<option value="">All permitted huts</option>{% endif %}{% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_slug == hut.slug %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}</select></div>
+      <div class="fin-field"><label for="month">Month</label><select id="month" name="month">{% for value,label in month_options %}<option value="{{ value }}" {% if month.month == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+      <div class="fin-field"><label for="year">Year</label><input id="year" type="number" name="year" value="{{ month.year }}" min="2000" max="2100"></div>
+      <button class="fin-button" type="submit">Show report</button>
+    </form>
+    <div class="fin-toolbar">
+      <div class="fin-month-nav"><a class="fin-text-link" href="?hut={{ selected_slug|urlencode }}&amp;year={{ previous.year }}&amp;month={{ previous.month }}">← Previous</a><strong>{{ month|date:"F Y" }}</strong><a class="fin-text-link" href="?hut={{ selected_slug|urlencode }}&amp;year={{ next.year }}&amp;month={{ next.month }}">Next →</a></div>
+      <a class="fin-export" href="{% url 'bookings:financial_export' %}?hut={{ selected_slug|urlencode }}&amp;year={{ month.year }}&amp;month={{ month.month }}">↓ Export CSV</a>
+    </div>
+  </section>
+
+  <section class="fin-grid" aria-label="Key financial figures">
+    <div class="fin-metric fin-metric--primary"><div class="fin-metric-label">Net cash received</div><div class="fin-metric-value">{{ net_cash|floatformat:2 }} {{ currency }}</div><div class="fin-metric-note">Recorded during {{ month|date:"F Y" }}</div></div>
+    <div class="fin-metric"><div class="fin-metric-label">Total receipts</div><div class="fin-metric-value">{{ receipts|floatformat:2 }} {{ currency }}</div><div class="fin-metric-note">Includes deposits received</div></div>
+    <div class="fin-metric fin-metric--soft"><div class="fin-metric-label">Outstanding balance</div><div class="fin-metric-value">{{ outstanding|floatformat:2 }} {{ currency }}</div><div class="fin-metric-note">Current balance for monthly arrivals</div></div>
+    <div class="fin-metric"><div class="fin-metric-label">Active arriving reservations</div><div class="fin-metric-value">{{ arrival_count }}</div><div class="fin-metric-note">Check-in during {{ month|date:"F Y" }}</div></div>
+  </section>
+
+  <div class="fin-two">
+    <section class="fin-panel" aria-labelledby="cash-heading"><div class="fin-section-head"><div><h2 id="cash-heading">Cash movements</h2><p class="fin-sub">Transactions recorded in {{ month|date:"F Y" }}</p></div></div>
+      <dl class="fin-list">
+        <div class="fin-list-row"><dt>Payments + deposits received</dt><dd>{{ receipts|floatformat:2 }} {{ currency }}</dd></div>
+        <div class="fin-list-row"><dt>Of which deposits</dt><dd>{{ deposits|floatformat:2 }} {{ currency }}</dd></div>
+        <div class="fin-list-row"><dt>Refunds</dt><dd>{{ refunds|floatformat:2 }} {{ currency }}</dd></div>
+        <div class="fin-list-row fin-list-row--total"><dt>Net cash received</dt><dd>{{ net_cash|floatformat:2 }} {{ currency }}</dd></div>
+      </dl>
+      <p class="fin-footnote">Based on transaction recording dates. Deposits are already included in receipts and are not added again.</p>
+    </section>
+    <section class="fin-panel" aria-labelledby="arrivals-heading"><div class="fin-section-head"><div><h2 id="arrivals-heading">Bookings arriving</h2><p class="fin-sub">Current balances for {{ month|date:"F Y" }} arrivals</p></div></div>
+      <dl class="fin-list">
+        <div class="fin-list-row"><dt>Active reservations</dt><dd>{{ arrival_count }}</dd></div>
+        <div class="fin-list-row"><dt>Current booking value</dt><dd>{{ booked|floatformat:2 }} {{ currency }}</dd></div>
+        <div class="fin-list-row"><dt>Net paid for these bookings</dt><dd>{{ paid_for_arrivals|floatformat:2 }} {{ currency }}</dd></div>
+        <div class="fin-list-row fin-list-row--total"><dt>Outstanding balance</dt><dd>{{ outstanding|floatformat:2 }} {{ currency }}</dd></div>
+        <div class="fin-list-row"><dt>Overpayments</dt><dd>{{ overpaid|floatformat:2 }} {{ currency }}</dd></div>
+      </dl>
+      <p class="fin-footnote">Current snapshot of non-cancelled bookings checking in during this month. Includes payments recorded outside this month; this is not a historical month-end balance.</p>
+    </section>
+  </div>
+
+  <section class="fin-panel" aria-labelledby="transactions-heading">
+    <div class="fin-section-head"><div><h2 id="transactions-heading">Transaction history</h2><p class="fin-sub">Payments and refunds recorded during {{ month|date:"F Y" }}</p></div></div>
+    <div class="fin-table-scroll"><table class="fin-table"><thead><tr><th scope="col">Date</th><th scope="col">Guest</th><th scope="col">Type</th><th scope="col">Method</th><th scope="col">Amount</th></tr></thead><tbody>
+      {% for tx in transactions %}<tr><td>{{ tx.created|date:"j M Y H:i" }}</td><td><a class="fin-guest" href="{% url 'bookings:reservation_payments' tx.reservation.code %}">{{ tx.reservation.name }}</a></td><td>{{ tx.get_kind_display }}</td><td>{{ tx.get_method_display }}</td><td class="fin-amount {% if tx.kind == 'refund' %}fin-refund{% endif %}">{% if tx.kind == 'refund' %}−{% endif %}{{ tx.amount|floatformat:2 }} {{ currency }}</td></tr>
+      {% empty %}<tr><td class="fin-empty" colspan="5">No transactions recorded this month.</td></tr>{% endfor %}
+    </tbody></table></div>
+  </section>
+</div>
 {% endblock %}

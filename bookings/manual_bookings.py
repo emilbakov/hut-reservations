@@ -4,7 +4,7 @@ from datetime import timedelta
 from django import forms
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect, render
@@ -12,6 +12,8 @@ from django.utils import timezone
 
 from .models import Hut, Reservation, Room
 from .services import NotAvailable, create_reservation, free_beds
+from .staff_booking_ui_v121 import availability_summary
+from .booking_calendar_v122 import booking_month
 
 
 class ManualBookingForm(forms.Form):
@@ -49,7 +51,7 @@ class ManualBookingForm(forms.Form):
         return data
 
 
-@staff_member_required
+@login_required(login_url="/staff/login/")
 def manual_booking(request):
     """Create a confirmed booking within the manager's authorized hut."""
     form = ManualBookingForm(request.POST if request.method == "POST" else None, user=request.user)
@@ -57,8 +59,17 @@ def manual_booking(request):
     chosen = None
     hut_id = request.POST.get("hut") if request.method == "POST" else request.GET.get("hut")
     if hut_id:
-        # Never use a raw hut id without applying the authorized queryset.
-        chosen = huts.filter(pk=hut_id).first() if str(hut_id).isdigit() else None
+        # Accept the numeric ID used by the booking form AND the slug used by
+        # dashboard/sidebar links. Both must resolve inside the manager's
+        # active, authorized huts. Never resolve globally then trust the result.
+        hut_value = str(hut_id).strip()
+        if request.method == "POST":
+            # The form's ModelChoiceField is deliberately PK-based.
+            chosen = huts.filter(pk=hut_value).first() if (hut_value.isascii() and hut_value.isdigit()) else None
+        else:
+            chosen = huts.filter(pk=hut_value).first() if (hut_value.isascii() and hut_value.isdigit()) else None
+            if chosen is None:
+                chosen = huts.filter(slug=hut_value).first()
         if chosen is None:
             raise PermissionDenied("Hut not permitted.")
     elif huts.count() == 1:
@@ -71,10 +82,23 @@ def manual_booking(request):
     date_form_valid = form.is_valid() if request.method == "POST" else False
     if date_form_valid:
         start, end = form.cleaned_data["check_in"], form.cleaned_data["check_out"]
+    elif request.method == "POST":
+        # Keep showing availability and entered guest details when POST validation
+        # fails (e.g. missing contact or a room quantity error).
+        try:
+            start = forms.DateField().clean(request.POST.get("check_in"))
+            end = forms.DateField().clean(request.POST.get("check_out"))
+            today = timezone.localdate()
+            if (start < today or end <= start or
+                start > today + timedelta(days=settings.BOOKING_MAX_DAYS_AHEAD) or
+                (end-start).days > settings.BOOKING_MAX_NIGHTS):
+                start = end = None
+        except (forms.ValidationError, TypeError, ValueError):
+            start = end = None
     elif request.method == "GET":
         try:
-            start = forms.DateField().clean(request.GET.get("check_in"))
-            end = forms.DateField().clean(request.GET.get("check_out"))
+            start = forms.DateField().clean(request.GET.get("check_in") or timezone.localdate().isoformat())
+            end = forms.DateField().clean(request.GET.get("check_out") or (timezone.localdate() + timedelta(days=1)).isoformat())
             if start < timezone.localdate() or end <= start or start > timezone.localdate() + timedelta(days=settings.BOOKING_MAX_DAYS_AHEAD) or (end-start).days > settings.BOOKING_MAX_NIGHTS:
                 start = end = None
         except (forms.ValidationError, TypeError):
@@ -83,7 +107,8 @@ def manual_booking(request):
     free = free_beds(rooms, start, end) if rooms and start and end else {}
     for room in rooms:
         raw = request.POST.get(f"beds_{room.pk}", "0") if request.method == "POST" else "0"
-        room_rows.append({"room": room, "free": free.get(room.pk), "requested": raw})
+        room_rows.append({"room": room, "free": free.get(room.pk), "requested": raw,
+                          "unavailable": max(0, room.capacity - free.get(room.pk, 0))})
 
     if request.method == "POST" and date_form_valid:
         quantities = {}
@@ -119,9 +144,28 @@ def manual_booking(request):
                 form.add_error(None, "Booking could not be saved. Check availability and dates.")
             else:
                 messages.success(request, f"Manual booking {reservation.code} created.")
-                return redirect("bookings:manager_reservations")
+                # Global reservation management still requires is_staff;
+                # hut managers without that flag return to their own workspace.
+                if request.user.is_staff:
+                    return redirect("bookings:manager_reservations")
+                return redirect("floorplans:staff_hub", hut_id=chosen.pk)
 
-    return render(request, "bookings/manual_booking.html", {
+    today = timezone.localdate()
+    return render(request, "bookings/staff_booking_v121.html", {
         "form": form, "selected_hut": chosen, "room_rows": room_rows,
-        "today": timezone.localdate(),
+        "booking_mode": "manual",
+        "dates_action": "/staff/reservations/new/",
+        "booking_action": "/staff/reservations/new/",
+        "check_in_value": (request.POST.get("check_in") if request.method == "POST" else request.GET.get("check_in")) or today.isoformat(),
+        "check_out_value": (request.POST.get("check_out") if request.method == "POST" else request.GET.get("check_out")) or (today + timedelta(days=1)).isoformat(),
+        "today_iso": today.isoformat(),
+        "availability": availability_summary(rooms, free, start, end),
+        "booking_calendar": booking_month(rooms, start, end, today=today,
+            month_value=request.POST.get("cal_month") if request.method == "POST" else request.GET.get("cal_month")),
+        "currency": settings.BOOKING_CURRENCY,
+        "date_error": ("Invalid dates. Check the booking horizon and stay length."
+                       if ((request.GET.get("check_in") or request.GET.get("check_out"))
+                           if request.method == "GET" else
+                           (request.POST.get("check_in") or request.POST.get("check_out")))
+                       and not (start and end) else None),
     })

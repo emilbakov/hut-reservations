@@ -1,0 +1,26 @@
+[
+  {
+    "path": "bookings/manual_bookings.py",
+    "existed": true
+  },
+  {
+    "path": "floorplans/staff_new_booking.py",
+    "existed": true
+  },
+  {
+    "path": "floorplans/templatetags/summitdesk_nav.py",
+    "existed": true
+  },
+  {
+    "path": "bookings/templates/bookings/manual_booking.html",
+    "existed": true
+  },
+  {
+    "path": "floorplans/templates/floorplans/staff_new_booking.html",
+    "existed": true
+  },
+  {
+    "path": "bookings/test_booking_access_v118.py",
+    "existed": false
+  }
+]

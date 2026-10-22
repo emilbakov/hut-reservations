@@ -1,0 +1,145 @@
+{% load summitdesk_nav %}
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SummitDesk | {{ hut.name }} Staff Hub</title>
+<style>
+:root{font-family:system-ui,-apple-system,sans-serif;color:#173d33;background:#f4f7f3}*{box-sizing:border-box}body{margin:0}.wrap{max-width:1180px;margin:auto;padding:22px}.head{background:#153f34;color:white;padding:26px;border-radius:20px;margin-bottom:20px}.head small{color:#c9e4b4}h1{margin:6px 0;font-size:clamp(24px,4vw,34px)}h2{font-size:19px;margin:0 0 16px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:14px}.card{background:white;border:1px solid #dce7dc;border-radius:15px;padding:19px;box-shadow:0 2px 8px #163d3210}.num{font-size:30px;font-weight:750}.muted{color:#60736b;font-size:14px}.links{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:18px 0 28px}.link{display:block;background:white;color:#164537;text-decoration:none;border:1px solid #dce7dc;border-radius:13px;padding:17px;font-weight:650}.link:hover,.link:focus{border-color:#91b951;background:#f2f9e7}.link span{display:block;font-weight:400;font-size:13px;color:#60736b;margin-top:5px}.section{margin-top:26px}.task{display:flex;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid #edf0eb}.task:last-child{border-bottom:0}.pill{border-radius:30px;background:#eaf2d6;padding:5px 9px;font-size:12px;white-space:nowrap}a:focus-visible{outline:3px solid #94b850;outline-offset:2px}@media(max-width:520px){.wrap{padding:12px}.head{padding:20px}.task{flex-direction:column}}
+</style></head><body>{% summitdesk_nav %}<main class="wrap">
+<header class="head"><small>SUMMITDESK · STAFF WORKSPACE</small><h1>{{ hut.name }}</h1><div>{{ today|date:"l, j F Y" }} · {% if manager %}Manager dashboard{% else %}My cleaner dashboard{% endif %}</div></header>
+<div class="grid">
+{% if manager %}<div class="card"><div class="muted">Occupied bed places today</div><div class="num">{{ occupied_beds }} <span class="muted">/ {{ capacity }}</span></div></div><div class="card"><div class="muted">Arrivals today · bed places</div><div class="num">{{ arrivals }}</div></div><div class="card"><div class="muted">Departures today · bed places</div><div class="num">{{ departures }}</div></div>{% endif %}
+<div class="card"><div class="muted">Cleaning tasks open</div><div class="num">{{ counts.open }}</div></div><div class="card"><div class="muted">Cleaning in progress</div><div class="num">{{ counts.in_progress }}</div></div><div class="card"><div class="muted">Cleaning completed</div><div class="num">{{ counts.done }}</div></div>
+</div>
+<!-- v37-daily-overview -->
+{% if manager %}
+<section class="section" aria-labelledby="v37-daily-title">
+  <h2 id="v37-daily-title">Today's confirmed booking snapshot</h2>
+  <div class="grid">
+    <div class="card"><div class="muted">Confirmed occupied bed places today</div><div class="num">{{ v37_confirmed_beds_today }}</div></div>
+    <div class="card"><div class="muted">Confirmed booking value for tonight</div><div class="num">{{ v37_booking_value_today|floatformat:2 }}</div><div class="muted">Estimated booking value, not payments received</div></div>
+    <div class="card"><div class="muted">Tomorrow's confirmed arrivals · bed places</div><div class="num">{{ v37_arrivals_tomorrow }}</div></div>
+  </div>
+  <p class="muted">Tonight uses confirmed reservations only, with check-out excluded. Values use the stored per-bed nightly rate. The existing top-row occupied/arrival/departure counts include pending holds.</p>
+</section>
+{% endif %}
+<section class="section"><h2>Workspace</h2><nav class="links" aria-label="Staff tools">
+{% if manager %}<a class="link" href="{% url 'floorplans:staff_calendar' hut.pk %}">Reservation calendar<span>Availability and numbered beds</span></a><a class="link" href="{% url 'floorplans:staff_overview' hut.pk %}">Operations overview<span>Arrivals, departures, occupancy</span></a><a class="link" href="{% url 'floorplans:staff_housekeeping' hut.pk %}">Housekeeping board<span>Bed readiness and maintenance</span></a><a class="link" href="{% url 'floorplans:cleaner_team' hut.pk %}">Cleaning team<span>{{ cleaner_count }} team memberships</span></a><a class="link" href="{% url 'floorplans:cleaner_invitations' hut.pk %}">Invite cleaners<span>Manage onboarding invitations</span></a>{% endif %}
+<a class="link" href="{% url 'floorplans:staff_tasks' hut.pk %}">{% if manager %}Manage cleaning tasks{% else %}My cleaning tasks{% endif %}<span>Assignments, priorities and progress</span></a>
+</nav></section>
+<!-- SUMMITDESK_V36_MANAGER_INSIGHTS -->
+{% if manager %}
+<section class="section" aria-labelledby="v36-insights-title">
+  <h2 id="v36-insights-title">Manager insights</h2>
+  <nav class="links" aria-label="Manager analytics and audit tools">
+    <a class="link" href="{% url 'floorplans:staff_analytics' hut.pk %}">Reservation analytics<span>Occupancy, booking trends and room utilization</span></a>
+    <a class="link" href="{% url 'floorplans:staff_financial_analytics' hut.pk %}">Booking value analytics<span>Confirmed and pending booking value, room trends and CSV export</span></a>
+    <a class="link" href="{% url 'floorplans:staff_audit_dashboard' hut.pk %}">Reservation audit<span>Staff activity, reservation changes and CSV export</span></a>
+  </nav>
+</section>
+{% endif %}
+<section class="section card"><h2>{% if manager %}Today's cleaning tasks{% else %}My tasks today{% endif %}</h2>
+{% for task in tasks %}<div class="task"><div><strong>{{ task.bed.room.name }} · Bed {{ task.bed.number }}</strong><div class="muted">{{ task.get_priority_display }} priority{% if manager and task.assignee %} · {{ task.assignee.get_username }}{% endif %}</div></div><span class="pill">{{ task.get_status_display }}</span></div>{% empty %}<p class="muted">No cleaning tasks scheduled for today.</p>{% endfor %}
+{% if task_total > 8 %}<p class="muted">Showing the first 8 of {{ task_total }} tasks. Open cleaning tasks to see all.</p>{% endif %}
+</section>{% if manager %}
+<!-- V38_FORECAST_START -->
+<section class="section card" aria-labelledby="v38-forecast-title">
+  <h2 id="v38-forecast-title">Next 7 days · Operations forecast</h2>
+  <!-- V45_FORECAST_DATES -->
+  <form method="get" action="" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:12px 0">
+    <label for="forecast-start-v45">Forecast starts</label>
+    <input id="forecast-start-v45" name="forecast_start" type="date" value="{{ forecast_start_v45|date:'Y-m-d' }}" min="{{ today|date:'Y-m-d' }}" max="{{ forecast_max_v45|date:'Y-m-d' }}" required style="padding:9px;border:1px solid #b6cbbd;border-radius:8px">
+    <button type="submit" style="padding:9px 14px;border:1px solid #153f34;border-radius:9px;background:#153f34;color:white;cursor:pointer">Show forecast</button>
+    <a href="?" style="color:#153f34">Reset to today</a>
+  </form>
+  <!-- V44_FORECAST_CSV -->
+  <form method="get" action="" style="margin:12px 0">
+    <input type="hidden" name="forecast_start" value="{{ forecast_start_v45|date:'Y-m-d' }}">
+    <button type="submit" name="forecast_export" value="csv" style="padding:10px 16px;border:1px solid #153f34;border-radius:9px;background:white;color:#153f34;cursor:pointer">Export 7-day forecast CSV</button>
+  </form>
+  <p class="muted">Confirmed and pending bed places, expected arrivals/departures, closures and scheduled cleaning tasks. Arrivals/departures count bed places, not individual guests.</p>
+  <div style="overflow-x:auto">
+    <table style="width:100%;min-width:780px;border-collapse:collapse;text-align:left">
+      <thead><tr><th scope="col">Day</th><th scope="col">Confirmed beds</th><th scope="col">Pending beds</th><th scope="col">Free beds</th><th scope="col">Arrivals</th><th scope="col">Departures</th><th scope="col">Closed beds</th><th scope="col">Cleaning tasks</th></tr></thead>
+      <tbody>{% for day in forecast_display_v45 %}
+        <tr style="border-top:1px solid #dce7dc">
+          <th scope="row" style="padding:11px 6px">{{ day.day|date:"D, j M" }}</th>
+          <td>{{ day.occupied }} / {{ day.available_capacity }}</td><td>{{ day.pending }}</td><td>{{ day.free }}</td><td>{{ day.arrivals }}</td><td>{{ day.departures }}</td><td>{{ day.closed }}</td><td>{{ day.tasks }}</td>
+        </tr>{% if day.over_capacity %}<tr><td colspan="8" style="color:#a22">Warning: booked/held places exceed available capacity for this day.</td></tr>{% endif %}
+      {% endfor %}</tbody>
+    </table>
+  </div>
+</section>
+<!-- V38_FORECAST_END -->
+<!-- V46_COMPARISON_START -->
+<section class="section card" aria-labelledby="v46-comparison-title">
+  <h2 id="v46-comparison-title">Seven-day forecast comparison</h2>
+  <p class="muted">Selected period: {{ comparison_v46.current_start|date:"j M Y" }}–{{ comparison_v46.current_end|date:"j M Y" }}. Previous period: {{ comparison_v46.previous_start|date:"j M Y" }}–{{ comparison_v46.previous_end|date:"j M Y" }}.</p>
+  <p class="muted">Bed-night totals sum daily bed places. Changes compare the two seven-day periods. Figures reflect current reservation status and room capacity, not historical snapshots.</p>
+  <div style="overflow-x:auto"><table style="width:100%;min-width:600px;border-collapse:collapse;text-align:left">
+    <thead><tr><th scope="col">Metric</th><th scope="col">Previous 7 days</th><th scope="col">Selected 7 days</th><th scope="col">Change</th><th scope="col">Change %</th></tr></thead>
+    <tbody>{% for metric in comparison_v46.metrics %}
+      <tr style="border-top:1px solid #dce7dc"><th scope="row" style="padding:10px 6px">{{ metric.label }}</th><td>{{ metric.previous }}</td><td>{{ metric.current }}</td><td>{% if metric.delta > 0 %}+{% endif %}{{ metric.delta }}</td><td>{% if metric.change_pct is None %}N/A{% else %}{{ metric.change_pct }}%{% endif %}</td></tr>
+    {% endfor %}</tbody>
+  </table></div>
+</section>
+<!-- V47_COMPARISON_EXPORT_START -->
+<p><a class="link" style="display:inline-block" href="?forecast_start={{ comparison_v46.current_start|date:'Y-m-d' }}&amp;comparison_export=csv">Export comparison CSV<span>Download previous vs selected seven-day totals</span></a></p>
+<!-- V47_COMPARISON_EXPORT_END -->
+<!-- V46_COMPARISON_END -->
+
+{% endif %}
+<!-- V40_ALERT_SUMMARY_START -->
+{% if manager %}
+<section class="section card" aria-labelledby="v40-summary-heading">
+  <h2 id="v40-summary-heading">Alert priorities · Next 7 days</h2>
+  <p class="muted">Prioritized summary of the v39 operational alerts for this hut. Read-only; no automatic reservation changes.</p>
+  <div class="grid" style="margin:12px 0 18px">
+    <div class="card"><div class="muted">Urgent</div><div class="num">{{ alert_summary_v40.counts.urgent }}</div></div>
+    <div class="card"><div class="muted">Warnings</div><div class="num">{{ alert_summary_v40.counts.warning }}</div></div>
+    <div class="card"><div class="muted">Information</div><div class="num">{{ alert_summary_v40.counts.info }}</div></div>
+  </div>
+  {% for alert in alert_summary_v40.top %}
+    <div class="task"><div><strong>{{ alert.title }}</strong><div class="muted">{{ alert.day|date:"D, j M" }} · {{ alert.detail }}</div></div><span class="pill">{{ alert.level|title }}</span></div>
+  {% empty %}<p class="muted">No current alerts to prioritize.</p>{% endfor %}
+  {% if alert_summary_v40.total > 5 %}<p class="muted">Showing 5 of {{ alert_summary_v40.total }} alerts. See the full operations alerts section below.</p>{% endif %}
+</section>
+{% endif %}
+<!-- V40_ALERT_SUMMARY_END -->
+
+<!-- V39_ALERTS_START -->
+{% if manager %}
+<section class="section card" aria-labelledby="v39-alerts-heading">
+  <h2 id="v39-alerts-heading">Operations alerts · Next 7 days</h2>
+  <p class="muted">Read-only capacity and preparation checks. Alerts are indicators, not proof of an individual bed conflict.</p>
+  <!-- V41_ALERT_FILTERS_START -->
+<form method="get" action="" style="display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin:14px 0" aria-label="Filter operations alerts">
+  <label for="v41-level" class="muted">Alert severity</label>
+  <select id="v41-level" name="alert_level" style="padding:9px;border:1px solid #dce7dc;border-radius:9px;background:white">
+    <option value="all" {% if alert_filter_v41.selected == 'all' %}selected{% endif %}>All alerts</option>
+    <option value="urgent" {% if alert_filter_v41.selected == 'urgent' %}selected{% endif %}>Urgent</option>
+    <option value="warning" {% if alert_filter_v41.selected == 'warning' %}selected{% endif %}>Warnings</option>
+    <option value="info" {% if alert_filter_v41.selected == 'info' %}selected{% endif %}>Information</option>
+  </select>
+  <!-- V42_ALERT_SEARCH_START -->
+  <label for="v42-alert-q" class="muted">Search alerts</label>
+  <input id="v42-alert-q" type="search" name="alert_q" value="{{ alert_search_v42.query }}" maxlength="100" placeholder="Title or description" style="padding:9px;border:1px solid #dce7dc;border-radius:9px;max-width:240px;width:100%">
+  <!-- V42_ALERT_SEARCH_END -->
+  <button type="submit" style="padding:9px 15px;border:0;border-radius:9px;background:#153f34;color:white;cursor:pointer">Apply filter</button>
+  <!-- V43_CSV_EXPORT -->
+  <button type="submit" name="alert_export" value="csv" style="padding:9px 15px;border:1px solid #153f34;border-radius:9px;background:white;color:#153f34;cursor:pointer">Export filtered CSV</button>
+  <span class="muted" aria-live="polite">Showing {{ alert_search_v42.shown }} of {{ alert_search_v42.total }} alerts</span>
+</form>
+<!-- V41_ALERT_FILTERS_END -->
+
+  {% for alert in alert_search_v42.rows %}
+    <div class="task">
+      <div><strong>{{ alert.title }}</strong><div class="muted">{{ alert.day|date:"D, j M" }} · {{ alert.detail }}</div></div>
+      <span class="pill">{{ alert.level|title }}</span>
+    </div>
+  {% empty %}
+    <p class="muted">No alerts match this severity filter for the next seven days.</p>
+  {% endfor %}
+</section>
+{% endif %}
+<!-- V39_ALERTS_END -->
+</main></body></html>

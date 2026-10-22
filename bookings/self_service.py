@@ -4,7 +4,7 @@ Approval records a decision; it NEVER changes inventory, dates, payment or statu
 Managers must apply approved requests using existing reservation tools.
 """
 import secrets
-from datetime import date
+from datetime import date, timedelta
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
@@ -16,8 +16,9 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
+from django.views.decorators.cache import never_cache
 from .deposits import deposit_summary, single_hut_id
-from .models import GuestAccessLink, GuestChangeRequest, Hut, Reservation
+from .models import GuestAccessLink, GuestChangeRequest, GuestConversationMessage, Hut, Reservation
 from .views import manageable_reservations, permitted_hut_selection
 
 def issue_guest_link(reservation, request=None):
@@ -36,6 +37,7 @@ def guest_reservation(token):
         token=token, revoked_at__isnull=True)
     return access.reservation
 
+@never_cache
 @require_http_methods(["GET", "POST"])
 def guest_self_service(request, token):
     reservation = guest_reservation(token)
@@ -82,6 +84,11 @@ def guest_self_service(request, token):
         "reservation": reservation, "hut": hut, "summary": summary,
         "items": reservation.items.select_related("room").all(),
         "requests": reservation.guest_change_requests.all()[:20],
+        "conversation_messages": list(reversed(list(
+            GuestConversationMessage.objects.filter(reservation=reservation, hut=hut)
+            .order_by("-created_at")[:100]))),
+        "can_message": reservation.check_out >= timezone.localdate() - timedelta(days=7),
+        "guest_token": token,
         "can_request": reservation.status in Reservation.HOLDING and reservation.check_in > timezone.localdate(),
         "currency": getattr(settings, "BOOKING_CURRENCY", "EUR"),
     })

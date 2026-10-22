@@ -1,0 +1,91 @@
+{% extends "bookings/base.html" %}
+{% block title %}Preview daily reminder{% endblock %}
+{% block content %}
+<style>
+  .dp{max-width:930px;margin:0 auto;padding:clamp(20px,3vw,38px) 0 65px;color:#17352a}
+  .dp *{box-sizing:border-box}
+  .dp-header{background:linear-gradient(125deg,#132f26,#2b5944);border-radius:22px;padding:clamp(24px,4vw,40px);color:#fff}
+  .dp-header small{color:#d6f485;font-size:.75rem;font-weight:850;letter-spacing:.16em}
+  .dp-header h1{font-size:clamp(1.7rem,3.8vw,2.65rem);margin:12px 0;color:#fff}
+  .dp-header p{color:#e0eae3;line-height:1.6;margin:0}
+  .dp-header a{display:inline-block;margin-top:20px;color:#fff;font-weight:800;text-underline-offset:4px}
+  .dp-panel{background:#fff;border:1px solid #dce8df;border-radius:18px;padding:clamp(18px,3vw,28px);margin-top:20px;box-shadow:0 7px 24px #183b290a}
+  .dp-panel h2{margin:0 0 12px;font-size:1.3rem}
+  .dp-panel p{color:#5c7165;line-height:1.6;margin:0 0 14px}
+  .dp-status{border-radius:12px;background:#f0f5ef;border:1px solid #c9ddc9;padding:16px 18px}
+  .dp-status strong{display:block;margin-bottom:5px}
+  .dp-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px}
+  .dp-stat{border:1px solid #e3ede5;border-radius:12px;padding:16px}
+  .dp-stat strong{display:block;font-size:1.8rem;color:#1c503b}
+  .dp-stat span{font-size:.82rem;color:#586f60}
+  .dp-hut{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:14px 0;border-bottom:1px solid #edf2ed}
+  .dp-hut:last-child{border-bottom:0}
+  .dp-hut a{font-weight:750;color:#1c503b;text-underline-offset:3px}
+  .dp-mail{white-space:pre-wrap;overflow-wrap:anywhere;background:#f7faf7;border:1px solid #dce8df;border-radius:12px;padding:18px;font:inherit;font-size:.9rem;line-height:1.65;color:#253d30}
+  .dp-note{font-size:.84rem;color:#617266}
+  .dp a:focus-visible{outline:3px solid #90bd6e;outline-offset:3px}
+  @media(max-width:580px){.dp-stats{grid-template-columns:1fr}.dp-stat{display:flex;align-items:center;gap:12px}.dp-stat strong{font-size:1.35rem}}
+</style>
+<div class="dp">
+  <header class="dp-header">
+    <small>SUMMITDESK / EMAIL REMINDERS</small>
+    <h1>Preview your daily summary</h1>
+    <p>See what your next reminder would contain and why it may or may not be sent. This page never sends an email or changes reservations.</p>
+    <a href="{% url 'bookings:manager_digest_preferences' %}">← Back to reminder settings</a>
+  </header>
+
+  <section class="dp-panel" aria-label="Reminder eligibility">
+    <h2>Reminder status for {{ today|date:"d M Y" }}</h2>
+    <div class="dp-status" role="status">
+      {% if digest_status == 'ready' %}
+        <strong>Eligible for the next daily reminder</strong>
+        The reminder can be sent when the scheduler and email service are configured and running.
+      {% elif digest_status == 'disabled' %}
+        <strong>Reminders are turned off</strong>
+        You can enable them in your reminder settings. The preview below is still available.
+      {% elif digest_status == 'already_sent' %}
+        <strong>Today's reminder was already recorded as sent</strong>
+        The scheduled command will not send a second digest to your account today.
+      {% elif digest_status == 'not_urgent' %}
+        <strong>Waiting for an urgent request</strong>
+        Urgent-only mode is on, but no pending request is over 24 hours old or due to arrive within two days.
+      {% elif digest_status == 'missing_email' %}
+        <strong>No email address on your account</strong>
+        Ask your administrator to add your email address before reminders can be delivered.
+      {% else %}
+        <strong>No pending guest reservation requests</strong>
+        There is nothing to include in a daily reminder right now.
+      {% endif %}
+    </div>
+    <div class="dp-stats" aria-label="Request counts">
+      <div class="dp-stat"><strong>{{ total }}</strong><span>Pending requests</span></div>
+      <div class="dp-stat"><strong>{{ waiting24 }}</strong><span>Waiting over 24 hours</span></div>
+      <div class="dp-stat"><strong>{{ arrival48 }}</strong><span>Arriving within 2 days or overdue</span></div>
+    </div>
+  </section>
+
+  <section class="dp-panel" aria-label="Authorized hut summaries">
+    <h2>Your hut summaries</h2>
+    {% for item in summaries %}
+      <div class="dp-hut">
+        <div><strong>{{ item.hut.name }}</strong><div class="dp-note">{{ item.pending }} pending · {{ item.waiting24 }} waiting · {{ item.arrival48 }} arrival due</div></div>
+        <a href="{% url 'bookings:approval_dashboard' %}?hut={{ item.hut.slug|urlencode }}&amp;status=pending">Review requests →</a>
+      </div>
+    {% empty %}
+      <p>No pending public guest requests in your assigned active huts.</p>
+    {% endfor %}
+  </section>
+
+  <section class="dp-panel" aria-label="Email content preview">
+    <h2>Email content preview</h2>
+    {% if email_subject %}
+      <p><strong>Subject:</strong> {{ email_subject }}</p>
+      <pre class="dp-mail">{{ email_body }}</pre>
+      {% if link_notice %}<p class="dp-note">{{ link_notice }}</p>{% endif %}
+      <p class="dp-note">This is a read-only preview. Scheduled email delivery still follows your saved preferences and once-per-day limit.</p>
+    {% else %}
+      <p>No email preview is available until there is a pending request in your huts.</p>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

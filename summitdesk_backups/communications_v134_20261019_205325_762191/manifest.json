@@ -1,0 +1,67 @@
+[
+  {
+    "path": "bookings/models.py",
+    "existed": true,
+    "installed_sha256": "9ee1db307d5574fea09450c0ee3d3c972f1e600371c9cc074a58241686491419"
+  },
+  {
+    "path": "bookings/urls.py",
+    "existed": true,
+    "installed_sha256": "6cb55ea34bc50b6ca0252055c732aaa23b0bcebe8e7813e7cfd465b62d27f05a"
+  },
+  {
+    "path": "bookings/self_service.py",
+    "existed": true,
+    "installed_sha256": "7840a5ab002e120106b1478566998096a88c6a6772699e6c9d42c2f3e4327fed"
+  },
+  {
+    "path": "bookings/templates/bookings/guest_self_service.html",
+    "existed": true,
+    "installed_sha256": "40cc7c664cb00c137c7145ff65308da442a38038e3ac9dc466833eb3551f9be2"
+  },
+  {
+    "path": "bookings/templates/bookings/manager_reservations.html",
+    "existed": true,
+    "installed_sha256": "c49404e356002023c8547124b37dd9e26bf845b4f0e7955373124dd6dc1037cc"
+  },
+  {
+    "path": "bookings/templates/bookings/communications_dashboard.html",
+    "existed": true,
+    "installed_sha256": "dc085321946e74d5268d9ab3cc4d951f42a64b06bc7f014fa58f37ccdf28fd6b"
+  },
+  {
+    "path": "floorplans/templatetags/summitdesk_nav.py",
+    "existed": true,
+    "installed_sha256": "26abd129397749ec71f0c2af5cfb0106b4aacbb62e6144f7fb73649c2ab79056"
+  },
+  {
+    "path": "bookings/conversations_v134.py",
+    "existed": false,
+    "installed_sha256": "a7c383f1c345f330389a8618809fd4026a1cf3609f41eea487db1387e77d8bcf"
+  },
+  {
+    "path": "bookings/migrations/0016_guest_conversation_v134.py",
+    "existed": false,
+    "installed_sha256": "7ff247fb604b8c4cfb375acd45b0ed6de5455f6912569aa2d3aa6133da59f4f7"
+  },
+  {
+    "path": "bookings/templates/bookings/conversation_inbox_v134.html",
+    "existed": false,
+    "installed_sha256": "70098bbf8c8d6aeed8c30837f70cdb265e25111516666890bdd11570166e1206"
+  },
+  {
+    "path": "bookings/templates/bookings/conversation_thread_v134.html",
+    "existed": false,
+    "installed_sha256": "f043b5169f5a95c62120854640821d89a48c230042f2d3616ee0e5991c8df817"
+  },
+  {
+    "path": "bookings/templates/bookings/quick_replies_v134.html",
+    "existed": false,
+    "installed_sha256": "57fea9e6949989d00b65cc563ffd1cedc2482333045b1de6d37a53379a1ae399"
+  },
+  {
+    "path": "bookings/test_conversations_v134.py",
+    "existed": false,
+    "installed_sha256": "9e9ac5b7756eccf1fa21ee20fa02a0cc774c7b29aa76890f0ab7abcbb5b1f7aa"
+  }
+]

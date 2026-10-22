@@ -1,0 +1,30 @@
+<!-- V73_V77_ACTION_TOOLS -->
+<div class="panel" aria-label="Action search and summary">
+<h3>v73–v77 · Find and prioritize actions</h3>
+<form method="get">
+<input type="hidden" name="operations" value="1">
+<input type="hidden" name="forecast_start" value="{{ forecast_start|date:'Y-m-d' }}">
+<label for="action_level">Priority</label>
+<select id="action_level" name="action_level">
+<option value="all" {% if action_level == 'all' %}selected{% endif %}>All</option>
+<option value="conflicts" {% if action_level == 'conflicts' %}selected{% endif %}>Conflicts</option>
+<option value="assignments" {% if action_level == 'assignments' %}selected{% endif %}>Bed assignments</option>
+<option value="cleaning" {% if action_level == 'cleaning' %}selected{% endif %}>Cleaning</option>
+</select>
+<label for="action_q">Search</label>
+<input id="action_q" type="search" name="action_q" value="{{ action_q }}" maxlength="100" placeholder="Room or action">
+<label for="action_day">Day</label>
+<select id="action_day" name="action_day"><option value="">All 7 days</option>
+{% for d in ops.dates %}<option value="{{ d|date:'Y-m-d' }}" {% if action_day == d|date:'Y-m-d' %}selected{% endif %}>{{ d|date:'D d M' }}</option>{% endfor %}
+</select>
+<label for="action_sort">Order</label>
+<select id="action_sort" name="action_sort">
+<option value="priority" {% if action_sort == 'priority' %}selected{% endif %}>Urgent first</option>
+<option value="date" {% if action_sort == 'date' %}selected{% endif %}>Earliest date first</option>
+</select>
+<button type="submit">Apply filters</button>
+</form>
+<p class="muted">Showing {{ action_summary.total }} matching actions: {{ action_summary.conflicts }} conflicts, {{ action_summary.assignments }} assignments, {{ action_summary.cleaning }} cleaning.</p>
+<p><a href="?operations=1&amp;forecast_start={{ forecast_start|date:'Y-m-d' }}">Clear action filters</a></p>
+<p><a href="?operations=1&amp;forecast_start={{ forecast_start|date:'Y-m-d' }}&amp;action_level={{ action_level|urlencode }}&amp;action_q={{ action_q|urlencode }}&amp;action_day={{ action_day|urlencode }}&amp;action_sort={{ action_sort|urlencode }}&amp;operations_export=actions">v76 · Export matching actions CSV</a></p>
+</div>

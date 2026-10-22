@@ -1,0 +1,18 @@
+Hello {{ reservation.name }},
+
+We received your reservation request for {{ hut_name }}.
+
+Your request is AWAITING APPROVAL. Your stay is not confirmed yet.
+The selected beds are held while the hut manager reviews your request.
+
+Arrival: {{ reservation.check_in|date:"j F Y" }}
+Departure: {{ reservation.check_out|date:"j F Y" }}
+Beds requested: {{ reservation.total_beds }}
+Estimated total: {{ reservation.total_price }} {{ currency }}
+Reference: {{ reservation.code }}
+
+Check your request status or cancel it using your private link:
+{{ link }}
+
+We will email you when the hut manager approves or declines your request.
+Please do not travel assuming the request is confirmed.

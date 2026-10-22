@@ -1,0 +1,13 @@
+<!-- V48_COMPARISON_HIGHLIGHTS_START -->
+<section class="section card" aria-labelledby="v48-highlights-title">
+  <h2 id="v48-highlights-title">Forecast comparison highlights</h2>
+  <p class="muted">Largest absolute changes between the previous and selected seven-day periods. An increase or decrease is not automatically good or bad.</p>
+  <div class="grid" style="margin:14px 0">
+    <div class="card"><div class="muted">Metrics changed</div><div class="num">{{ comparison_highlights_v48.changed_count }}</div></div>
+    <div class="card"><div class="muted">Metrics unchanged</div><div class="num">{{ comparison_highlights_v48.unchanged_count }}</div></div>
+  </div>
+  {% for metric in comparison_highlights_v48.top %}
+    <div class="task"><div><strong>{{ metric.label }}</strong><div class="muted">Previous: {{ metric.previous }} · Selected: {{ metric.current }}</div></div><span class="pill">{% if metric.delta > 0 %}+{% endif %}{{ metric.delta }}</span></div>
+  {% empty %}<p class="muted">No changes between the two periods.</p>{% endfor %}
+</section>
+<!-- V48_COMPARISON_HIGHLIGHTS_END -->

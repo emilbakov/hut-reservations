@@ -1,0 +1,12 @@
+[
+  {
+    "path": "floorplans/templates/floorplans/visual_beds.html",
+    "existed": true,
+    "sha256": "52c32b0123b4ebe38c4bb26a55865464affa9b6d688172e015e04c8a8844b382"
+  },
+  {
+    "path": "floorplans/static/floorplans/visual_beds_v120.css",
+    "existed": false,
+    "sha256": null
+  }
+]
