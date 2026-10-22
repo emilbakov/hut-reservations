@@ -3,6 +3,7 @@ from calendar import monthrange
 from datetime import date, timedelta
 
 from django.http import Http404
+from django.conf import settings
 from django.shortcuts import render
 from django.utils import timezone
 
@@ -55,7 +56,8 @@ def month_rows(first, rooms, visible_ids=None):
                 'overbooked': remaining < 0, 'inactive': not room.is_active,
                 'reservations': [
                     {'code': item.reservation.code, 'guest': item.reservation.name,
-                     'beds': item.beds, 'status': item.reservation.status}
+                     'beds': item.beds, 'status': item.reservation.status,
+                     'check_in': item.reservation.check_in, 'check_out': item.reservation.check_out}
                     for item in active
                     if visible_ids is None or item.reservation_id in visible_ids
                 ],
@@ -75,6 +77,8 @@ def render_property_month(request, hut, quickstay_form=None, quickstay_initial=N
         first = date(year, month, 1)
     except (ValueError, TypeError, OverflowError):
         first = today.replace(day=1)
+    if quickstay_arrival and 2000 <= quickstay_arrival.year <= 2100:
+        first = quickstay_arrival.replace(day=1)
     # The property URL fixes the hut; do not allow hut/room query parameters to expand scope.
     rooms = list(Room.objects.filter(hut=hut).order_by('position', 'pk'))
     item_ids = ReservationItem.objects.filter(room__in=rooms).values_list('reservation_id', flat=True)
@@ -99,7 +103,9 @@ def render_property_month(request, hut, quickstay_form=None, quickstay_initial=N
         'hut': hut, 'selected_hut': hut, 'selected_slug': hut.slug,
         'first': first, 'prev_month': prev_month, 'next_month': next_month,
         'days': [first + timedelta(days=n) for n in range(monthrange(first.year, first.month)[1] + 14)],
-        'rows': rows, 'today': today,
+        'rows': rows, 'today': today, 'currency': settings.BOOKING_CURRENCY,
+        'max_nights': settings.BOOKING_MAX_NIGHTS,
+        'latest_arrival': today + timedelta(days=settings.BOOKING_MAX_DAYS_AHEAD),
         'quickstay_form': quickstay_form, 'quickstay_initial': quickstay_initial or {},
         'total_beds': sum(room.capacity for room in rooms if room.is_active),
         'occupied_bed_nights': sum(cell['booked'] for row in rows for cell in row['days']),

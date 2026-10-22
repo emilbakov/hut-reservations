@@ -1,6 +1,7 @@
 
 {% extends "bookings/base.html" %}
-{% block title %}Reservation {{ reservation.code }}{% endblock %}
+{% load i18n ui_v147 %}
+{% block title %}{% blocktranslate with v0=reservation.code %}Reservation {{ v0 }}{% endblocktranslate %}{% endblock %}
 
 {% block content %}
 <style>
@@ -295,136 +296,134 @@
 <main class="rs-page">
 
   <header class="rs-hero">
-    <p class="rs-eyebrow">SummitDesk / Your mountain stay</p>
+    <p class="rs-eyebrow">{% translate "SummitDesk / Your mountain stay" %}</p>
 
     {% if reservation.status == 'cancelled' %}
-      <span class="rs-status rs-cancelled">Cancelled</span>
-      <h1>Reservation cancelled.</h1>
+      <span class="rs-status rs-cancelled">{% translate "Cancelled" %}</span>
+      <h1>{% translate "Reservation cancelled." %}</h1>
       <p class="rs-hero-description">
-        Your booking has been cancelled. You can still review
-        the reservation details below.
+        {% translate "Your booking has been cancelled. You can still review the reservation details below." %}
       </p>
 
     {% elif reservation.status == 'pending' %}
       <span class="rs-status rs-pending">
         {% if reservation.guest_request %}
-          Awaiting hut approval
+          {% translate "Awaiting hut approval" %}
         {% else %}
-          Awaiting confirmation
+          {% translate "Awaiting confirmation" %}
         {% endif %}
       </span>
-      <h1>Your adventure awaits.</h1>
+      <h1>{% translate "Your adventure awaits." %}</h1>
       <p class="rs-hero-description">
         {% if reservation.guest_request %}
-          Your request has been received. Your selected beds are held
-          while the hut manager reviews your reservation.
+          {% translate "Your request has been received. Your selected beds are held while the hut manager reviews your reservation." %}
         {% else %}
-          Your beds are currently on hold. Your reservation
-          is not yet confirmed.
+          {% translate "Your beds are currently on hold. Your reservation is not yet confirmed." %}
         {% endif %}
       </p>
 
     {% else %}
-      <span class="rs-status rs-confirmed">Confirmed</span>
-      <h1>See you in the mountains.</h1>
+      <span class="rs-status rs-confirmed">{% translate "Confirmed" %}</span>
+      <h1>{% translate "See you in the mountains." %}</h1>
       <p class="rs-hero-description">
-        Your reservation is confirmed. Keep this private booking
-        link to review or manage your stay.
+        {% translate "Your reservation is confirmed. Keep this private booking link to review or manage your stay." %}
       </p>
     {% endif %}
 
     <div class="rs-ref">
-      <span>Booking reference</span>
+      <span>{% translate "Booking reference" %}</span>
       <strong>{{ reservation.code }}</strong>
     </div>
   </header>
 
-  <section class="rs-date-grid" aria-label="Stay dates">
+  <section class="rs-date-grid" aria-label="{% translate "Stay dates" %}">
     <div class="rs-date-card">
-      <div class="rs-label">Check-in</div>
+      <div class="rs-label">{% translate "Check-in" %}</div>
       <div class="rs-date-value">{{ reservation.check_in|date:"j M Y" }}</div>
       <div class="rs-date-sub">{{ reservation.check_in|date:"l" }}</div>
     </div>
 
     <div class="rs-date-card">
-      <div class="rs-label">Check-out</div>
+      <div class="rs-label">{% translate "Check-out" %}</div>
       <div class="rs-date-value">{{ reservation.check_out|date:"j M Y" }}</div>
       <div class="rs-date-sub">{{ reservation.check_out|date:"l" }}</div>
     </div>
 
     <div class="rs-date-card">
-      <div class="rs-label">Duration</div>
+      <div class="rs-label">{% translate "Duration" %}</div>
       <div class="rs-date-value">
-        {{ reservation.nights }} night{{ reservation.nights|pluralize }}
+        {{ reservation.nights|night_count }}
       </div>
-      <div class="rs-date-sub">Your mountain stay</div>
+      <div class="rs-date-sub">{% translate "Your mountain stay" %}</div>
     </div>
   </section>
 
   <div class="rs-layout">
 
     <section class="rs-panel" aria-labelledby="rs-booking-title">
-      <p class="rs-section-tag">Reservation details</p>
-      <h2 id="rs-booking-title">Your booking</h2>
+      <p class="rs-section-tag">{% translate "Reservation details" %}</p>
+      <h2 id="rs-booking-title">{% translate "Your booking" %}</h2>
 
       {% if reservation.status == 'cancelled' %}
         <div class="rs-note cancelled">
-          This reservation has been cancelled.
+          {% translate "This reservation has been cancelled." %}
         </div>
       {% elif reservation.status == 'pending' %}
         <div class="rs-note pending">
           {% if reservation.guest_request %}
-            Your reservation request is awaiting approval from the hut manager.
+            {% translate "Your reservation request is awaiting approval from the hut manager." %}
           {% else %}
-            Your reservation is awaiting confirmation.
+            {% translate "Your reservation is awaiting confirmation." %}
           {% endif %}
         </div>
       {% else %}
         <div class="rs-note">
-          Your reservation is confirmed.
+          {% translate "Your reservation is confirmed." %}
           {% if reservation.email %}
-            Confirmation details were sent to {{ reservation.email }}.
+            {% blocktranslate with v0=reservation.email %}Confirmation details were sent to {{ v0 }}.{% endblocktranslate %}
           {% endif %}
         </div>
       {% endif %}
 
       <div class="rs-info-grid">
         <div class="rs-info-item">
-          <div class="rs-label">Guest name</div>
+          <div class="rs-label">{% translate "Guest name" %}</div>
           <div class="rs-info-value">{{ reservation.name }}</div>
         </div>
 
         <div class="rs-info-item">
-          <div class="rs-label">Reservation status</div>
+          <div class="rs-label">{% translate "Reservation status" %}</div>
           <div class="rs-info-value">
             {% if reservation.guest_request and reservation.status == 'pending' %}
-              Awaiting approval
+              {% translate "Awaiting approval" %}
             {% else %}
-              {{ reservation.get_status_display }}
+              {% translate reservation.get_status_display %}
             {% endif %}
           </div>
         </div>
 
         {% if reservation.email %}
           <div class="rs-info-item">
-            <div class="rs-label">Email address</div>
+            <div class="rs-label">{% translate "Email address" %}</div>
             <div class="rs-info-value">{{ reservation.email }}</div>
           </div>
         {% endif %}
 
         {% if reservation.phone %}
           <div class="rs-info-item">
-            <div class="rs-label">Phone number</div>
+            <div class="rs-label">{% translate "Phone number" %}</div>
             <div class="rs-info-value">{{ reservation.phone }}</div>
           </div>
         {% endif %}
       </div>
 
+      {% if email_delivery_delayed %}<p class="rs-note" role="status">{% translate "Your reservation is saved. Email delivery is delayed. Keep this page and check your status here." %}</p>{% endif %}
       {% if reservation.status != 'cancelled' %}
         <div class="rs-actions">
+        {% if can_manage_directly %}
           <a class="rs-button rs-button-primary"
              href="{% url 'bookings:modify' reservation.code %}">
-            Change dates or beds &rarr;
+            {% translate "Change dates or beds &rarr;" %}
           </a>
 
           <form method="post"
@@ -432,25 +431,27 @@
                 onsubmit="return confirm('Cancel this reservation? This action cannot be undone.');">
             {% csrf_token %}
             <button class="rs-button rs-button-danger" type="submit">
-              Cancel reservation
+              {% translate "Cancel reservation" %}
             </button>
           </form>
+        {% else %}
+          <a class="rs-button rs-button-primary" href="{{ guest_portal_url }}">{% translate "Request a change or cancellation &rarr;" %}</a>
+        {% endif %}
         </div>
       {% endif %}
 
       <p class="rs-help">
-        This page is accessible through your private reservation link.
-        Please avoid sharing it publicly.
+        {% translate "This page is accessible through your private reservation link. Please avoid sharing it publicly." %}
       </p>
     </section>
 
     <section class="rs-panel" aria-labelledby="rs-rooms-title">
-      <p class="rs-section-tag">Accommodation</p>
+      <p class="rs-section-tag">{% translate "Accommodation" %}</p>
       <h2 id="rs-rooms-title">
         {% if reservation.guest_request and reservation.status == 'pending' %}
-          Beds requested
+          {% translate "Beds requested" %}
         {% else %}
-          Reserved beds
+          {% translate "Reserved beds" %}
         {% endif %}
       </h2>
 
@@ -459,7 +460,7 @@
           <div>
             <div class="rs-room-name">{{ item.room.name }}</div>
             <div class="rs-room-beds">
-              {{ item.beds }} bed{{ item.beds|pluralize }}
+              {{ item.beds|bed_count }}
             </div>
           </div>
 
@@ -468,11 +469,11 @@
           </div>
         </div>
       {% empty %}
-        <p>No beds are listed for this reservation.</p>
+        <p>{% translate "No beds are listed for this reservation." %}</p>
       {% endfor %}
 
       <div class="rs-total">
-        <span>Total price</span>
+        <span>{% translate "Total price" %}</span>
         <strong>{{ reservation.total_price }} {{ CURRENCY }}</strong>
       </div>
     </section>

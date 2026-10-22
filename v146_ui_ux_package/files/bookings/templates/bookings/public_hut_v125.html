@@ -1,0 +1,93 @@
+{% extends "bookings/public_base_v124.html" %}
+{% load static %}
+{% block title %}{{ hut.name }} · Rooms & booking{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'bookings/public_hut_v125.css' %}">
+<div class="ph-detail">
+  <div class="pub-container ph-crumbs"><a href="{% url 'bookings:public_home' %}">Home</a><span aria-hidden="true">/</span><a href="{% url 'bookings:hut_list' %}">Explore huts</a><span aria-hidden="true">/</span><span aria-current="page">{{ hut.name }}</span></div>
+  <div class="pub-container ph-intro">
+    <div class="ph-title-group"><span class="pub-eyebrow">YOUR MOUNTAIN STAY</span><h1>{{ hut.name }}</h1><p class="ph-location"><span aria-hidden="true">⌖</span> {{ hut.location|default:"Mountain retreat" }}</p></div>
+    <a class="ph-back-link" href="{% url 'bookings:hut_list' %}"><span aria-hidden="true">←</span> All mountain huts</a>
+  </div>
+  <nav class="pub-container" aria-label="Booking steps"><ol class="sd146-flow"><li><a href="#booking-dates"><b>1</b>Dates &amp; guests</a></li><li><a href="#rooms"><b>2</b>Choose beds</a></li><li><a href="{% if booking %}#guest-details{% else %}#booking-dates{% endif %}"><b>3</b>Your details</a></li><li><a href="{% if booking %}#ph-review{% else %}#booking-dates{% endif %}"><b>4</b>Review request</a></li></ol></nav>
+  <div class="pub-container ph-gallery" aria-label="Hut photograph">
+    {% if hut.image %}
+      <img class="ph-cover" src="{{ hut.image.url }}" alt="{{ hut.name }} mountain hut" fetchpriority="high">
+    {% else %}
+      <div class="ph-cover-fallback" role="img" aria-label="Illustration of a mountain landscape">
+        <svg viewBox="0 0 1100 420" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="ph-sky" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#b9d6c6"/><stop offset="1" stop-color="#e9f1e2"/></linearGradient></defs><path fill="url(#ph-sky)" d="M0 0h1100v420H0z"/><circle cx="825" cy="92" r="48" fill="#f6f4cf"/><path d="M0 370 230 110l170 192 125-143 210 211 130-150 235 200H0Z" fill="#8ba99a"/><path d="M0 420 300 195l145 135 185-120 230 210H0Z" fill="#527f6d"/><path d="M0 420 180 300l160 120 180-110 180 110 165-145 235 145H0Z" fill="#315e4b"/><path d="m204 142 26-32 23 30-26-7-23 9Zm301 41 20-24 24 27-23-7-21 4Z" fill="#e8f0e7"/></svg>
+      </div>
+    {% endif %}
+    <div class="ph-photo-note"><span aria-hidden="true">✳</span> A place to pause, explore and recharge</div>
+  </div>
+  <div class="pub-container ph-layout">
+    <div class="ph-content">
+      <section class="ph-section ph-about" aria-labelledby="ph-about-title">
+        <div class="ph-section-kicker"><span class="ph-kicker-line"></span> THE HUT</div>
+        <h2 id="ph-about-title">A place to call basecamp.</h2>
+        {% if hut.description %}<div class="ph-description">{{ hut.description|linebreaks }}</div>{% else %}<p class="ph-description">Your next mountain stay starts here. Choose your dates to check the rooms and beds at this hut.</p>{% endif %}
+        <div class="ph-facts"><div><span class="ph-fact-icon" aria-hidden="true">⌂</span><span>Mountain accommodation</span></div><div><span class="ph-fact-icon" aria-hidden="true">◷</span><span>Book for your selected nights</span></div><div><span class="ph-fact-icon" aria-hidden="true">✓</span><span>Live bed availability</span></div></div>
+      </section>
+      <section class="ph-section ph-rooms" id="rooms" aria-labelledby="ph-rooms-title">
+        <div class="ph-section-heading"><div><div class="ph-section-kicker"><span class="ph-kicker-line"></span> YOUR OPTIONS</div><h2 id="ph-rooms-title">Rooms &amp; beds</h2><p>Simple choices, clear prices. Every bed is priced per night.</p></div>{% if booking %}<span class="ph-dates-pill">{{ nights }} night{{ nights|pluralize }}</span>{% endif %}</div>
+        {% if booking %}
+          <div class="ph-stay-banner"><span aria-hidden="true">◷</span><div><strong>{{ check_in|date:'D, j M Y' }} — {{ check_out|date:'D, j M Y' }}</strong><span>Availability for your entire stay</span></div><a href="#booking-dates">Change dates</a></div>
+          <form method="post" action="{% url 'bookings:hut_detail' hut.slug %}" id="ph-reservation-form" class="ph-reservation-form" data-nights="{{ nights }}" data-currency="{{ CURRENCY }}">
+            {% csrf_token %}
+<input type="hidden" name="submission_token" value="{{ submission_token }}">
+            <input type="hidden" name="check_in" value="{{ check_in|date:'Y-m-d' }}">
+            <input type="hidden" name="check_out" value="{{ check_out|date:'Y-m-d' }}">
+            {% if booking.non_field_errors %}<div class="ph-error-box" role="alert">{{ booking.non_field_errors }}</div>{% endif %}
+            <div id="ph-fully-booked-msg">{% if not any_free %}<div class="ph-empty" role="status"><strong>Fully booked for these dates.</strong><p>Try a different arrival or departure date to see more options.</p><a href="#booking-dates">Choose other dates →</a></div>{% endif %}</div>
+            <div class="ph-room-list" id="ph-room-list">
+              {% for room, free, field in booking.rows %}
+                <article class="ph-room-card {% if not free %}ph-room-full{% endif %}" data-room-id="{{ room.pk }}" data-room-name="{{ room.name }}">
+                  <div class="ph-room-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20V9l9-6 9 6v11M3 20h18M8 20v-7h8v7"/></svg></div>
+                  <div class="ph-room-info"><h3>{{ room.name }}</h3><p>{{ room.description|default:'A comfortable place to rest after the trail.' }}</p><div class="ph-room-badges"><span>{{ room.capacity }} bed{{ room.capacity|pluralize }} total</span><span class="{% if free %}ph-available{% else %}ph-unavailable{% endif %}">{% if free %}{{ free }} available for your stay{% else %}Full for these dates{% endif %}</span></div></div>
+                  <div class="ph-room-action"><div class="ph-room-price"><strong>{{ room.price_per_night|floatformat:2 }} {{ CURRENCY }}</strong><span>per bed / night</span></div>{% if field %}<label for="{{ field.id_for_label }}">Beds to reserve</label><div class="ph-quantity"><button type="button" data-quantity="-1" data-for="{{ field.id_for_label }}" aria-label="Remove one bed from {{ room.name }}">−</button>{{ field }}<button type="button" data-quantity="1" data-for="{{ field.id_for_label }}" aria-label="Add one bed in {{ room.name }}">+</button></div>{% if field.errors %}<div class="ph-field-errors">{{ field.errors }}</div>{% endif %}{% else %}<span class="ph-room-disabled">Not available</span>{% endif %}</div>
+                </article>
+              {% empty %}
+                <div class="ph-empty"><strong>No rooms are accepting bookings at this hut.</strong><p>Please check back later.</p></div>
+              {% endfor %}
+            </div>
+            <section id="ph-alternatives" class="ph-alternatives" aria-label="Available alternatives">
+             {% if booking.errors and available_rooms %}<p>These rooms can fit your group for the same dates:</p>{% for option in available_rooms %}<button type="button" class="sd146-quiet" data-select-room="{{ option.room.pk }}">{{ option.room.name }} · {{ option.free }} free · {{ option.room.price_per_night|floatformat:2 }} {{ CURRENCY }} / bed / night</button>{% endfor %}{% endif %}
+             {% if insufficient_party %}<p class="sd146-feedback warning">Only {{ available_total }} beds are available for your entire stay. Try another date or adjust your group size.</p>{% if alternative_stays %}<p>Nearby dates with enough beds:</p>{% for stay in alternative_stays %}<button type="submit" class="sd146-quiet" name="preview_stay" value="{{ stay.check_in|date:'Y-m-d' }}:{{ stay.check_out|date:'Y-m-d' }}" data-apply-stay data-check-in="{{ stay.check_in|date:'Y-m-d' }}" data-check-out="{{ stay.check_out|date:'Y-m-d' }}" formnovalidate>{{ stay.check_in|date:'j M' }} – {{ stay.check_out|date:'j M Y' }} · {{ stay.free }} beds available</button>{% endfor %}{% endif %}{% endif %}
+            </section>
+              <section class="ph-guest" {% if not any_free %}hidden{% endif %} id="guest-details" aria-labelledby="ph-guest-title"><div class="ph-section-kicker"><span class="ph-kicker-line"></span> ALMOST THERE</div><h2 id="ph-guest-title">Your details</h2><p>We'll send your request to the hut manager. Your stay is not confirmed until they approve it.</p>
+                <div class="ph-guest-grid">{% for field in booking.visible_fields %}{% if field.name == 'name' or field.name == 'email' or field.name == 'phone' or field.name == 'notes' %}<div class="ph-guest-field {% if field.name == 'notes' %}ph-wide{% endif %}">{{ field.label_tag }}{{ field }}{% if field.errors %}<div class="ph-field-errors">{{ field.errors }}</div>{% endif %}</div>{% endif %}{% endfor %}</div>
+                <section class="ph-review" id="ph-review" aria-labelledby="ph-review-title"><h3 id="ph-review-title">Your request summary</h3><p><strong>{{ hut.name }}</strong><br><span id="ph-review-dates">{{ check_in|date:'j M Y' }} – {{ check_out|date:'j M Y' }}</span></p>
+                <div class="ph-party-row"><label for="ph-party-size">Guests in your group</label><input id="ph-party-size" type="number" name="beds" min="1" max="30" required value="{{ requested_beds|default:1 }}"></div>
+                <p id="ph-selection-status" class="sd146-feedback" role="status" aria-live="polite">{{ selected_beds }} of {{ requested_beds|default:1 }} beds selected.</p><ul id="ph-summary-lines">{% for line in summary_rows %}<li><span>{{ line.room.name }} · {{ line.beds }} beds × {{ nights }} nights</span><strong>{{ line.subtotal|floatformat:2 }} {{ CURRENCY }}</strong></li>{% empty %}<li>Choose beds from the rooms above.</li>{% endfor %}</ul>
+                <div class="ph-checkout"><div><span>Estimated total for <span id="ph-night-count">{{ nights }}</span> nights</span><strong><span id="ph-total" aria-live="polite">{{ estimated_total|floatformat:2 }}</span> {{ CURRENCY }}</strong></div><button class="ph-primary" type="submit" id="ph-request-submit">Request reservation →</button></div></section>
+                <p class="ph-small-print">We check availability again before accepting your request. Selected beds are held while the hut reviews it. You will receive an email when the manager approves or declines.</p>
+              </section>
+          </form>
+        {% else %}
+          <div class="ph-room-list">
+            {% for room in public_rooms %}
+              <article class="ph-room-card"><div class="ph-room-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20V9l9-6 9 6v11M3 20h18M8 20v-7h8v7"/></svg></div><div class="ph-room-info"><h3>{{ room.name }}</h3><p>{{ room.description|default:'A comfortable place to rest after the trail.' }}</p><div class="ph-room-badges"><span>{{ room.capacity }} bed{{ room.capacity|pluralize }} total</span><span>Check dates for availability</span></div></div><div class="ph-room-action"><div class="ph-room-price"><strong>{{ room.price_per_night|floatformat:2 }} {{ CURRENCY }}</strong><span>per bed / night</span></div><a class="ph-choose-link" href="#booking-dates">Check availability <span aria-hidden="true">↗</span></a></div></article>
+            {% empty %}<div class="ph-empty">No rooms are listed at this hut yet.</div>{% endfor %}
+          </div>
+        {% endif %}
+      </section>
+    </div>
+    <aside class="ph-sidebar" id="booking-dates" aria-label="Check booking availability">
+      <div class="ph-booking-panel"><div class="ph-panel-head"><span class="ph-section-kicker">PLAN YOUR STAY</span><h2>Find your bed.</h2><p>Choose your dates to see exactly what's free.</p></div>
+        <form method="get" action="{% url 'bookings:hut_detail' hut.slug %}" id="ph-date-form">
+          {% if search.non_field_errors %}<div class="ph-error-box" role="alert">{{ search.non_field_errors }}</div>{% endif %}
+          <div class="ph-date-fields"><div class="ph-date-field">{{ search.check_in.label_tag }}{{ search.check_in }}{% if search.check_in.errors %}<div class="ph-field-errors">{{ search.check_in.errors }}</div>{% endif %}</div><div class="ph-date-field">{{ search.check_out.label_tag }}{{ search.check_out }}{% if search.check_out.errors %}<div class="ph-field-errors">{{ search.check_out.errors }}</div>{% endif %}</div></div>
+          <div class="ph-date-field"><label for="ph-search-guests">Guests</label><input id="ph-search-guests" type="number" name="beds" min="1" max="30" required value="{{ requested_beds|default:1 }}">{% if party_error %}<div class="ph-field-errors" role="alert">{{ party_error }}</div>{% endif %}</div>
+          <p id="ph-availability-status" role="status" aria-live="polite"></p>
+          <button class="ph-primary ph-check-btn" type="submit">Check availability <span aria-hidden="true">→</span></button>
+        </form>
+        {% if booking %}<div class="ph-booking-result" id="ph-booking-result"><div class="ph-result-top"><span>YOUR STAY</span><strong>{{ nights }} night{{ nights|pluralize }}</strong></div><p>{{ check_in|date:'j M' }} – {{ check_out|date:'j M Y' }}</p>{% if any_free %}<div class="ph-status-good"><span aria-hidden="true">●</span> Beds available — choose below</div><a href="#rooms" class="ph-result-link">Select your beds <span aria-hidden="true">↓</span></a>{% else %}<div class="ph-status-full">No beds available for these dates</div>{% endif %}</div>{% else %}<div class="ph-booking-hint"><span aria-hidden="true">◷</span> Live availability appears after you choose your dates.</div>{% endif %}
+        <div class="ph-panel-foot"><span aria-hidden="true">✓</span> Manager approval required · no account needed</div>
+      </div>
+    </aside>
+  </div>
+  {% if booking %}<a class="ph-mobile-review" href="#ph-review" id="ph-mobile-review" {% if not any_free %}hidden{% endif %}><span id="ph-mobile-count">{{ selected_beds }} beds selected</span><strong id="ph-mobile-total">{{ estimated_total|floatformat:2 }} {{ CURRENCY }}</strong><span>Review request ↓</span></a>{% endif %}
+  <div class="pub-container ph-bottom"><div><span class="pub-eyebrow">READY FOR THE MOUNTAINS?</span><h2>Good nights start with a good place.</h2><p>Find a bed, pack your bag, and head for the trail.</p></div><a href="{% url 'bookings:hut_list' %}">Explore more huts <span aria-hidden="true">↗</span></a></div>
+</div>
+<script src="{% static 'bookings/public_hut_v125.js' %}" defer></script>
+{% endblock %}

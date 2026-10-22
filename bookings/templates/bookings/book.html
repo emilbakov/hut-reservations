@@ -256,6 +256,7 @@
     {% endif %}
 
         {% csrf_token %}
+<input type="hidden" name="submission_token" value="{{ submission_token }}">
 
         <input
             type="hidden"

@@ -124,7 +124,8 @@ class BookingPageTests(TestCase):
         self.assertContains(response, "4 available for your stay")
 
     def test_booking_is_saved_and_emailed(self):
-        response = self.post(dorm=2, small=1)
+        with self.captureOnCommitCallbacks(execute=True):
+            response = self.post(dorm=2, small=1)
         reservation = Reservation.objects.get()
         self.assertRedirects(response, reservation.get_absolute_url())
         self.assertEqual(reservation.total_beds, 3)
@@ -156,13 +157,13 @@ class BookingPageTests(TestCase):
         self.assertContains(self.post(start=3, end=3, dorm=1), "must be after arrival")
         self.assertFalse(Reservation.objects.exists())
 
-    def test_guest_can_cancel(self):
+    def test_guest_cancellation_requires_manager_review(self):
         self.post(small=2)
         reservation = Reservation.objects.get()
         self.client.post(reverse("bookings:cancel", args=[reservation.code]))
         reservation.refresh_from_db()
-        self.assertEqual(reservation.status, "cancelled")
-        self.assertEqual(free_beds([self.small], day(1), day(3))[self.small.pk], 2)
+        self.assertEqual(reservation.status, "pending")
+        self.assertEqual(free_beds([self.small], day(1), day(3))[self.small.pk], 0)
 
 
 class AdminTests(TestCase):
@@ -264,7 +265,10 @@ class CalendarAndModificationTests(TestCase):
         self.assertEqual(self.client.get(reverse("bookings:calendar"),
             {"year": "bad", "month": 13}).status_code, 400)
 
-    def test_guest_can_change_dates_and_beds(self):
+    def test_manager_can_change_dates_and_beds(self):
+        user = get_user_model().objects.create_user('calendar-manager', is_staff=True)
+        self.hut.managers.add(user)
+        self.client.force_login(user)
         response = self.client.post(reverse("bookings:modify", args=[self.reservation.code]), {
             "check_in": day(5).isoformat(), "check_out": day(7).isoformat(),
             f"room_{self.room.pk}": 3,
@@ -276,6 +280,9 @@ class CalendarAndModificationTests(TestCase):
         self.assertEqual(free_beds([self.room], day(2), day(4))[self.room.pk], 3)
 
     def test_failed_modification_keeps_original(self):
+        user = get_user_model().objects.create_user('calendar-manager', is_staff=True)
+        self.hut.managers.add(user)
+        self.client.force_login(user)
         create_reservation(check_in=day(5), check_out=day(7),
             beds_by_room={self.room.pk: 3}, name="Other", email="other@example.com")
         response = self.client.post(reverse("bookings:modify", args=[self.reservation.code]), {
@@ -288,6 +295,9 @@ class CalendarAndModificationTests(TestCase):
         self.assertEqual(self.reservation.total_beds, 2)
 
     def test_cancelled_reservation_cannot_be_modified(self):
+        user = get_user_model().objects.create_user('calendar-manager', is_staff=True)
+        self.hut.managers.add(user)
+        self.client.force_login(user)
         self.reservation.status = Reservation.Status.CANCELLED
         self.reservation.save()
         response = self.client.get(reverse("bookings:modify", args=[self.reservation.code]))

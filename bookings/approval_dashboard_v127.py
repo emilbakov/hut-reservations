@@ -31,6 +31,8 @@ def approval_dashboard(request):
         'confirmed': scoped.filter(status=Reservation.Status.CONFIRMED).count(),
         'cancelled': scoped.filter(status=Reservation.Status.CANCELLED).count(),
     }
+    from .models import ReservationNotification
+    delivery_failures = ReservationNotification.objects.filter(reservation__in=scoped, status='failed').count()
     priority_counts = pending_priorities(scoped, now=now, today=today)
     results = filter_requests(scoped, filters, now=now, today=today)
 
@@ -56,6 +58,7 @@ def approval_dashboard(request):
         )
 
     return render(request, 'bookings/approval_dashboard_v127.html', {
+        'delivery_failures': delivery_failures,
         'page': page, 'huts': huts, 'selected_hut': selected_hut,
         'selected_slug': selected_slug,
         'manager_mode': not request.user.is_superuser,

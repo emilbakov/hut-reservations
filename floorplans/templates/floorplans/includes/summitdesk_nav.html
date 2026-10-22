@@ -1,40 +1,40 @@
-{% load static %}
+{% load i18n ui_v147 static %}
 {% if visible %}
 <link rel="stylesheet" href="{% static 'floorplans/summitdesk_shell_v116.css' %}">
-<a class="sd116-skip" href="#main-content">Skip to main content</a>
+<a class="sd116-skip" href="#main-content">{% translate "Skip to main content" %}</a>
 <div class="sd116-backdrop" id="sd116-backdrop" hidden></div>
-<aside class="sd116-sidebar" id="sd116-sidebar" aria-label="SummitDesk navigation">
+<aside class="sd116-sidebar" id="sd116-sidebar" aria-label="{% translate "SummitDesk navigation" %}">
   <div class="sd116-brand-row">
-    <a class="sd116-brand" href="{{ dashboard_url }}" aria-label="SummitDesk home">
+    <a class="sd116-brand" href="{{ dashboard_url }}" aria-label="{% translate "SummitDesk home" %}">
       <span class="sd116-mark" aria-hidden="true">▲</span>
-      <span>Summit<span class="sd116-brand-light">Desk</span><small>PROPERTY MANAGEMENT</small></span>
+      <span>Summit<span class="sd116-brand-light">Desk</span><small>{% translate "PROPERTY MANAGEMENT" %}</small></span>
     </a>
-    <button class="sd116-close" id="sd116-close" type="button" aria-label="Close menu">✕</button>
+    <button class="sd116-close" id="sd116-close" type="button" aria-label="{% translate "Close menu" %}">✕</button>
   </div>
   <div class="sd116-property">
-    <span class="sd116-property-caption">WORKSPACE</span>
+    <span class="sd116-property-caption">{% translate "WORKSPACE" %}</span>
     {% if property_options|length > 1 %}
-      <label class="sd116-select-label" for="sd116-property-select">Choose property</label>
-      <select id="sd116-property-select" aria-label="Switch property">
-        <option value="">Select a property</option>
+      <label class="sd116-select-label" for="sd116-property-select">{% translate "Choose property" %}</label>
+      <select id="sd116-property-select" aria-label="{% translate "Switch property" %}">
+        <option value="">{% translate "Select a property" %}</option>
         {% for option in property_options %}<option value="{{ option.url }}" {% if option.selected %}selected{% endif %}>{{ option.name }}</option>{% endfor %}
       </select>
     {% elif property_options %}
       <span class="sd116-property-name">{{ property_options.0.name }}</span>
     {% else %}
-      <span class="sd116-property-name">All properties</span>
+      <span class="sd116-property-name">{% translate "All properties" %}</span>
     {% endif %}
   </div>
-  <nav class="sd116-navigation" aria-label="Main staff navigation">
+  <nav class="sd116-navigation" aria-label="{% translate "Main staff navigation" %}">
     {% for group in groups %}
       <div class="sd116-nav-group">
-        <div class="sd116-group-title">{{ group.title }}</div>
+        <div class="sd116-group-title">{% translate group.title %}</div>
         {% for link in group.links %}
           <a href="{{ link.url }}" class="sd116-nav-link{% if link.active %} sd116-selected{% endif %}" {% if link.active %}aria-current="page"{% endif %}>
             <span class="sd116-nav-symbol" aria-hidden="true">
               {% if link.icon == 'layout-dashboard' %}▦{% elif link.icon == 'calendar-days' or link.icon == 'calendar-range' %}▤{% elif link.icon == 'book-open' %}▧{% elif link.icon == 'arrow-left-right' %}⇄{% elif link.icon == 'plus-circle' %}＋{% elif link.icon == 'house' %}⌂{% elif link.icon == 'clipboard-list' %}☷{% elif link.icon == 'bed-double' %}▥{% elif link.icon == 'sparkles' %}✧{% elif link.icon == 'list-checks' %}☑{% elif link.icon == 'users' %}♙{% elif link.icon == 'mail' %}✉{% elif link.icon == 'wallet' %}▣{% elif link.icon == 'chart-no-axes-column' %}▥{% else %}✉{% endif %}
             </span>
-            <span>{{ link.label }}</span>
+            <span>{% translate link.label %}</span>
             {% if link.active %}<span class="sd116-active-indicator" aria-hidden="true"></span>{% endif %}
           </a>
         {% endfor %}
@@ -42,12 +42,12 @@
     {% endfor %}
   </nav>
   <div class="sd116-sidebar-bottom">
-    <a href="{{ public_url }}">↗ &nbsp; Open public website</a>
+    <a href="{{ public_url }}">{% translate "↗ &nbsp; Open public website" %}</a>
     <form method="post" action="{% url 'bookings:staff_logout' %}" class="sd117-signout-form">
       {% csrf_token %}
-      <button type="submit" class="sd117-signout-button">↪ &nbsp; Sign out</button>
+      <button type="submit" class="sd117-signout-button">{% translate "↪ &nbsp; Sign out" %}</button>
     </form>
-    <span>SummitDesk · Staff workspace</span>
+    <span>{% translate "SummitDesk · Staff workspace" %}</span>
   </div>
   <style>
     .sd117-signout-form{margin:0!important;padding:0!important}
@@ -56,15 +56,16 @@
     .sd117-signout-button:focus-visible{outline:3px solid #b6e57d!important;outline-offset:4px!important}
   </style>
 </aside>
-<header class="sd116-topbar" aria-label="Workspace toolbar">
+<header class="sd116-topbar" aria-label="{% translate "Workspace toolbar" %}">
   <div class="sd116-top-left">
-    <button id="sd116-open" class="sd116-menu-button" type="button" aria-label="Open navigation" aria-controls="sd116-sidebar" aria-expanded="false">☰</button>
-    <div class="sd116-top-title"><span>Workspace / {% if hut %}{{ hut.name }}{% else %}All properties{% endif %}</span><strong>{{ title }}</strong></div>
+    <button id="sd116-open" class="sd116-menu-button" type="button" aria-label="{% translate "Open navigation" %}" aria-controls="sd116-sidebar" aria-expanded="false">☰</button>
+    <div class="sd116-top-title"><span>{% translate "Workspace /" %} {% if hut %}{{ hut.name }}{% else %}{% translate "All properties" %}{% endif %}</span><strong>{% translate title %}</strong></div>
   </div>
   <div class="sd116-top-actions">
-    {% if search_url %}<form class="sd116-top-search" method="get" action="{{ search_url }}" role="search"><label class="sd116-sr-only" for="sd116-search">Search reservations</label><input id="sd116-search" type="search" name="q" placeholder="Search reservations" maxlength="100" required><button type="submit" aria-label="Search">⌕</button></form>{% endif %}
-    {% if new_booking_url %}<a class="sd116-create" href="{{ new_booking_url }}"><span aria-hidden="true">＋</span> New booking</a>{% endif %}
-    <span class="sd116-avatar" title="{{ user.get_username }}" aria-label="Signed in as {{ user.get_username }}">{{ user.get_username|slice:':1'|upper }}</span>
+    {% if search_url %}<form class="sd116-top-search" method="get" action="{{ search_url }}" role="search"><label class="sd116-sr-only" for="sd116-search">{% translate "Search reservations" %}</label><input id="sd116-search" type="search" name="q" placeholder="{% translate "Search reservations" %}" maxlength="100" required><button type="submit" aria-label="{% translate "Search" %}">⌕</button></form>{% endif %}
+    {% if new_booking_url %}<a class="sd116-create" href="{{ new_booking_url }}"><span aria-hidden="true">＋</span> {% translate "New reservation" %}</a>{% endif %}
+    {% include "bookings/language_v147.html" %}
+    <span class="sd116-avatar" title="{{ user.get_username }}" aria-label="{% blocktranslate with v0=user.get_username %}Signed in as {{ v0 }}{% endblocktranslate %}">{{ user.get_username|slice:':1'|upper }}</span>
   </div>
 </header>
 <script defer src="{% static 'floorplans/summitdesk_shell_v116.js' %}"></script>

@@ -1,21 +1,22 @@
-<form class="pub-search" method="get" action="{% url 'bookings:hut_list' %}" aria-label="Find available mountain huts">
+<form class="pub-search" method="get" action="{% url 'bookings:hut_list' %}
+{% load i18n ui_v147 %}" aria-label="{% translate "Find available mountain huts" %}">
   <div class="pub-search-field pub-search-destination">
-    <label for="pub-q">Destination or hut</label>
-    <input id="pub-q" type="search" name="q" maxlength="100" value="{{ query }}" placeholder="Where to next?" autocomplete="off">
+    <label for="pub-q">{% translate "Destination or hut" %}</label>
+    <input id="pub-q" type="search" name="q" maxlength="100" value="{{ query }}" placeholder="{% translate "Where to next?" %}" autocomplete="off">
   </div>
   <div class="pub-search-field">
-    <label for="pub-check-in">Check-in</label>
+    <label for="pub-check-in">{% translate "Check-in" %}</label>
     <input id="pub-check-in" name="check_in" type="date" min="{{ search.check_in.field.widget.attrs.min }}" value="{{ search.check_in.value|default_if_none:'' }}" aria-describedby="pub-date-errors">
   </div>
   <div class="pub-search-field">
-    <label for="pub-check-out">Check-out</label>
+    <label for="pub-check-out">{% translate "Check-out" %}</label>
     <input id="pub-check-out" name="check_out" type="date" min="{{ search.check_out.field.widget.attrs.min }}" value="{{ search.check_out.value|default_if_none:'' }}" aria-describedby="pub-date-errors">
   </div>
   <div class="pub-search-field pub-search-beds">
-    <label for="pub-beds">Beds needed</label>
+    <label for="pub-beds">{% translate "Beds needed" %}</label>
     <input id="pub-beds" type="number" name="beds" min="1" max="30" step="1" value="{{ beds }}" required>
   </div>
-  <button class="pub-search-button" type="submit">Find a stay <span aria-hidden="true">→</span></button>
+  <button class="pub-search-button" type="submit">{% translate "Find a stay" %} <span aria-hidden="true">→</span></button>
 </form>
 {% if search.errors or beds_error %}
   <div class="pub-form-errors" id="pub-date-errors" role="alert">
@@ -23,4 +24,4 @@
     {% for error in search.non_field_errors %}<p>{{ error }}</p>{% endfor %}
     {% if beds_error %}<p>{{ beds_error }}</p>{% endif %}
   </div>
-{% else %}<span id="pub-date-errors" class="pub-sr-only">Select both dates to see availability for your stay.</span>{% endif %}
+{% else %}<span id="pub-date-errors" class="pub-sr-only">{% translate "Select both dates to see availability for your stay." %}</span>{% endif %}

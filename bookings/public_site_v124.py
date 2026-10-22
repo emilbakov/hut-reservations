@@ -3,6 +3,7 @@
 This module deliberately reuses the booking service's availability rules.
 No reservation writes or new permission rules are introduced here.
 """
+from django.utils.translation import gettext as _
 from django.db.models import Prefetch, Q
 from django.shortcuts import render
 
@@ -25,7 +26,7 @@ def _directory(request, *, homepage):
         beds_error = ""
     except (TypeError, ValueError):
         beds = 1
-        beds_error = "Choose between 1 and 30 beds."
+        beds_error = _("Choose between 1 and 30 beds.")
 
     huts_qs = Hut.objects.filter(is_active=True)
     if query:

@@ -1,4 +1,5 @@
 {% extends 'bookings/base.html' %}
+{% load l10n %}
 {% block title %}New reservation{% endblock %}
 {% block content %}
 <style>
@@ -97,7 +98,7 @@
               <p class="sd-cal-hint">Tap a date to check a one-night stay. Change check-out above for longer stays. Counts are per night; room availability below covers your whole stay.</p>
             </div>
             {% for row in room_rows %}
-            <div class="sd-room{% if not row.free %} full{% endif %}" data-price="{{ row.room.price_per_night }}" data-free="{{ row.free }}">
+            <div class="sd-room{% if not row.free %} full{% endif %}" data-price="{{ row.room.price_per_night|unlocalize }}" data-free="{{ row.free }}">
               <div><div class="sd-room-name">{{ row.room.name }}</div><div class="sd-room-meta">{{ row.room.capacity }} total · {{ row.unavailable }} unavailable</div><div class="sd-free{% if not row.free %} none{% endif %}">{% if row.free %}{{ row.free }} free for your stay{% else %}No beds free for these dates{% endif %}</div>
                 <div class="sd-meter" role="meter" aria-label="Beds available in {{ row.room.name }}" aria-valuemin="0" aria-valuemax="{{ row.room.capacity }}" aria-valuenow="{{ row.free }}"><span style="width:{% widthratio row.free row.room.capacity 100 %}%"></span></div>
                 <div class="sd-room-price">{{ row.room.price_per_night }} {{ currency }} / bed / night</div>
@@ -151,7 +152,7 @@
   const rows=Array.from(form.querySelectorAll('.sd-room'));
   const totalNode=document.getElementById('sd-selected-beds'),priceNode=document.getElementById('sd-estimate'),statusNode=document.getElementById('sd-selection-status');
   const nights=Number('{{ availability.nights|default:0 }}');
-  function update(){let count=0,cost=0;for(const row of rows){const input=row.querySelector('input[type=number]');if(!input||input.disabled)continue;const value=Number(input.value);if(Number.isInteger(value)&&value>=0){count+=value;cost+=value*Number(row.dataset.price||0)*nights;}}totalNode.textContent=String(count);priceNode.textContent=cost.toFixed(2);statusNode.textContent=count?'Availability will be checked again when you save.':'Select at least one bed to continue.';}
+  function update(){let count=0,cost=0;for(const row of rows){const input=row.querySelector('input[type=number]');if(!input||input.disabled)continue;const value=Number(input.value);if(Number.isInteger(value)&&value>=0){count+=value;cost+=value*Number(row.dataset.price||0)*nights;}}totalNode.textContent=String(count);priceNode.textContent=(window.SummitDeskUI?window.SummitDeskUI.amount(cost):cost.toFixed(2));statusNode.textContent=count?'Availability will be checked again when you save.':'Select at least one bed to continue.';}
   for(const row of rows){const input=row.querySelector('input[type=number]');if(input)input.addEventListener('input',update);}update();
   form.addEventListener('submit',e=>{let count=0;for(const row of rows){const input=row.querySelector('input[type=number]');if(!input||input.disabled)continue;const value=Number(input.value),max=Number(row.dataset.free);if(!Number.isInteger(value)||value<0||value>max){e.preventDefault();input.focus();statusNode.textContent='Choose a whole number within the available beds for each room.';return;}count+=value;}if(!count){e.preventDefault();statusNode.textContent='Select at least one bed before creating the reservation.';return;}const name=form.querySelector('[name=name]');if(name&&!name.value.trim()){e.preventDefault();name.focus();statusNode.textContent='Enter the guest name.';return;}const email=form.querySelector('[name=email]'),phone=form.querySelector('[name=phone]');if(email&&email.required&&!email.value.trim()){e.preventDefault();email.focus();statusNode.textContent='Enter the guest email.';return;}if(email&&!email.required&&!email.value.trim()&&phone&&!phone.value.trim()){e.preventDefault();phone.focus();statusNode.textContent='Enter a phone number or email.';}});
 })();

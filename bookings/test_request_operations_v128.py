@@ -30,9 +30,10 @@ class RequestOperationsTests(TestCase):
         cls.queue = reverse('bookings:approval_dashboard')
         cls.export = reverse('bookings:request_export')
 
-    def make_request(self, *, name='Own Guest', room=None, days=8, status='pending', guest_request=True, old=False, notes=''):
+    def make_request(self, *, name='Own Guest', room=None, days=8, status='pending', guest_request=True, old=False, notes='', code=None):
         room = room or self.room
         r = Reservation.objects.create(
+            code=code if code is not None else f'RQ128{Reservation.objects.count() + 1:06d}',
             name=name, email='guest@example.com', phone='555', notes=notes,
             check_in=self.today + timedelta(days=days),
             check_out=self.today + timedelta(days=days + 2),
@@ -146,6 +147,16 @@ class RequestOperationsTests(TestCase):
         self.assertTrue(row['Hut'].startswith("'@"))
         self.assertTrue(row['Rooms'].startswith("' "))
         self.assertTrue(row['Guest notes'].startswith("' "))
+
+    def test_dash_prefixed_reference_is_escaped_without_changing_the_booking(self):
+        reservation = self.make_request(code='-rtP8iXk8FD5', days=1)
+        self.client.force_login(self.manager)
+        _, rows = self.csv_rows({'priority': 'arrival48'})
+        self.assertEqual([row['Reference'] for row in rows], ["'-rtP8iXk8FD5"])
+        page = self.client.get(self.queue, {'priority': 'arrival48'})
+        self.assertEqual([r.code for r in page.context['page']], ['-rtP8iXk8FD5'])
+        reservation.refresh_from_db()
+        self.assertEqual(reservation.code, '-rtP8iXk8FD5')
 
     def test_export_is_read_only_get_only_and_empty_export_has_header(self):
         self.client.force_login(self.manager)

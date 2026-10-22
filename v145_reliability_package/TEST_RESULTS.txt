@@ -1,0 +1,19 @@
+SummitDesk v145 reliability package
+Validated: 23 October 2026
+
+Application suite: 463 tests, 459 passed, 4 skipped.
+The 4 skips require PostgreSQL: 3 existing transaction/concurrency tests and
+1 new concurrent replay/last-bed test. They were not run against PostgreSQL.
+
+System check: no issues.
+Model/migration drift: no changes detected.
+Installer preflight/install/repeat-install/payload checks: passed.
+Customized baseline refusal: passed.
+Rollback edit and backup-integrity guards: passed.
+Original source restoration and retained additive migration: passed.
+Injected installation write failure recovery: passed.
+SQLite backup contents and mode 600: passed.
+Deployment shell syntax and Python compilation: passed.
+
+Not locally exercised: production PostgreSQL pg_dump, systemd activation,
+real SMTP delivery, and live browser/mobile interaction.

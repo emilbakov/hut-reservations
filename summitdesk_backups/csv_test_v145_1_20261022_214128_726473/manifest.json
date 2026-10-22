@@ -1,0 +1,10 @@
+[
+  {
+    "path": "bookings/test_request_operations_v128.py",
+    "before_sha256": "fad13d893a8076073c94476cb0a9d421ceb79fb74b6cbb077403afde6f239bf1",
+    "after_sha256": "de5f0502125432ef15ddf7675549547e2a013e658cfdd84d37dd501a7ee5becf",
+    "existed": true,
+    "mode": 420,
+    "backup_sha256": "fad13d893a8076073c94476cb0a9d421ceb79fb74b6cbb077403afde6f239bf1"
+  }
+]

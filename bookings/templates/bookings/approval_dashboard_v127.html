@@ -44,6 +44,8 @@
 }
 </style>
 <div class="aq">
+{% if delivery_failures %}<p class="aq-panel" role="alert"><strong>{{ delivery_failures }} email notification{{ delivery_failures|pluralize }} failed.</strong> <a href="{% url 'bookings:notification_deliveries' %}?hut={{ selected_slug|urlencode }}">Review delivery and retry</a></p>{% endif %}
+
   <header class="aq-header">
     <div><p class="aq-kicker">SUMMITDESK / FRONT DESK</p><h1>Guest reservation requests</h1><p>Review new requests, check room and bed details, and respond with confidence. Beds are held while requests await a decision.</p></div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">

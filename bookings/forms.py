@@ -3,6 +3,7 @@ from datetime import timedelta
 from django import forms
 from django.conf import settings
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 
 class DateInput(forms.DateInput):
@@ -13,8 +14,8 @@ class DateInput(forms.DateInput):
 
 
 class SearchForm(forms.Form):
-    check_in = forms.DateField(label="Arrival", widget=DateInput())
-    check_out = forms.DateField(label="Departure", widget=DateInput())
+    check_in = forms.DateField(label=_("Arrival"), widget=DateInput())
+    check_out = forms.DateField(label=_("Departure"), widget=DateInput())
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -29,15 +30,15 @@ class SearchForm(forms.Form):
             return data
         today = timezone.localdate()
         if check_in < today:
-            self.add_error("check_in", "Arrival cannot be in the past.")
+            self.add_error("check_in", _("Arrival cannot be in the past."))
         elif check_in > today + timedelta(days=settings.BOOKING_MAX_DAYS_AHEAD):
-            self.add_error("check_in", "That is too far ahead to book online.")
+            self.add_error("check_in", _("That is too far ahead to book online."))
         if check_out <= check_in:
-            self.add_error("check_out", "Departure must be after arrival.")
+            self.add_error("check_out", _("Departure must be after arrival."))
         elif (check_out - check_in).days > settings.BOOKING_MAX_NIGHTS:
             self.add_error(
                 "check_out",
-                f"Online bookings are limited to {settings.BOOKING_MAX_NIGHTS} nights.",
+                _("Online bookings are limited to %(count)s nights.") % {"count": settings.BOOKING_MAX_NIGHTS},
             )
         return data
 
@@ -45,13 +46,13 @@ class SearchForm(forms.Form):
 class BookingForm(forms.Form):
     """Guest details plus one "how many beds" field per room with space."""
 
-    name = forms.CharField(max_length=100)
-    email = forms.EmailField()
-    phone = forms.CharField(max_length=30, required=False)
+    name = forms.CharField(max_length=100, label=_("Name"))
+    email = forms.EmailField(label=_("Email"))
+    phone = forms.CharField(max_length=30, required=False, label=_("Phone"))
     notes = forms.CharField(
         required=False,
         widget=forms.Textarea(attrs={"rows": 3}),
-        label="Notes for the hut keeper",
+        label=_("Notes for the hut keeper"),
     )
 
     def __init__(self, *args, rooms, free, **kwargs):
@@ -70,7 +71,7 @@ class BookingForm(forms.Form):
                         attrs={"data-price": str(room.price_per_night), "class": "beds"}
                     ),
                     error_messages={
-                        "max_value": f"Only {free[room.pk]} left in {room.name}.",
+                        "max_value": _("Only %(count)s left in %(room)s.") % {"count": free[room.pk], "room": room.name},
                     },
                 )
 
@@ -92,5 +93,5 @@ class BookingForm(forms.Form):
     def clean(self):
         data = super().clean()
         if not self.errors and not any(self.beds_by_room().values()):
-            raise forms.ValidationError("Choose at least one bed.")
+            raise forms.ValidationError(_("Choose at least one bed."))
         return data

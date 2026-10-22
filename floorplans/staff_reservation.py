@@ -117,14 +117,10 @@ def staff_reservation(request, hut_id, code):
                     if locked.guest_request and previous_status != target:
                         if target == "confirmed":
                             from bookings.views import send_confirmation
-                            transaction.on_commit(
-                                lambda locked=locked: send_confirmation(request, locked)
-                            )
+                            send_confirmation(request, locked)
                         elif target == "cancelled":
                             from bookings.guest_requests_v126 import send_guest_request_declined
-                            transaction.on_commit(
-                                lambda locked=locked: send_guest_request_declined(request, locked)
-                            )
+                            send_guest_request_declined(request, locked)
             if not error_message:
                 return redirect(reverse("floorplans:staff_reservation", args=[hut.pk, reservation.code]) + "?status_changed=1")
     items = list(reservation.items.select_related("room").filter(room__hut=hut).order_by("room__position", "pk"))

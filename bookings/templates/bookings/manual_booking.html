@@ -1,4 +1,5 @@
 {% extends 'bookings/base.html' %}
+{% load l10n %}
 {% block title %}New reservation{% endblock %}
 {% block content %}
 <style>
@@ -58,7 +59,7 @@
         <div><h3>{{ row.room.name }}</h3><div class="mb-muted">{{ row.room.price_per_night }} {{ CURRENCY }} per bed / night · {{ row.room.capacity }} total beds</div>
           {% if row.free is not None %}{% if row.free > 0 %}<span class="mb-pill">{{ row.free }} available</span>{% else %}<span class="mb-pill full">Fully booked</span>{% endif %}{% else %}<span class="mb-pill full">Availability unavailable</span>{% endif %}
         </div>
-        <div class="mb-qty" data-price="{{ row.room.price_per_night }}" data-free="{{ row.free|default:0 }}">
+        <div class="mb-qty" data-price="{{ row.room.price_per_night|unlocalize }}" data-free="{{ row.free|default:0 }}">
           <button type="button" data-change="-1" aria-label="Remove one bed from {{ row.room.name }}" {% if not row.free %}disabled{% endif %}>−</button>
           <input type="number" name="beds_{{ row.room.pk }}" aria-label="Beds in {{ row.room.name }}" min="0" max="{{ row.free|default:0 }}" step="1" value="{{ row.requested }}" {% if not row.free %}readonly{% endif %}>
           <button type="button" data-change="1" aria-label="Add one bed to {{ row.room.name }}" {% if not row.free %}disabled{% endif %}>+</button>
@@ -94,7 +95,7 @@
  const quantities=[...booking.querySelectorAll('.mb-qty')];
  const inDate=booking.querySelector('[name="check_in"]').value, outDate=booking.querySelector('[name="check_out"]').value;
  const nights=Math.max(0,Math.round((Date.parse(outDate+'T00:00:00')-Date.parse(inDate+'T00:00:00'))/86400000));
- function update(){let beds=0,total=0;for(const group of quantities){const input=group.querySelector('input');const max=Number(group.dataset.free)||0;let val=Number(input.value);if(!Number.isInteger(val)||val<0)val=0;val=Math.min(val,max);input.value=val;beds+=val;total+=val*(Number(group.dataset.price)||0)*nights;}document.getElementById('mb-bed-count').textContent=beds;document.getElementById('mb-estimate').textContent=total.toFixed(2);return beds;}
+ function update(){let beds=0,total=0;for(const group of quantities){const input=group.querySelector('input');const max=Number(group.dataset.free)||0;let val=Number(input.value);if(!Number.isInteger(val)||val<0)val=0;val=Math.min(val,max);input.value=val;beds+=val;total+=val*(Number(group.dataset.price)||0)*nights;}document.getElementById('mb-bed-count').textContent=beds;document.getElementById('mb-estimate').textContent=(window.SummitDeskUI?window.SummitDeskUI.amount(total):total.toFixed(2));return beds;}
  quantities.forEach(group=>{const input=group.querySelector('input');group.querySelectorAll('[data-change]').forEach(btn=>btn.addEventListener('click',()=>{input.value=(Number(input.value)||0)+Number(btn.dataset.change);update();}));input.addEventListener('input',update);});
  const status=document.getElementById('mb-suggest-status');
  document.getElementById('mb-suggest').addEventListener('click',()=>{

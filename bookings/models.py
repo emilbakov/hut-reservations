@@ -8,6 +8,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import F, Q
 from django.urls import reverse
+from django.utils import timezone
 
 
 def make_code():
@@ -600,3 +601,32 @@ class PreArrivalReminder(models.Model):
 
     def __str__(self):
         return f"Pre-arrival reminder for {self.reservation.code}"             
+
+
+class PublicBookingSubmission(models.Model):
+    """A browser-scoped idempotency record, committed with its booking."""
+    key = models.CharField(max_length=64, unique=True)
+    payload_hash = models.CharField(max_length=64)
+    reservation = models.ForeignKey(Reservation, null=True, blank=True, on_delete=models.SET_NULL)
+    expires_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class ReservationNotification(models.Model):
+    """Durable delivery state; private message bodies never appear in staff UI."""
+    reservation = models.ForeignKey(Reservation, on_delete=models.CASCADE, related_name='delivery_notifications')
+    dedupe_key = models.CharField(max_length=64, unique=True)
+    kind = models.CharField(max_length=32)
+    recipient = models.EmailField()
+    subject = models.CharField(max_length=255)
+    body = models.TextField()
+    status = models.CharField(max_length=12, default='pending', choices=[('pending', 'Queued'), ('sent', 'Sent'), ('failed', 'Failed'), ('skipped', 'Not needed')])
+    attempts = models.PositiveIntegerField(default=0)
+    next_attempt_at = models.DateTimeField(default=timezone.now)
+    last_attempt_at = models.DateTimeField(null=True, blank=True)
+    sent_at = models.DateTimeField(null=True, blank=True)
+    last_error = models.CharField(max_length=250, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [models.Index(fields=['status', 'next_attempt_at'], name='sd145_notification_due')]

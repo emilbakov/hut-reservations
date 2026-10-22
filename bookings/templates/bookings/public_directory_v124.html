@@ -1,11 +1,12 @@
 {% extends "bookings/public_base_v124.html" %}
-{% block title %}Explore mountain huts{% endblock %}
+{% load i18n ui_v147 %}
+{% block title %}{% translate "Explore mountain huts" %}{% endblock %}
 {% block content %}
-<section class="pub-directory-heading"><div class="pub-container"><span class="pub-eyebrow">EXPLORE THE MOUNTAINS</span><h1>Find your <em>next basecamp.</em></h1><p>Search by hut or location, check availability and book your mountain stay.</p></div></section>
-<div class="pub-container pub-directory-search"><div class="pub-search-panel"><div class="pub-search-panel-title"><span>SEARCH MOUNTAIN HUTS</span><span class="pub-search-hint">Availability is checked for your full stay</span></div>{% include "bookings/public_search_v124.html" %}</div></div>
+<section class="pub-directory-heading"><div class="pub-container"><span class="pub-eyebrow">{% translate "EXPLORE THE MOUNTAINS" %}</span><h1>{% translate "Find your" %} <em>{% translate "next basecamp." %}</em></h1><p>{% translate "Search by hut or location, check availability and book your mountain stay." %}</p></div></section>
+<div class="pub-container pub-directory-search"><div class="pub-search-panel"><div class="pub-search-panel-title"><span>{% translate "SEARCH MOUNTAIN HUTS" %}</span><span class="pub-search-hint">{% translate "Availability is checked for your full stay" %}</span></div>{% include "bookings/public_search_v124.html" %}</div></div>
 <section class="pub-container pub-section pub-directory-results">
-  <div class="pub-section-heading"><div><span class="pub-eyebrow">YOUR MOUNTAIN STAYS</span><h2>{% if dates_valid %}Huts with space for you{% elif query %}Search results{% else %}Explore all huts{% endif %}</h2></div><span class="pub-result-count">{{ cards|length }} hut{{ cards|length|pluralize }}{% if dates_valid %} · {{ beds }} bed{{ beds|pluralize }} needed{% endif %}</span></div>
-  {% if dates_valid %}<p class="pub-section-lead">Available beds are calculated for every night from {{ check_in|date:"j M" }} to {{ check_out|date:"j M Y" }}. Availability can change before you complete your booking.</p>{% else %}<p class="pub-section-lead">Choose your check-in and check-out dates above to see how many beds are free.</p>{% endif %}
+  <div class="pub-section-heading"><div><span class="pub-eyebrow">{% translate "YOUR MOUNTAIN STAYS" %}</span><h2>{% if dates_valid %}{% translate "Huts with space for you" %}{% elif query %}{% translate "Search results" %}{% else %}{% translate "Explore all huts" %}{% endif %}</h2></div><span class="pub-result-count">{{ cards|length|hut_count }}{% if dates_valid %} {% blocktranslate with v0=beds|bed_count %}· {{ v0 }} needed{% endblocktranslate %}{% endif %}</span></div>
+  {% if dates_valid %}<p class="pub-section-lead">{% blocktranslate with v0=check_in|date:"j M" v1=check_out|date:"j M Y" %}Available beds are calculated for every night from {{ v0 }} to {{ v1 }}. Availability can change before you complete your booking.{% endblocktranslate %}</p>{% else %}<p class="pub-section-lead">{% translate "Choose your check-in and check-out dates above to see how many beds are free." %}</p>{% endif %}
   {% include "bookings/public_cards_v124.html" %}
 </section>
 {% endblock %}

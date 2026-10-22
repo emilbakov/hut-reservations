@@ -25,7 +25,7 @@ BOOKINGS_STAFF = frozenset({
     'approval_dashboard', 'manager_digest_preferences',
     'manager_digest_preview', 'manager_digest_history',
     'availability_calendar', 'calendar_create', 'calendar_edit',
-    'calendar_timeline', 'calendar_move',
+    'calendar_timeline', 'calendar_move', 'notification_deliveries',
 })
 
 FRONT_DESK = {
@@ -62,7 +62,7 @@ GLOBAL_WORKSPACE = {
     'conversation_inbox': 'guests', 'conversation_thread': 'guests',
     'quick_replies': 'guests',
     'guest_link_controls': 'guests',
-    'approval_dashboard': 'approvals',
+    'approval_dashboard': 'approvals', 'notification_deliveries': 'email_delivery',
     'manager_digest_preferences': 'reminders',
     'manager_digest_preview': 'reminders',
     'manager_digest_history': 'reminders',
@@ -163,16 +163,14 @@ def summitdesk_nav(context):
     if user.is_staff:
         group('Front desk', [
             b('dashboard', 'Overview', 'layout-dashboard', 'dashboard'),
-            b('calendar_timeline', 'Reservation calendar', 'calendar-days', 'calendar'),
+            b('calendar_timeline', 'Weekly reservation calendar', 'calendar-days', 'calendar'),
             b('manager_reservations', 'Reservations', 'book-open', 'reservations'),
             b('manager_stays', 'Arrivals & departures', 'arrow-left-right', 'stays'),
-            b('manual_booking', 'New reservation', 'plus-circle', 'new'),
         ])
     if hut and manager:
         group('Property operations', [
             f('staff_hub', 'Property dashboard', 'house', 'property'),
-            f('staff_calendar', 'Property calendar', 'calendar-range', 'property_calendar'),
-            f('staff_new_booking', 'New reservation', 'plus-circle', 'new'),
+            f('staff_calendar', 'Monthly stay planner', 'calendar-range', 'property_calendar'),
             f('staff_arrivals', 'Property arrivals', 'arrow-left-right', 'property_stays'),
             f('staff_overview', 'Daily operations', 'clipboard-list', 'operations'),
             f('visual_beds', 'Rooms & beds', 'bed-double', 'beds'),
@@ -200,11 +198,17 @@ def summitdesk_nav(context):
             b('communications_dashboard', 'Guest communication', 'messages-square', 'guests'),
             b('conversation_inbox', 'Guest inbox', 'mail', 'guests'),
             b('approval_dashboard', 'Guest approvals', 'clipboard-list', 'approvals'),
+            b('notification_deliveries', 'Email delivery', 'mail', 'email_delivery'),
             b('manager_digest_preferences', 'Reminder settings', 'mail', 'reminders'),
         ])
 
+    if user.is_superuser:
+        group('Administration', [{'url': reverse('admin:index'), 'label': 'Django admin', 'icon': 'settings', 'active': False, 'key': 'admin'}])
+
     current_link = next((link for g in groups for link in g['links'] if link['active']), None)
     title = current_link['label'] if current_link else 'Workspace'
+    if match.url_name in ('staff_new_booking', 'manual_booking', 'calendar_create'):
+        title = 'New reservation'
     if match.url_name in ('staff_reservation', 'calendar_edit'):
         title = 'Reservation details'
     if match.url_name == 'staff_search':
@@ -221,9 +225,6 @@ def summitdesk_nav(context):
         'role': 'Manager' if manager else 'Cleaner', 'search_url': search_url,
         'property_options': property_options, 'user': user,
         'dashboard_url': _url('bookings', 'dashboard') if user.is_staff else _url('floorplans', 'staff_hub', hut_id=hut.pk),
-        'new_booking_url': (b('manual_booking', 'New reservation', 'plus-circle', 'new')['url']
-                            if user.is_staff else
-                            f('staff_new_booking', 'New reservation', 'plus-circle', 'new')['url']
-                            if hut and manager else None),
+        'new_booking_url': (_url('floorplans', 'staff_new_booking', hut_id=hut.pk) if hut and manager else _url('bookings', 'manual_booking')) if user.is_staff else None,
         'public_url': _url('bookings', 'hut_list'),
     }

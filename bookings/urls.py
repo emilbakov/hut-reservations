@@ -182,3 +182,7 @@ urlpatterns += [
     path('staff/availability/week/', calendar_timeline, name='calendar_timeline'),
     path('staff/availability/move/', calendar_move, name='calendar_move'),
 ]
+
+# v145: property-scoped delivery status and retry.
+from .delivery_views_v145 import notification_deliveries
+urlpatterns += [path('staff/reservation-email/', notification_deliveries, name='notification_deliveries')]

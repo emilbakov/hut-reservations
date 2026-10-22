@@ -1,0 +1,12 @@
+{% extends 'bookings/public_base_v124.html' %}
+{% block title %}Private reservation access{% endblock %}
+{% block content %}
+<section class="pub-container" style="max-width:650px;padding-top:50px;padding-bottom:70px">
+  <h1>Open your private reservation link</h1>
+  <p>For your privacy, a booking reference alone no longer opens reservation details.</p>
+  <p>Use the private link from your email, or request another copy below. A hut manager must reissue access if the previous link was disabled.</p>
+  {% for message in messages %}<p role="status">{{ message }}</p>{% endfor %}
+  <form method="post">{% csrf_token %}<button class="pub-search-button" type="submit">Email my private link</button></form>
+  <p>No longer have access to the booking email? Contact the hut directly.</p>
+</section>
+{% endblock %}

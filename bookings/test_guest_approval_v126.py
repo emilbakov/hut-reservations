@@ -41,10 +41,11 @@ class GuestApprovalTests(TestCase):
         }
 
     def submit(self, beds=2):
-        return self.client.post(
-            reverse('bookings:hut_detail', kwargs={'slug': self.hut.slug}),
-            self.guest_payload(beds),
-        )
+        with self.captureOnCommitCallbacks(execute=True):
+            return self.client.post(
+                reverse('bookings:hut_detail', kwargs={'slug': self.hut.slug}),
+                self.guest_payload(beds),
+            )
 
     def test_guest_request_not_confirmed_and_manager_notified(self):
         response = self.submit()
@@ -59,7 +60,8 @@ class GuestApprovalTests(TestCase):
         guest_mail = next(message for message in mail.outbox if message.to == ['guest@example.com'])
         manager_mail = next(message for message in mail.outbox if message.to == ['manager@example.com'])
         self.assertIn('awaiting approval', guest_mail.subject.lower())
-        self.assertIn(reservation.get_absolute_url(), guest_mail.body)
+        self.assertIn('/guest/manage/', guest_mail.body)
+        self.assertNotIn('/guest/manage/', manager_mail.body)
         self.assertNotIn(reservation.get_absolute_url(), manager_mail.body)
         self.assertIn('action required', manager_mail.subject.lower())
 

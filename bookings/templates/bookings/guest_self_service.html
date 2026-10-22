@@ -1,5 +1,6 @@
 {% extends "bookings/base.html" %}
-{% block title %}Manage your reservation{% endblock %}
+{% load i18n ui_v147 %}
+{% block title %}{% translate "Manage your reservation" %}{% endblock %}
 {% block content %}
 <style>
 .gss-page{--forest:#143e32;--deep:#0b2b24;--lime:#c9f16b;--ink:#172e29;--muted:#64746e;--line:#dce7df;--paper:#fff;max-width:1120px;margin:0 auto 3rem;color:var(--ink)}
@@ -15,62 +16,64 @@
 </style>
 <div class="gss-page">
   <header class="gss-hero">
-    <div class="gss-eyebrow">Your mountain stay · Reservation details</div>
-    <h1>Your reservation at {{ hut.name }}</h1>
-    <p>Everything you need to review your booking and contact the hut team about changes.</p>
-    <div class="gss-hero-meta"><span class="gss-pill">{{ reservation.get_status_display }}</span><span class="gss-ref">Reference: <strong>{{ reservation.code }}</strong></span></div>
+    <div class="gss-eyebrow">{% translate "Your mountain stay · Reservation details" %}</div>
+    <h1>{% blocktranslate with v0=hut.name %}Your reservation at {{ v0 }}{% endblocktranslate %}</h1>
+    <p>{% translate "Everything you need to review your booking and contact the hut team about changes." %}</p>
+    <div class="gss-hero-meta"><span class="gss-pill">{% if reservation.guest_request and reservation.status == 'pending' %}{% translate "Awaiting hut approval" %}{% else %}{% translate reservation.get_status_display %}{% endif %}</span><span class="gss-ref">{% translate "Reference:" %} <strong>{{ reservation.code }}</strong></span></div>
+    {% if reservation.guest_request and reservation.status == 'pending' %}<p>{% translate "Your request is saved. Your stay is not confirmed until the hut manager approves it." %}</p>{% endif %}
   </header>
   <div class="gss-grid">
     <section class="gss-card" aria-labelledby="gss-booking-title">
-      <div class="gss-card-head"><h2 id="gss-booking-title">Your stay</h2><span class="gss-pill">{{ reservation.nights }} night{{ reservation.nights|pluralize }}</span></div>
-      <div class="gss-dates"><div><span class="gss-date-label">Check-in</span><span class="gss-date-value">{{ reservation.check_in|date:"j M Y" }}</span></div><span class="gss-arrow" aria-hidden="true">→</span><div><span class="gss-date-label">Check-out</span><span class="gss-date-value">{{ reservation.check_out|date:"j M Y" }}</span></div></div>
-      <p class="gss-nights">Your reservation includes the rooms and beds listed below.</p>
-      <div class="gss-table-wrap"><table><thead><tr><th scope="col">Room</th><th scope="col">Beds</th><th scope="col" class="gss-price">Price per night</th></tr></thead><tbody>{% for item in items %}<tr><td><strong>{{ item.room.name }}</strong></td><td>{{ item.beds }}</td><td class="gss-price">{{ item.price_per_night }} {{ currency }}</td></tr>{% empty %}<tr><td colspan="3">No rooms listed for this reservation.</td></tr>{% endfor %}</tbody></table></div>
-      <div class="gss-total"><span>Reservation total</span><strong>{{ reservation.total_price }} {{ currency }}</strong></div>
+      <div class="gss-card-head"><h2 id="gss-booking-title">{% translate "Your stay" %}</h2><span class="gss-pill">{{ reservation.nights|night_count }}</span></div>
+      <div class="gss-dates"><div><span class="gss-date-label">{% translate "Check-in" %}</span><span class="gss-date-value">{{ reservation.check_in|date:"j M Y" }}</span></div><span class="gss-arrow" aria-hidden="true">→</span><div><span class="gss-date-label">{% translate "Check-out" %}</span><span class="gss-date-value">{{ reservation.check_out|date:"j M Y" }}</span></div></div>
+      <p class="gss-nights">{% translate "Your reservation includes the rooms and beds listed below." %}</p>
+      <div class="gss-table-wrap"><table><thead><tr><th scope="col">{% translate "Room" %}</th><th scope="col">{% translate "Beds" %}</th><th scope="col" class="gss-price">{% translate "Price per night" %}</th></tr></thead><tbody>{% for item in items %}<tr><td><strong>{{ item.room.name }}</strong></td><td>{{ item.beds }}</td><td class="gss-price">{{ item.price_per_night }} {{ currency }}</td></tr>{% empty %}<tr><td colspan="3">{% translate "No rooms listed for this reservation." %}</td></tr>{% endfor %}</tbody></table></div>
+      <div class="gss-total"><span>{% translate "Reservation total" %}</span><strong>{{ reservation.total_price }} {{ currency }}</strong></div>
     </section>
     <section class="gss-card" aria-labelledby="gss-payment-title">
-      <div class="gss-card-head"><h2 id="gss-payment-title">Deposit overview</h2></div>
+      <div class="gss-card-head"><h2 id="gss-payment-title">{% translate "Deposit overview" %}</h2></div>
       {% if summary %}
-      <div class="gss-stat"><span>Deposit required</span><strong>{{ summary.target }} {{ currency }}</strong></div>
-      <div class="gss-stat"><span>Net payments received</span><strong>{{ summary.net_paid }} {{ currency }}</strong></div>
-      <div class="gss-stat gss-stat--important"><span>Deposit remaining</span><strong>{{ summary.remaining }} {{ currency }}</strong></div>
-      <div class="gss-stat"><span>Deposit due date</span><strong>{{ summary.due_date }}</strong></div>
-      <p class="gss-subtitle">For payment questions, contact the hut directly.</p>
-      {% else %}<p class="gss-subtitle">No deposit details are currently available for this reservation.</p>{% endif %}
+      <div class="gss-stat"><span>{% translate "Deposit required" %}</span><strong>{{ summary.target }} {{ currency }}</strong></div>
+      <div class="gss-stat"><span>{% translate "Net payments received" %}</span><strong>{{ summary.net_paid }} {{ currency }}</strong></div>
+      <div class="gss-stat gss-stat--important"><span>{% translate "Deposit remaining" %}</span><strong>{{ summary.remaining }} {{ currency }}</strong></div>
+      <div class="gss-stat"><span>{% translate "Deposit due date" %}</span><strong>{{ summary.due_date }}</strong></div>
+      <p class="gss-subtitle">{% translate "For payment questions, contact the hut directly." %}</p>
+      {% else %}<p class="gss-subtitle">{% translate "No deposit details are currently available for this reservation." %}</p>{% endif %}
     </section>
   </div>
+  {% if email_delivery_delayed %}<p class="gss-info" role="status">{% translate "Your reservation is saved. Email delivery is delayed. You can continue checking the status on this page." %}</p>{% endif %}
   {% if can_request %}
   <section class="gss-card" aria-labelledby="gss-change-title">
-    <h2 id="gss-change-title">Request a change</h2>
-    <p class="gss-subtitle">Need to change your dates or cancel? Send a request to the hut manager.</p>
-    <div class="gss-info"><strong>Important:</strong> Sending a request does not change or cancel your booking automatically. The hut manager must review it.</div>
+    <h2 id="gss-change-title">{% translate "Request a change" %}</h2>
+    <p class="gss-subtitle">{% translate "Need to change your dates or cancel? Send a request to the hut manager." %}</p>
+    <div class="gss-info"><strong>{% translate "Important:" %}</strong> {% translate "Sending a request does not change or cancel your booking automatically. The hut manager must review it." %}</div>
     <form method="post" id="gss-request-form">
       {% csrf_token %}
       <div class="gss-form-grid">
-        <div class="gss-field gss-field--full"><label for="gss-request-type">Request type</label><select name="request_type" id="gss-request-type" required><option value="change">Change dates / booking</option><option value="cancellation">Request cancellation</option></select></div>
-        <div class="gss-field gss-date-field"><label for="gss-check-in">Requested arrival (for changes)</label><input type="date" name="requested_check_in" id="gss-check-in"></div>
-        <div class="gss-field gss-date-field"><label for="gss-check-out">Requested departure (for changes)</label><input type="date" name="requested_check_out" id="gss-check-out"></div>
-        <div class="gss-field gss-field--full"><label for="gss-details">Additional details</label><textarea name="details" id="gss-details" maxlength="2000" placeholder="Tell the hut manager what you'd like to change or why you need to cancel."></textarea></div>
+        <div class="gss-field gss-field--full"><label for="gss-request-type">{% translate "Request type" %}</label><select name="request_type" id="gss-request-type" required><option value="change">{% translate "Change dates / booking" %}</option><option value="cancellation">{% translate "Request cancellation" %}</option></select></div>
+        <div class="gss-field gss-date-field"><label for="gss-check-in">{% translate "Requested arrival (for changes)" %}</label><input type="date" name="requested_check_in" id="gss-check-in"></div>
+        <div class="gss-field gss-date-field"><label for="gss-check-out">{% translate "Requested departure (for changes)" %}</label><input type="date" name="requested_check_out" id="gss-check-out"></div>
+        <div class="gss-field gss-field--full"><label for="gss-details">{% translate "Additional details" %}</label><textarea name="details" id="gss-details" maxlength="2000" placeholder="{% translate "Tell the hut manager what you'd like to change or why you need to cancel." %}"></textarea></div>
       </div>
-      <button class="gss-btn" type="submit">Submit request →</button>
+      <button class="gss-btn" type="submit">{% translate "Submit request →" %}</button>
     </form>
   </section>
   {% endif %}
-  <section class="gss-card" aria-labelledby="gss-history-title"><div class="gss-card-head"><h2 id="gss-history-title">Your requests</h2></div>
-    {% for change in requests %}<article class="gss-request"><div class="gss-request-top"><div><strong>{{ change.get_request_type_display }}</strong> <span class="gss-pill">{{ change.get_status_display }}</span></div><time>{{ change.created_at|date:"j M Y H:i" }}</time></div>{% if change.manager_note %}<p><strong>Manager's note:</strong> {{ change.manager_note }}</p>{% endif %}</article>
-    {% empty %}<div class="gss-empty">You haven't submitted any requests yet.</div>{% endfor %}
+  <section class="gss-card" aria-labelledby="gss-history-title"><div class="gss-card-head"><h2 id="gss-history-title">{% translate "Your requests" %}</h2></div>
+    {% for change in requests %}<article class="gss-request"><div class="gss-request-top"><div><strong>{% translate change.get_request_type_display %}</strong> <span class="gss-pill">{% translate change.get_status_display %}</span></div><time>{{ change.created_at|date:"j M Y H:i" }}</time></div>{% if change.manager_note %}<p><strong>{% translate "Manager's note:" %}</strong> {{ change.manager_note }}</p>{% endif %}</article>
+    {% empty %}<div class="gss-empty">{% translate "You haven't submitted any requests yet." %}</div>{% endfor %}
   </section>
   <section class="gss-card" id="guest-conversation" aria-labelledby="gss-conversation-title">
-    <h2 id="gss-conversation-title">Messages with the hut team</h2>
-    <p class="gss-subtitle">You can send messages here and read replies from the hut team. Refresh the page to see new replies. Email replies are not imported into this conversation.</p>
-    <div class="v134-thread" role="log" aria-label="Conversation messages">
+    <h2 id="gss-conversation-title">{% translate "Messages with the hut team" %}</h2>
+    <p class="gss-subtitle">{% translate "You can send messages here and read replies from the hut team. Refresh the page to see new replies. Email replies are not imported into this conversation." %}</p>
+    <div class="v134-thread" role="log" aria-label="{% translate "Conversation messages" %}">
       {% for entry in conversation_messages %}
-      <article class="v134-bubble {% if entry.sender == 'manager' %}team{% endif %}"><div class="v134-meta"><strong>{% if entry.sender == 'manager' %}Hut team{% else %}You{% endif %}</strong><time>{{ entry.created_at|date:"j M Y, H:i" }}</time></div>{% if entry.subject %}<strong>{{ entry.subject }}</strong>{% endif %}<p>{{ entry.body }}</p></article>
-      {% empty %}<div class="gss-empty">No messages yet.</div>{% endfor %}
+      <article class="v134-bubble {% if entry.sender == 'manager' %}team{% endif %}"><div class="v134-meta"><strong>{% if entry.sender == 'manager' %}{% translate "Hut team" %}{% else %}{% translate "You" %}{% endif %}</strong><time>{{ entry.created_at|date:"j M Y, H:i" }}</time></div>{% if entry.subject %}<strong>{{ entry.subject }}</strong>{% endif %}<p>{{ entry.body }}</p></article>
+      {% empty %}<div class="gss-empty">{% translate "No messages yet." %}</div>{% endfor %}
     </div>
-    {% if can_message %}<form method="post" action="{% url 'bookings:guest_send_message' guest_token %}">{% csrf_token %}<div class="gss-field"><label for="gss-message">Your message</label><textarea id="gss-message" name="body" maxlength="2000" required placeholder="Ask a question about your stay..."></textarea></div><button class="gss-btn" type="submit">Send message →</button></form><p class="v134-message-note">This sends a message inside SummitDesk, not an email. For urgent matters, contact the hut directly.</p>{% else %}<p class="v134-message-note">Messaging for this stay is closed.</p>{% endif %}
+    {% if can_message %}<form method="post" action="{% url 'bookings:guest_send_message' guest_token %}">{% csrf_token %}<div class="gss-field"><label for="gss-message">{% translate "Your message" %}</label><textarea id="gss-message" name="body" maxlength="2000" required placeholder="{% translate "Ask a question about your stay..." %}"></textarea></div><button class="gss-btn" type="submit">{% translate "Send message →" %}</button></form><p class="v134-message-note">{% translate "This sends a message inside SummitDesk, not an email. For urgent matters, contact the hut directly." %}</p>{% else %}<p class="v134-message-note">{% translate "Messaging for this stay is closed." %}</p>{% endif %}
   </section>
-  <aside class="gss-privacy"><span class="gss-privacy-symbol" aria-hidden="true">🔒</span><p><strong>Keep this link private.</strong> Anyone with this link can view your reservation and submit requests on your behalf.</p></aside>
+  <aside class="gss-privacy"><span class="gss-privacy-symbol" aria-hidden="true">🔒</span><p><strong>{% translate "Keep this link private." %}</strong> {% translate "Anyone with this link can view your reservation and submit requests on your behalf." %}</p></aside>
 </div>
 <script>
 (function(){

@@ -8,6 +8,7 @@ from collections import defaultdict
 from datetime import date, timedelta
 
 from django.conf import settings
+from django.utils.formats import date_format
 
 from .models import BedClosure, Reservation, ReservationItem
 
@@ -90,7 +91,7 @@ def booking_month(rooms, selected_start, selected_end, *, today, month_value=Non
     prev_month = (target - timedelta(days=1)).replace(day=1)
     next_month = (last_day + timedelta(days=1)).replace(day=1)
     return {
-        'label': target.strftime('%B %Y'), 'month': target.strftime('%Y-%m'),
+        'label': date_format(target, 'F Y'), 'month': target.strftime('%Y-%m'),
         'weeks': weeks,
         'prev': prev_month.strftime('%Y-%m') if prev_month >= first_allowed else None,
         'next': next_month.strftime('%Y-%m') if next_month <= last_allowed else None,

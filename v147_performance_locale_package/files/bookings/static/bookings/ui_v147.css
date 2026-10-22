@@ -1,0 +1,10 @@
+.sd147-language{display:inline-flex!important;align-items:center;gap:3px;margin:0!important;padding:3px!important;border:1px solid #92aa99;border-radius:10px;background:#f4f8f2;flex:none;width:auto!important}
+.sd147-language button{display:inline-grid;place-items:center;min-width:42px;min-height:40px;padding:6px!important;margin:0!important;border:0;border-radius:7px;background:transparent;color:#234c38;font:750 13px/1.2 system-ui,sans-serif;cursor:pointer}
+.sd147-language button[aria-pressed=true]{background:#195b42;color:white}.sd147-language button:focus-visible{outline:3px solid #507b13;outline-offset:3px}
+:is(.public-v124,.sd116-active) :is(button,a,input,textarea,select,summary):focus-visible{outline:3px solid #507b13;outline-offset:3px}
+.sd140-status:focus,#sd140-status:focus,.ph-error-box:focus{outline:3px solid #507b13;outline-offset:3px}
+.ph-room-info,.ph-room-action,.ph-checkout>div{min-width:0}.ph-room-price strong,.ph-checkout strong{overflow-wrap:anywhere}
+.sd116-top-actions{flex-wrap:wrap}.pub-header-inner{flex-wrap:wrap}.pub-header .sd147-language{margin-left:auto!important}
+.sd116-sidebar :is(a,button,select,input):focus-visible{outline-color:#c9ef71}
+@media(max-width:600px){.pub-brand-name small{display:none}.pub-header-inner{gap:8px}.sd116-top-actions .sd147-language{order:2}.sd116-top-actions{gap:6px}.sd147-language button{min-width:36px}.ph-mobile-review{flex-wrap:wrap}.sd140-summary p{overflow-wrap:anywhere}}
+@media(forced-colors:active){.sd140-pick[aria-pressed=true]{outline:3px solid Highlight}.sd146-boundary{font-weight:bold}}

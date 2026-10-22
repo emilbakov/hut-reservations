@@ -31,7 +31,10 @@ def append_guest_portal_to_confirmation(request, reservation, body):
     """Append guest-only access instructions to the guest confirmation body."""
     if not reservation.email or single_hut_id(reservation) is None:
         return body
-    url = guest_portal_url(reservation, request)
+    try:
+        url = guest_portal_url(reservation, request)
+    except PermissionDenied:
+        return body + '\n\nPrivate online access is disabled. Contact the hut for assistance.\n'
     return body + ("\n\nManage your reservation securely:\n" + url +
                    "\nKeep this link private; anyone with it can view your booking.\n")
 

@@ -25,9 +25,7 @@ def issue_guest_link(reservation, request=None):
     """Return a newly created or existing URL. Never expose token in staff listings."""
     access, _ = GuestAccessLink.objects.get_or_create(reservation=reservation)
     if access.revoked_at:
-        access.token = secrets.token_urlsafe(32)
-        access.revoked_at = None
-        access.save(update_fields=["token", "revoked_at"])
+        raise PermissionDenied('Private access is revoked. A manager must explicitly reissue it.')
     path = reverse("bookings:guest_self_service", args=[access.token])
     return request.build_absolute_uri(path) if request else path
 
@@ -41,6 +39,9 @@ def guest_reservation(token):
 @require_http_methods(["GET", "POST"])
 def guest_self_service(request, token):
     reservation = guest_reservation(token)
+    from .reliability_v145 import grant_guest_access
+    from .notifications_v145 import guest_delivery_delayed
+    grant_guest_access(request, reservation, token=token)
     hut_id = single_hut_id(reservation)
     if not hut_id:
         raise Http404("Booking cannot be managed online.")
@@ -69,6 +70,8 @@ def guest_self_service(request, token):
                 return redirect("bookings:guest_self_service", token=token)
         with transaction.atomic():
             locked = Reservation.objects.select_for_update().get(pk=reservation.pk)
+            if not GuestAccessLink.objects.select_for_update().filter(reservation=locked, token=token, revoked_at__isnull=True).exists():
+                raise Http404('Private reservation access is unavailable.')
             if locked.status not in Reservation.HOLDING or locked.check_in <= timezone.localdate():
                 messages.error(request, "This reservation can no longer accept requests.")
                 return redirect("bookings:guest_self_service", token=token)
@@ -82,6 +85,7 @@ def guest_self_service(request, token):
         return redirect("bookings:guest_self_service", token=token)
     return render(request, "bookings/guest_self_service.html", {
         "reservation": reservation, "hut": hut, "summary": summary,
+        "email_delivery_delayed": guest_delivery_delayed(reservation),
         "items": reservation.items.select_related("room").all(),
         "requests": reservation.guest_change_requests.all()[:20],
         "conversation_messages": list(reversed(list(

@@ -1,0 +1,482 @@
+
+{% extends "bookings/base.html" %}
+{% block title %}Reservation {{ reservation.code }}{% endblock %}
+
+{% block content %}
+<style>
+  .rs-page {
+    --ink: #172a20;
+    --muted: #65756c;
+    --green: #173d2d;
+    --lime: #c7f36b;
+    --line: #e2e9e2;
+    --surface: #f5f8f3;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 28px 0 80px;
+    color: var(--ink);
+  }
+
+  .rs-page * { box-sizing: border-box; }
+  .rs-page a { text-decoration: none; }
+
+  .rs-hero {
+    position: relative;
+    overflow: hidden;
+    border-radius: 28px;
+    background: linear-gradient(120deg, #10291e, #28543b);
+    color: white;
+    padding: clamp(26px, 5vw, 48px);
+  }
+
+  .rs-hero::after {
+    content: "";
+    position: absolute;
+    width: 350px;
+    height: 350px;
+    right: -100px;
+    bottom: -210px;
+    border: 65px solid rgba(199,243,107,.10);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .rs-eyebrow {
+    color: var(--lime);
+    font-size: .76rem;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    font-weight: 800;
+    margin: 0 0 12px;
+  }
+
+  .rs-hero h1 {
+    color: white;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    letter-spacing: -.055em;
+    line-height: 1.1;
+    margin: 0 0 14px;
+  }
+
+  .rs-hero-description {
+    color: #dbe9df;
+    max-width: 600px;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .rs-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 999px;
+    padding: 8px 13px;
+    font-size: .78rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+  }
+
+  .rs-status::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    background: currentColor;
+    border-radius: 50%;
+  }
+
+  .rs-confirmed { background: var(--lime); color: #214018; }
+  .rs-pending { background: #fff0b3; color: #745300; }
+  .rs-cancelled { background: #ffe1dd; color: #922e26; }
+
+  .rs-ref {
+    margin-top: 25px;
+    display: inline-flex;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 14px;
+    background: rgba(255,255,255,.10);
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 12px;
+    font-size: .85rem;
+  }
+
+  .rs-ref strong {
+    color: white;
+    font-family: ui-monospace, monospace;
+    overflow-wrap: anywhere;
+  }
+
+  .rs-date-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 22px;
+  }
+
+  .rs-date-card {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 22px;
+    min-width: 0;
+  }
+
+  .rs-label {
+    color: var(--muted);
+    font-size: .77rem;
+    font-weight: 750;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .rs-date-value {
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+    font-weight: 850;
+    letter-spacing: -.04em;
+  }
+
+  .rs-date-sub {
+    color: var(--muted);
+    font-size: .83rem;
+    margin-top: 5px;
+  }
+
+  .rs-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(280px, .85fr);
+    gap: 22px;
+    margin-top: 22px;
+    align-items: start;
+  }
+
+  .rs-panel {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    padding: clamp(22px, 3vw, 30px);
+    min-width: 0;
+  }
+
+  .rs-panel h2 {
+    color: var(--ink);
+    font-size: 1.35rem;
+    letter-spacing: -.035em;
+    margin: 0 0 22px;
+  }
+
+  .rs-section-tag {
+    color: #547557;
+    text-transform: uppercase;
+    letter-spacing: .13em;
+    font-size: .7rem;
+    font-weight: 800;
+    margin: 0 0 7px;
+  }
+
+  .rs-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+  }
+
+  .rs-info-item { min-width: 0; }
+
+  .rs-info-value {
+    font-weight: 750;
+    overflow-wrap: anywhere;
+  }
+
+  .rs-note {
+    padding: 15px 17px;
+    border-radius: 13px;
+    margin-bottom: 24px;
+    font-size: .9rem;
+    line-height: 1.6;
+    background: #f0f7e8;
+    color: #315326;
+  }
+
+  .rs-note.pending { background: #fff7dc; color: #795700; }
+  .rs-note.cancelled { background: #fff0ee; color: #8d3028; }
+
+  .rs-room {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 17px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .rs-room:first-of-type { padding-top: 0; }
+
+  .rs-room-name { font-weight: 800; }
+  .rs-room-beds { color: var(--muted); font-size: .85rem; margin-top: 5px; }
+  .rs-room-price { font-weight: 800; white-space: nowrap; text-align: right; }
+
+  .rs-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    padding-top: 24px;
+  }
+
+  .rs-total span { color: var(--muted); font-weight: 700; }
+
+  .rs-total strong {
+    font-size: 1.8rem;
+    letter-spacing: -.045em;
+  }
+
+  .rs-actions {
+    margin-top: 22px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .rs-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    border-radius: 12px;
+    padding: 13px 18px;
+    font-weight: 800;
+    font-size: .9rem;
+    cursor: pointer;
+    text-align: center;
+    transition: background .15s ease;
+  }
+
+  .rs-button-primary {
+    background: var(--green);
+    color: white !important;
+    border: 1px solid var(--green);
+  }
+
+  .rs-button-primary:hover { background: #28563c; }
+
+  .rs-button-danger {
+    background: white;
+    color: #a53b30;
+    border: 1px solid #e8c4be;
+  }
+
+  .rs-button-danger:hover { background: #fff1ef; }
+
+  .rs-help {
+    color: var(--muted);
+    font-size: .83rem;
+    line-height: 1.6;
+    margin: 22px 0 0;
+  }
+
+  @media (max-width: 780px) {
+    .rs-layout { grid-template-columns: 1fr; }
+    .rs-date-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .rs-date-card:last-child { grid-column: 1 / -1; }
+  }
+
+  @media (max-width: 480px) {
+    .rs-page { padding-top: 12px; }
+    .rs-hero { border-radius: 20px; }
+    .rs-date-grid { gap: 10px; }
+    .rs-date-card { padding: 17px; }
+    .rs-panel { border-radius: 18px; }
+    .rs-info-grid { gap: 20px 12px; }
+    .rs-actions, .rs-actions form, .rs-actions .rs-button {
+      width: 100%;
+    }
+  }
+</style>
+
+<main class="rs-page">
+
+  <header class="rs-hero">
+    <p class="rs-eyebrow">SummitDesk / Your mountain stay</p>
+
+    {% if reservation.status == 'cancelled' %}
+      <span class="rs-status rs-cancelled">Cancelled</span>
+      <h1>Reservation cancelled.</h1>
+      <p class="rs-hero-description">
+        Your booking has been cancelled. You can still review
+        the reservation details below.
+      </p>
+
+    {% elif reservation.status == 'pending' %}
+      <span class="rs-status rs-pending">
+        {% if reservation.guest_request %}
+          Awaiting hut approval
+        {% else %}
+          Awaiting confirmation
+        {% endif %}
+      </span>
+      <h1>Your adventure awaits.</h1>
+      <p class="rs-hero-description">
+        {% if reservation.guest_request %}
+          Your request has been received. Your selected beds are held
+          while the hut manager reviews your reservation.
+        {% else %}
+          Your beds are currently on hold. Your reservation
+          is not yet confirmed.
+        {% endif %}
+      </p>
+
+    {% else %}
+      <span class="rs-status rs-confirmed">Confirmed</span>
+      <h1>See you in the mountains.</h1>
+      <p class="rs-hero-description">
+        Your reservation is confirmed. Keep this private booking
+        link to review or manage your stay.
+      </p>
+    {% endif %}
+
+    <div class="rs-ref">
+      <span>Booking reference</span>
+      <strong>{{ reservation.code }}</strong>
+    </div>
+  </header>
+
+  <section class="rs-date-grid" aria-label="Stay dates">
+    <div class="rs-date-card">
+      <div class="rs-label">Check-in</div>
+      <div class="rs-date-value">{{ reservation.check_in|date:"j M Y" }}</div>
+      <div class="rs-date-sub">{{ reservation.check_in|date:"l" }}</div>
+    </div>
+
+    <div class="rs-date-card">
+      <div class="rs-label">Check-out</div>
+      <div class="rs-date-value">{{ reservation.check_out|date:"j M Y" }}</div>
+      <div class="rs-date-sub">{{ reservation.check_out|date:"l" }}</div>
+    </div>
+
+    <div class="rs-date-card">
+      <div class="rs-label">Duration</div>
+      <div class="rs-date-value">
+        {{ reservation.nights }} night{{ reservation.nights|pluralize }}
+      </div>
+      <div class="rs-date-sub">Your mountain stay</div>
+    </div>
+  </section>
+
+  <div class="rs-layout">
+
+    <section class="rs-panel" aria-labelledby="rs-booking-title">
+      <p class="rs-section-tag">Reservation details</p>
+      <h2 id="rs-booking-title">Your booking</h2>
+
+      {% if reservation.status == 'cancelled' %}
+        <div class="rs-note cancelled">
+          This reservation has been cancelled.
+        </div>
+      {% elif reservation.status == 'pending' %}
+        <div class="rs-note pending">
+          {% if reservation.guest_request %}
+            Your reservation request is awaiting approval from the hut manager.
+          {% else %}
+            Your reservation is awaiting confirmation.
+          {% endif %}
+        </div>
+      {% else %}
+        <div class="rs-note">
+          Your reservation is confirmed.
+          {% if reservation.email %}
+            Confirmation details were sent to {{ reservation.email }}.
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <div class="rs-info-grid">
+        <div class="rs-info-item">
+          <div class="rs-label">Guest name</div>
+          <div class="rs-info-value">{{ reservation.name }}</div>
+        </div>
+
+        <div class="rs-info-item">
+          <div class="rs-label">Reservation status</div>
+          <div class="rs-info-value">
+            {% if reservation.guest_request and reservation.status == 'pending' %}
+              Awaiting approval
+            {% else %}
+              {{ reservation.get_status_display }}
+            {% endif %}
+          </div>
+        </div>
+
+        {% if reservation.email %}
+          <div class="rs-info-item">
+            <div class="rs-label">Email address</div>
+            <div class="rs-info-value">{{ reservation.email }}</div>
+          </div>
+        {% endif %}
+
+        {% if reservation.phone %}
+          <div class="rs-info-item">
+            <div class="rs-label">Phone number</div>
+            <div class="rs-info-value">{{ reservation.phone }}</div>
+          </div>
+        {% endif %}
+      </div>
+
+      {% if reservation.status != 'cancelled' %}
+        <div class="rs-actions">
+          <a class="rs-button rs-button-primary"
+             href="{% url 'bookings:modify' reservation.code %}">
+            Change dates or beds &rarr;
+          </a>
+
+          <form method="post"
+                action="{% url 'bookings:cancel' reservation.code %}"
+                onsubmit="return confirm('Cancel this reservation? This action cannot be undone.');">
+            {% csrf_token %}
+            <button class="rs-button rs-button-danger" type="submit">
+              Cancel reservation
+            </button>
+          </form>
+        </div>
+      {% endif %}
+
+      <p class="rs-help">
+        This page is accessible through your private reservation link.
+        Please avoid sharing it publicly.
+      </p>
+    </section>
+
+    <section class="rs-panel" aria-labelledby="rs-rooms-title">
+      <p class="rs-section-tag">Accommodation</p>
+      <h2 id="rs-rooms-title">
+        {% if reservation.guest_request and reservation.status == 'pending' %}
+          Beds requested
+        {% else %}
+          Reserved beds
+        {% endif %}
+      </h2>
+
+      {% for item in reservation.items.all %}
+        <div class="rs-room">
+          <div>
+            <div class="rs-room-name">{{ item.room.name }}</div>
+            <div class="rs-room-beds">
+              {{ item.beds }} bed{{ item.beds|pluralize }}
+            </div>
+          </div>
+
+          <div class="rs-room-price">
+            {{ item.subtotal }} {{ CURRENCY }}
+          </div>
+        </div>
+      {% empty %}
+        <p>No beds are listed for this reservation.</p>
+      {% endfor %}
+
+      <div class="rs-total">
+        <span>Total price</span>
+        <strong>{{ reservation.total_price }} {{ CURRENCY }}</strong>
+      </div>
+    </section>
+
+  </div>
+</main>
+{% endblock %}

@@ -1,3 +1,4 @@
+from django.utils.translation import gettext as _
 import logging
 
 from django.conf import settings
@@ -15,6 +16,9 @@ from django.views.decorators.http import require_GET
 from django.template.loader import render_to_string
 from django.views.decorators.http import require_POST
 
+from django.views.decorators.cache import never_cache
+from .reliability_v145 import (submission_token, submission_identity, completed_submission,
+    create_public_submission, grant_guest_access, require_reservation_access, has_guest_access, can_manage, portal_url)
 from .forms import BookingForm, SearchForm
 from .models import GuestStay, Hut, Reservation, ReservationItem, Room
 from .services import NotAvailable, create_reservation, free_beds, modify_reservation
@@ -46,16 +50,26 @@ def hut_detail(request, slug):
     return book(request, hut=hut, template_name="bookings/public_hut_v125.html")
 
 
+@never_cache
 def book(request, hut=None, *, template_name="bookings/book.html"):
     """Pick dates, see available beds and book a selected hut."""
 
     params = request.POST if request.method == "POST" else request.GET
+    preview_only = request.method == 'POST' and bool(request.POST.get('preview_stay'))
+    if preview_only:
+        params = request.POST.copy()
+        dates = params.get('preview_stay', '').split(':', 1)
+        params['check_in'] = dates[0]
+        params['check_out'] = dates[1] if len(dates) == 2 else ''
+    from .ux_v146 import party_size, selected_summary, nearby_stays
+    requested_beds, beds_error = party_size(params)
     has_dates = "check_in" in params
     search = SearchForm(params if has_dates else None)
 
     context = {
         "search": search,
-        "hut": hut,
+        "hut": hut, "requested_beds": requested_beds, "party_error": beds_error,
+        "submission_token": request.POST.get("submission_token") or submission_token(request, hut),
     }
     if hut is not None:
         context["public_rooms"] = Room.objects.filter(hut=hut, is_active=True).order_by("position", "name")
@@ -73,31 +87,54 @@ def book(request, hut=None, *, template_name="bookings/book.html"):
 
         def booking_form():
             return BookingForm(
-                request.POST if request.method == "POST" else None,
+                request.POST if request.method == "POST" and not preview_only else None,
+                initial=request.POST.dict() if preview_only else None,
                 rooms=rooms,
                 free=free_beds(rooms, check_in, check_out),
             )
 
         booking = booking_form()
+        identity = None
+        identity_error = beds_error
+        if beds_error and booking.is_bound:
+            booking.add_error(None, beds_error)
+        if request.method == 'POST' and not preview_only and not beds_error:
+            try:
+                identity = submission_identity(request, hut)
+                previous = completed_submission(identity)
+            except ValueError as exc:
+                identity_error = str(exc)
+                booking.add_error(None, identity_error)
+            else:
+                if previous:
+                    grant_guest_access(request, previous)
+                    return redirect(previous)
 
-        if request.method == "POST" and booking.is_valid():
+        if request.method == 'POST' and not preview_only and not identity_error and booking.is_valid() and requested_beds is not None:
+            if sum(booking.beds_by_room().values()) != requested_beds:
+                booking.add_error(None, _('Select exactly %(count)s beds for your group, or update the group size.') % {'count': requested_beds})
+
+        if request.method == "POST" and not preview_only and not identity_error and booking.is_valid():
             guest = {
                 key: booking.cleaned_data[key]
                 for key in ("name", "email", "phone", "notes")
             }
 
             try:
-                reservation = create_reservation(
-                    check_in=check_in,
-                    check_out=check_out,
-                    beds_by_room=booking.beds_by_room(),
-                    status=Reservation.Status.PENDING,
-                    guest_request=True,
-                    **guest,
-                )
+                def save_request():
+                    reservation = create_reservation(
+                        check_in=check_in, check_out=check_out,
+                        beds_by_room=booking.beds_by_room(),
+                        status=Reservation.Status.PENDING, guest_request=True, **guest)
+                    from .guest_requests_v126 import send_guest_request_received
+                    send_guest_request_received(request, reservation)
+                    return reservation
+                reservation = create_public_submission(identity, save_request)
 
             except ValidationError as exc:
                 booking.add_error(None, "; ".join(exc.messages))
+            except ValueError as exc:
+                booking.add_error(None, str(exc))
 
             except NotAvailable:
                 booking = booking_form()
@@ -105,15 +142,21 @@ def book(request, hut=None, *, template_name="bookings/book.html"):
                 if booking.is_valid():
                     booking.add_error(
                         None,
-                        "Those beds were just taken. Please try again.",
+                        _("Those beds were just taken. Please try again."),
                     )
 
             else:
-                from .guest_requests_v126 import send_guest_request_received
-                send_guest_request_received(request, reservation)
+                grant_guest_access(request, reservation)
                 return redirect(reservation)
 
+        summary_rows, selected_beds, estimated_total = selected_summary(booking, rooms, (check_out - check_in).days)
+        target = requested_beds or 1
+        available_total = sum(booking.free.values())
         context.update(
+            summary_rows=summary_rows, selected_beds=selected_beds, estimated_total=estimated_total,
+            available_total=available_total, insufficient_party=available_total < target,
+            alternative_stays=nearby_stays(hut, rooms, check_in, check_out, target) if available_total < target else [],
+            available_rooms=[{'room': room, 'free': booking.free[room.pk]} for room in rooms if booking.free[room.pk] >= target],
             booking=booking,
             check_in=check_in,
             check_out=check_out,
@@ -313,25 +356,51 @@ def dashboard_export(request):
     return response
 
 
+@never_cache
 def reservation_detail(request, code):
-
     reservation = get_object_or_404(Reservation.objects.prefetch_related("items__room"), code=code)
-    return render(request, "bookings/reservation.html", {"reservation": reservation})
+    if not can_manage(request, reservation) and not has_guest_access(request, reservation):
+        from .delivery_views_v145 import recover_guest_link
+        return recover_guest_link(request, reservation)
+    from .notifications_v145 import guest_delivery_delayed
+    staff = can_manage(request, reservation)
+    return render(request, "bookings/reservation.html", {
+        "reservation": reservation, "can_manage_directly": staff,
+        "guest_portal_url": portal_url(reservation) if not staff else '',
+        "email_delivery_delayed": guest_delivery_delayed(reservation),
+    })
 
 
+@never_cache
 @require_POST
 def reservation_cancel(request, code):
     reservation = get_object_or_404(Reservation, code=code)
-    if reservation.status != Reservation.Status.CANCELLED:
-        reservation.status = Reservation.Status.CANCELLED
-        reservation.save(update_fields=["status"])
-        messages.success(request, "Your reservation has been cancelled.")
+    if not require_reservation_access(request, reservation):
+        messages.info(request, 'Send a cancellation request for the hut manager to review.')
+        return redirect(portal_url(reservation))
+    # Staff use the existing locked, property-authorized status workflow.
+    return manager_reservation_action_v145(request, reservation)
+
+
+def manager_reservation_action_v145(request, reservation):
+    with transaction.atomic():
+        locked = get_locked_manageable_reservation(request.user, code=reservation.code)
+        if locked.status != Reservation.Status.CANCELLED:
+            locked.status = Reservation.Status.CANCELLED
+            locked.save(update_fields=['status'])
+            if locked.guest_request:
+                from .guest_requests_v126 import send_guest_request_declined
+                send_guest_request_declined(request, locked)
+    messages.success(request, 'Reservation cancelled.')
     return redirect(reservation)
+
 
 
 def send_confirmation(request, reservation):
     """Email the guest (and the hut keeper, if configured). A mail failure
     must never lose a booking that is already saved, so errors are logged."""
+    from .notifications_v145 import supersede_request_notifications
+    supersede_request_notifications(reservation)
     custom_confirmation_subject = None
     custom_confirmation_body = None
     from .deposits import single_hut_id
@@ -360,11 +429,11 @@ def send_confirmation(request, reservation):
         recipients.append(settings.BOOKING_NOTIFY_EMAIL)
     from .guest_links import append_guest_portal_to_confirmation
     guest_body = append_guest_portal_to_confirmation(request, reservation, body)
-    for recipient in recipients:
-        try:
-            send_mail(custom_confirmation_subject or f"Your reservation at {settings.HUT_NAME}", (guest_body if recipient == reservation.email else body), None, [recipient])
-        except Exception:
-            logger.exception("Could not send confirmation for %s", reservation.code)
+    from .notifications_v145 import queue_notification
+    for recipient in set(recipients):
+        queue_notification(reservation, 'confirmation_guest' if recipient == reservation.email else 'confirmation_manager',
+            custom_confirmation_subject or f"Your reservation at {settings.HUT_NAME}",
+            guest_body if recipient == reservation.email else body, recipient)
 
 
 @require_GET
@@ -381,7 +450,7 @@ def availability_calendar(request):
     today = timezone.localdate()
     if first > today + timedelta(days=settings.BOOKING_MAX_DAYS_AHEAD) or (year, month) < (today.year, today.month):
         return JsonResponse({"error": "Month outside booking window."}, status=400)
-    rooms_query = Room.objects.filter(is_active=True)
+    rooms_query = Room.objects.filter(is_active=True, hut__is_active=True)
 
     hut_slug = request.GET.get("hut")
 
@@ -393,23 +462,33 @@ def availability_calendar(request):
         )
         rooms_query = rooms_query.filter(hut=hut)
 
+    from .availability_v147 import nightly_availability
     rooms = list(rooms_query)
+    window_start = max(first, today)
+    # Bound before adding a day, including December at the date upper limit.
+    month_end = first + timedelta(days=monthrange(year, month)[1])
+    window_end = min(month_end, today + timedelta(days=settings.BOOKING_MAX_DAYS_AHEAD + 1))
+    by_night = nightly_availability(rooms, window_start, window_end)
     days = []
     for day in range(1, monthrange(year, month)[1] + 1):
         start = date(year, month, day)
         if start < today or start > today + timedelta(days=settings.BOOKING_MAX_DAYS_AHEAD):
             continue
-        remaining = free_beds(rooms, start, start + timedelta(days=1))
+        remaining = by_night.get(start, {})
         days.append({"date": start.isoformat(), "free_beds": sum(remaining.values()),
                      "rooms": {str(r.pk): remaining[r.pk] for r in rooms}})
     return JsonResponse({"days": days, "capacity": sum(r.capacity for r in rooms)})
 
 
+@never_cache
 def reservation_modify(request, code):
     """Allow changes within the reservation's original hut only."""
     reservation = get_object_or_404(
         Reservation.objects.prefetch_related("items__room"), code=code
     )
+    if not require_reservation_access(request, reservation):
+        messages.info(request, 'Send a change request for the hut manager to review.')
+        return redirect(portal_url(reservation))
     if reservation.status not in Reservation.HOLDING:
         messages.error(request, "Cancelled reservations cannot be modified.")
         return redirect(reservation)
@@ -576,9 +655,7 @@ def manager_reservation_action(request, code):
                 reservation.status = Reservation.Status.CONFIRMED
                 reservation.save(update_fields=["status"])
                 if reservation.guest_request:
-                    transaction.on_commit(
-                        lambda reservation=reservation: send_confirmation(request, reservation)
-                    )
+                    send_confirmation(request, reservation)
                 messages.success(request, "Reservation confirmed.")
         else:
             if reservation.status == Reservation.Status.CANCELLED:
@@ -588,9 +665,7 @@ def manager_reservation_action(request, code):
                 reservation.save(update_fields=["status"])
                 if reservation.guest_request:
                     from .guest_requests_v126 import send_guest_request_declined
-                    transaction.on_commit(
-                        lambda reservation=reservation: send_guest_request_declined(request, reservation)
-                    )
+                    send_guest_request_declined(request, reservation)
                 messages.success(request, "Reservation cancelled; beds are available again.")
 
     # Only a fixed, known destination is allowed (never a user-supplied URL).
