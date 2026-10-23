@@ -1,6 +1,8 @@
 {% extends "bookings/base.html" %}
+{% load i18n %}
 {% block title %}Guest requests{% endblock %}
 {% block content %}
+{% include "bookings/undo_decision_v152.html" with source="approvals" %}
 <style>
   .aq{--pine:#193d31;--deep:#102a22;--lime:#d8f47c;--muted:#617468;--line:#dbe7de;--paper:#f7faf5;color:var(--deep);max-width:1380px;margin:0 auto;padding:clamp(16px,3vw,34px) 0 70px}
   .aq *{box-sizing:border-box}.aq a{color:inherit}.aq-header{border-radius:23px;background:linear-gradient(120deg,#102b25,#275743);color:#fff;padding:clamp(24px,4vw,44px);display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
@@ -47,7 +49,7 @@
 {% if delivery_failures %}<p class="aq-panel" role="alert"><strong>{{ delivery_failures }} email notification{{ delivery_failures|pluralize }} failed.</strong> <a href="{% url 'bookings:notification_deliveries' %}?hut={{ selected_slug|urlencode }}">Review delivery and retry</a></p>{% endif %}
 
   <header class="aq-header">
-    <div><p class="aq-kicker">SUMMITDESK / FRONT DESK</p><h1>Guest reservation requests</h1><p>Review new requests, check room and bed details, and respond with confidence. Beds are held while requests await a decision.</p></div>
+    <div><p class="aq-kicker">КАРЛЪК / FRONT DESK</p><h1>Guest reservation requests</h1><p>Review new requests, check room and bed details, and respond with confidence. Beds are held while requests await a decision.</p></div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       <a class="aq-back" href="{% url 'bookings:manager_digest_preferences' %}">Email reminders</a>
       <a class="aq-back" href="{% url 'bookings:manager_reservations' %}">← All reservations</a>
@@ -65,10 +67,9 @@
     <a href="?status=pending&amp;priority=arrival48{% if selected_slug %}&amp;hut={{ selected_slug|urlencode }}{% endif %}"><strong>{{ priority_counts.arrival48 }}</strong> Arrival due within 2 days or overdue ↗</a>
   </section>
 
-  <section class="aq-panel" aria-label="Filter guest requests">
-    <form method="get" class="aq-filter">
+  <details class="sd152-filters"><summary>{% translate "Filters" %} · {{ selected_hut.name|default:"All huts" }}{% if q %} · {{ q }}{% endif %}</summary><form method="get" class="aq-filter">
       <input type="hidden" name="status" value="{{ status_filter }}">
-      <div class="aq-field"><label for="aq-hut">Mountain hut</label><select name="hut" id="aq-hut">
+      <div class="aq-field"><label for="aq-hut">Hut</label><select name="hut" id="aq-hut">
         {% if not manager_mode %}<option value="">All huts</option>{% endif %}
         {% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_slug == hut.slug %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}
       </select></div>
@@ -79,8 +80,7 @@
         <option value="arrival48" {% if priority_filter == 'arrival48' %}selected{% endif %}>Arrival due / overdue</option>
       </select></div>
       <button type="submit" class="aq-btn aq-btn-dark">Apply filters →</button>
-    </form>
-  </section>
+    </form></details>
 
   <div class="aq-results-heading"><h2>{% if status_filter == 'pending' %}Awaiting your decision{% elif status_filter == 'confirmed' %}Approved requests{% elif status_filter == 'cancelled' %}Declined requests{% else %}All public requests{% endif %}</h2><div class="aq-heading-actions"><p>{{ page.paginator.count }} matching request{{ page.paginator.count|pluralize }}</p><a class="aq-download" href="{% url 'bookings:request_export' %}?status={{ status_filter|urlencode }}&amp;hut={{ selected_slug|urlencode }}&amp;q={{ q|urlencode }}&amp;priority={{ priority_filter|urlencode }}">↓ Download CSV (all matches)</a></div></div>
   {% if page.object_list %}
@@ -101,14 +101,12 @@
         </ul></div>
         {% if reservation.notes %}<div class="aq-note"><strong>Guest notes</strong>
 {{ reservation.notes }}</div>{% endif %}
+        {% if reservation.last_decision.reason %}<p class="aq-note"><strong>{% translate "Decision reason" %}</strong><br>{{ reservation.last_decision.reason }}</p>{% endif %}
       </div>
       <div class="aq-card-foot">
         <span class="aq-ref">Reference: {{ reservation.code }}</span>
         {% if reservation.reviewable_here %}
-        <div class="aq-actions">
-          <form method="post" action="{% url 'bookings:manager_reservation_action' reservation.code %}">{% csrf_token %}<input type="hidden" name="action" value="confirm"><input type="hidden" name="source" value="approvals"><button class="aq-btn aq-btn-approve" type="submit" onclick="return confirm('Approve this guest reservation request?');">✓ Approve</button></form>
-          <form method="post" action="{% url 'bookings:manager_reservation_action' reservation.code %}">{% csrf_token %}<input type="hidden" name="action" value="cancel"><input type="hidden" name="source" value="approvals"><button class="aq-btn aq-btn-decline" type="submit" onclick="return confirm('Decline this request and release the held beds?');">Decline</button></form>
-        </div>
+        {% include "bookings/decision_actions_v152.html" with source="approvals" %}
         {% elif reservation.status == 'pending' %}<span class="aq-ref">Requires administrator review</span>{% endif %}
       </div>
     </article>

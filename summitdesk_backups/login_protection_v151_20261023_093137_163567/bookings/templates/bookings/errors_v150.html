@@ -1,0 +1,6 @@
+{% load i18n %}
+<section class="sd150-errors" id="sd150-errors" tabindex="-1" aria-labelledby="sd150-errors-title" {% if not form_errors %}hidden{% endif %}>
+  <h2 id="sd150-errors-title">{% translate "Please check your request" %}</h2>
+  <p>{% translate "Your request has not been sent. Fix the following and try again." %}</p>
+  <ul>{% for error in form_errors %}<li><a href="#{{ error.target }}">{% if error.label %}{{ error.label }}: {% endif %}{{ error.message }}</a></li>{% endfor %}</ul>
+</section>

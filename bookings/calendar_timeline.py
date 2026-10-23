@@ -7,8 +7,8 @@ from django.http import Http404
 from django.shortcuts import render
 from django.utils import timezone
 from django.views.decorators.http import require_GET
-from .models import Reservation, ReservationItem, Room
-from .views import permitted_hut_selection
+from .models import BedClosure, Reservation, ReservationItem, Room
+from .views import manageable_reservations, permitted_hut_selection
 
 @staff_member_required
 @require_GET
@@ -27,9 +27,13 @@ def calendar_timeline(request):
     rooms = Room.objects.filter(hut__in=huts).select_related('hut').order_by('hut__name', 'position', 'pk')
     if selected: rooms = rooms.filter(hut=selected)
     room_list = list(rooms)
-    items = ReservationItem.objects.filter(room__in=room_list,
+    items = list(ReservationItem.objects.filter(room__in=room_list,
         reservation__status__in=Reservation.HOLDING,
-        reservation__check_in__lt=end, reservation__check_out__gt=start).select_related('reservation', 'room')
+        reservation__check_in__lt=end, reservation__check_out__gt=start).select_related('reservation', 'room'))
+    visible_ids = set(manageable_reservations(request.user).filter(
+        pk__in=[item.reservation_id for item in items]).values_list('pk', flat=True))
+    closures = list(BedClosure.objects.filter(bed__room__in=room_list, start__lt=end, end__gt=start)
+                    .values_list('bed__room_id', 'bed_id', 'start', 'end'))
     slots = {(room.pk, day): [] for room in room_list for day in days}
     for item in items:
         for day in days:
@@ -40,16 +44,21 @@ def calendar_timeline(request):
         cells = []
         for day in days:
             booked = slots[room.pk, day]
-            cells.append({'day': day, 'items': booked,
-                          'free': room.capacity - sum(i.beds for i in booked)})
+            blocked = len({bed for room_id, bed, first, last in closures if room_id == room.pk and first <= day < last})
+            left = room.capacity - sum(i.beds for i in booked) - blocked
+            cells.append({'day': day, 'items': [i for i in booked if i.reservation_id in visible_ids],
+                          'free': max(0, left) if room.is_active else 0, 'over': left < 0, 'blocked': blocked})
         # V113_TIMELINE_LAYOUT: booking bars span the nights occupied.
-        room_items = [item for item in items if item.room_id == room.pk]
+        room_items = [item for item in items if item.room_id == room.pk and item.reservation_id in visible_ids]
         bars = build_bars(room_items, start, end)
         track_count = max((bar['track'] for bar in bars), default=1)
         rows.append({'room': room, 'cells': cells, 'bars': bars,
                      'track_count': track_count, 'grid_end': track_count + 1})
+    agenda = [{'day': day, 'free': sum(row['cells'][index]['free'] for row in rows),
+               'rooms': [{'room': row['room'], **row['cells'][index]} for row in rows]}
+              for index, day in enumerate(days)]
     return render(request, 'bookings/calendar_timeline.html', {
-        'rows': rows, 'days': days, 'start': start, 'today': timezone.localdate(),
+        'rows': rows, 'agenda': agenda, 'days': days, 'start': start, 'today': timezone.localdate(),
         'last_day': days[-1], 'booking_count': sum(len(row['bars']) for row in rows),
         'prev': start - timedelta(days=7), 'next': end,
         'huts': huts, 'selected_slug': slug, 'selected_hut': selected,

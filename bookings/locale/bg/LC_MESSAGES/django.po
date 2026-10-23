@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: SummitDesk v147\n"
+"Project-Id-Version: SummitDesk v151\n"
 "Language: bg\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1337,3 +1337,528 @@ msgid_plural "%(count)s huts"
 msgstr[0] "%(count)s хижа"
 msgstr[1] "%(count)s хижи"
 
+
+msgid "Green fields and forested ridges in the Rhodope Mountains, Bulgaria"
+msgstr "Зелени поля и планински хребети в Родопите, България"
+
+msgid "Contact"
+msgstr "Контакти"
+
+msgid "View on map"
+msgstr "Виж на картата"
+
+msgid "Footer navigation"
+msgstr "Навигация в долната част"
+
+msgid "Useful links"
+msgstr "Полезни връзки"
+
+msgid "Booking questions"
+msgstr "Често задавани въпроси"
+
+msgid "Cancellation policy"
+msgstr "Условия за анулиране"
+
+msgid "Privacy notice"
+msgstr "Уведомление за поверителност"
+
+msgid "Landscape photo:"
+msgstr "Пейзажна снимка:"
+
+msgid "cropped and compressed"
+msgstr "изрязана и компресирана"
+
+msgid "Last updated"
+msgstr "Последна актуализация"
+
+msgid "This policy is currently available in the language shown below."
+msgstr "В момента тези условия са достъпни на езика, показан по-долу."
+
+msgid "BEFORE YOU SET OFF"
+msgstr "ПРЕДИ ДА ТРЪГНЕШ"
+
+msgid "A little help with your stay."
+msgstr "Полезно за твоя престой."
+
+msgid "The essentials, before you head for the mountains."
+msgstr "Най-важното, преди да поемеш към планината."
+
+msgid "Is my reservation confirmed immediately?"
+msgstr "Резервацията ми потвърждава ли се веднага?"
+
+msgid "Your booking starts as a request. The hut manager reviews it and sends the decision by email. Please wait for confirmation before travelling."
+msgstr "Резервацията започва като заявка. Управителят на хижата я преглежда и изпраща отговора по имейл. Моля, изчакай потвърждение, преди да пътуваш."
+
+msgid "Can I request a change or cancellation?"
+msgstr "Мога ли да поискам промяна или анулиране?"
+
+msgid "Use the private link in your booking email to send a request to the hut manager. A request does not change your booking until the manager approves it."
+msgstr "Използвай личната връзка от имейла за резервацията, за да изпратиш заявка до управителя на хижата. Заявката не променя резервацията, докато управителят не я одобри."
+
+msgid "Read the cancellation policy"
+msgstr "Прочети условията за анулиране"
+
+msgid "Which dates does availability cover?"
+msgstr "За кои дати важат свободните места?"
+
+msgid "Search results show beds available for every night of your selected stay. Check-out day is not an overnight stay."
+msgstr "Резултатите показват свободни легла за всяка нощ от избрания престой. Денят на напускане не включва нощувка."
+
+msgid "How we use your booking details — privacy notice"
+msgstr "Как използваме данните за резервацията — уведомление за поверителност"
+
+msgid "Please check your request"
+msgstr "Провери заявката си"
+
+msgid "Your request has not been sent. Fix the following and try again."
+msgstr "Заявката не е изпратена. Поправи следното и опитай отново."
+
+msgid "required"
+msgstr "задължително"
+
+msgid "optional"
+msgstr "незадължително"
+
+msgid "Optional. Helps the hut contact you about arrival changes."
+msgstr "Незадължително. Помага на хижата да се свърже с теб при промяна в пристигането."
+
+msgid "Leave this field blank"
+msgstr "Остави това поле празно"
+
+msgid "We couldn't verify this request. Reload the page and try again."
+msgstr "Не успяхме да проверим заявката. Презареди страницата и опитай отново."
+
+msgid "Too many booking requests. Your details are kept. Please wait a little and try again, or contact the hut."
+msgstr "Твърде много заявки за резервация. Данните ти са запазени. Изчакай малко и опитай отново или се свържи с хижата."
+
+msgid "When and how do I pay?"
+msgstr "Кога и как се плаща?"
+
+msgid "No payment is collected by this booking request form. The hut manager will confirm how and when to pay, including any deposit."
+msgstr "Чрез този формуляр за заявка не се извършва плащане. Управителят на хижата ще потвърди как и кога да платиш, включително евентуален депозит."
+
+msgid "Your hut"
+msgstr "Твоята хижа"
+
+msgid "Location and directions"
+msgstr "Местоположение и упътвания"
+
+msgid "Booking support"
+msgstr "Съдействие за резервации"
+
+msgid "We use your details to process this request and communicate about your stay."
+msgstr "Използваме данните ти, за да обработим заявката и да се свържем с теб относно престоя."
+
+msgid "Choose beds to see the total"
+msgstr "Избери легла, за да видиш общата сума"
+
+msgid "Error:"
+msgstr "Грешка:"
+
+msgid "Request received."
+msgstr "Заявката е получена."
+
+msgid "Estimated total"
+msgstr "Приблизителна обща сума"
+
+msgid "This stay has started or passed. Please contact the hut about changes."
+msgstr "Този престой вече е започнал или приключил. За промени се свържи с хижата."
+
+msgid "What happens next?"
+msgstr "Какво следва?"
+
+msgid "The hut manager will email their decision. Please wait for approval before travelling."
+msgstr "Управителят на хижата ще изпрати отговора по имейл. Изчакай одобрение, преди да пътуваш."
+
+msgid "If your arrival is soon, contact the hut directly."
+msgstr "Ако пристигането ти е скоро, свържи се директно с хижата."
+
+msgid "Hello %(name)s,"
+msgstr "Здравей, %(name)s,"
+
+msgid "We received your reservation request for %(name)s."
+msgstr "Получихме заявката ти за резервация в %(name)s."
+
+msgid "Hut phone"
+msgstr "Телефон на хижата"
+
+msgid "Hut email"
+msgstr "Имейл на хижата"
+
+msgid "Your request is AWAITING APPROVAL. Your stay is not confirmed yet."
+msgstr "Заявката ти ОЧАКВА ОДОБРЕНИЕ. Престоят все още не е потвърден."
+
+msgid "The selected beds are held while the hut manager reviews your request."
+msgstr "Избраните легла се задържат, докато управителят на хижата прегледа заявката."
+
+msgid "View your request status or ask for changes using your private link:"
+msgstr "Провери състоянието на заявката или поискай промени чрез личната си връзка:"
+
+msgid "We will email you when the hut manager approves or declines your request."
+msgstr "Ще получиш имейл, когато управителят на хижата одобри или откаже заявката."
+
+msgid "Please do not travel assuming the request is confirmed."
+msgstr "Моля, не пътувай с предположението, че заявката е потвърдена."
+
+msgid "Sign-in temporarily unavailable"
+msgstr "Входът временно не е достъпен"
+
+msgid "Too many sign-in attempts"
+msgstr "Твърде много опити за вход"
+
+msgid "We couldn't check sign-in protection. Please try again shortly."
+msgstr "Не успяхме да проверим защитата при вход. Опитай отново след малко."
+
+msgid "A password reset does not clear this temporary limit."
+msgstr "Смяната на паролата не премахва това временно ограничение."
+
+msgid "Return to sign-in"
+msgstr "Обратно към входа"
+
+msgid "Please wait about %(minutes)s minute before trying again."
+msgid_plural "Please wait about %(minutes)s minutes before trying again."
+msgstr[0] "Изчакай около %(minutes)s минута, преди да опиташ отново."
+msgstr[1] "Изчакай около %(minutes)s минути, преди да опиташ отново."
+
+#: staff workflow v152
+msgid "Needs your decision"
+msgstr "Нуждаят се от решение"
+
+#: staff workflow v152
+msgid "Staff overview"
+msgstr "Преглед за служители"
+
+#: staff workflow v152
+msgid "Pending requests"
+msgstr "Чакащи заявки"
+
+#: staff workflow v152
+msgid "Confirmed bookings"
+msgstr "Потвърдени резервации"
+
+#: staff workflow v152
+msgid "Checked in now"
+msgstr "Настанени в момента"
+
+#: staff workflow v152
+msgid "Bookings actually in the hut"
+msgstr "Реално настанени резервации"
+
+#: staff workflow v152
+msgid "Filters"
+msgstr "Филтри"
+
+#: staff workflow v152
+msgid "Hut"
+msgstr "Хижа"
+
+#: staff workflow v152
+msgid "All huts"
+msgstr "Всички хижи"
+
+#: staff workflow v152
+msgid "Apply filters"
+msgstr "Приложи филтрите"
+
+#: staff workflow v152
+msgid "All pending requests"
+msgstr "Всички чакащи заявки"
+
+#: staff workflow v152
+msgid "Requested"
+msgstr "Получена"
+
+#: staff workflow v152
+msgid "No requests awaiting your decision."
+msgstr "Няма заявки, очакващи Вашето решение."
+
+#: staff workflow v152
+msgid "Confirmed arrivals"
+msgstr "Потвърдени пристигания"
+
+#: staff workflow v152
+msgid "No confirmed arrivals scheduled."
+msgstr "Няма планирани потвърдени пристигания."
+
+#: staff workflow v152
+msgid "Beds held tonight"
+msgstr "Задържани легла за тази вечер"
+
+#: staff workflow v152
+msgid "Expected occupancy from pending and confirmed bookings. Checked in now counts bookings with an actual check-in and no check-out."
+msgstr "Очаквана заетост от чакащи и потвърдени резервации. „Настанени в момента“ брои резервациите с регистрирано настаняване и без напускане."
+
+#: staff workflow v152
+msgid "Monthly occupancy"
+msgstr "Месечна заетост"
+
+#: staff workflow v152
+msgid "Booked bed-nights"
+msgstr "Резервирани леглонощувки"
+
+#: staff workflow v152
+msgid "Projected revenue"
+msgstr "Прогнозни приходи"
+
+#: staff workflow v152
+msgid "Capacity check"
+msgstr "Проверка на свободните легла"
+
+#: staff workflow v152
+msgid "%(requested)s requested · %(available)s available before this request · %(remaining)s left after approval"
+msgstr "%(requested)s заявени · %(available)s свободни преди тази заявка · %(remaining)s остават след одобрение"
+
+#: staff workflow v152
+msgid "Inactive room"
+msgstr "Неактивна стая"
+
+#: staff workflow v152
+msgid "Minimum free beds across every night, including maintenance closures. This request’s own hold is excluded. Checked again when you approve."
+msgstr "Най-малко свободни легла през всички нощи, включително затворените за поддръжка. Задържаните от тази заявка легла са изключени. Проверява се отново при одобрение."
+
+#: staff workflow v152
+msgid "Approve"
+msgstr "Одобри"
+
+#: staff workflow v152
+msgid "Confirm this stay for %(name)s?"
+msgstr "Потвърждавате ли престоя на %(name)s?"
+
+#: staff workflow v152
+msgid "The guest will receive a confirmation."
+msgstr "Гостът ще получи потвърждение."
+
+#: staff workflow v152
+msgid "Approve request"
+msgstr "Одобри заявката"
+
+#: staff workflow v152
+msgid "Capacity conflict. Review the room or maintenance closure before approving."
+msgstr "Недостатъчно свободни легла. Проверете стаята или затварянето за поддръжка преди одобрение."
+
+#: staff workflow v152
+msgid "Decline"
+msgstr "Откажи"
+
+#: staff workflow v152
+msgid "Reason / message to the guest (optional)"
+msgstr "Причина / съобщение до госта (незадължително)"
+
+#: staff workflow v152
+msgid "This releases the held beds. Your message will be included in the guest email."
+msgstr "Това освобождава задържаните легла. Съобщението Ви ще бъде включено в имейла до госта."
+
+#: staff workflow v152
+msgid "Decline request"
+msgstr "Откажи заявката"
+
+#: staff workflow v152
+msgid "Requires administrator review"
+msgstr "Необходим е преглед от администратор"
+
+#: staff workflow v152
+msgid "Recent decision"
+msgstr "Последно решение"
+
+#: staff workflow v152
+msgid "Undo is available for five minutes if the booking is unchanged and beds are still available. The guest receives a status correction."
+msgstr "Отмяна е възможна до пет минути, ако резервацията не е променена и леглата все още са свободни. Гостът получава корекция на статуса."
+
+#: staff workflow v152
+msgid "Undo decision"
+msgstr "Отмени решението"
+
+#: staff workflow v152
+msgid "Keep the reason within 1,000 characters."
+msgstr "Ограничете причината до 1000 знака."
+
+#: staff workflow v152
+msgid "Only pending reservations can be confirmed."
+msgstr "Могат да се потвърждават само чакащи резервации."
+
+#: staff workflow v152
+msgid "Capacity conflict: approval was not saved. Review rooms or maintenance closures."
+msgstr "Недостатъчно легла: одобрението не е запазено. Проверете стаите или затварянията за поддръжка."
+
+#: staff workflow v152
+msgid "Reservation is already cancelled."
+msgstr "Резервацията вече е отменена."
+
+#: staff workflow v152
+msgid "Reservation confirmed."
+msgstr "Резервацията е потвърдена."
+
+#: staff workflow v152
+msgid "Reservation cancelled; beds are available again."
+msgstr "Резервацията е отменена; леглата отново са свободни."
+
+#: staff workflow v152
+msgid "This decision can no longer be undone. Review the reservation."
+msgstr "Това решение вече не може да бъде отменено. Прегледайте резервацията."
+
+#: staff workflow v152
+msgid "Beds are no longer available. The decision was not undone."
+msgstr "Леглата вече не са свободни. Решението не е отменено."
+
+#: staff workflow v152
+msgid "Decision undone. The request is awaiting approval again."
+msgstr "Решението е отменено. Заявката отново очаква одобрение."
+
+#: staff workflow v152
+msgid "A guest status correction has been queued."
+msgstr "Корекция на статуса е добавена за изпращане до госта."
+
+#: staff workflow v152
+msgid "Calendar views"
+msgstr "Изгледи на календара"
+
+#: staff workflow v152
+msgid "Bookings"
+msgstr "Резервации"
+
+#: staff workflow v152
+msgid "Free beds"
+msgstr "Свободни легла"
+
+#: staff workflow v152
+msgid "Room ledger"
+msgstr "Справка по стаи"
+
+#: staff workflow v152
+msgid "Bed availability"
+msgstr "Свободни легла"
+
+#: staff workflow v152
+msgid "Booking calendar"
+msgstr "Календар на резервациите"
+
+#: staff workflow v152
+msgid "Week list"
+msgstr "Седмичен списък"
+
+#: staff workflow v152
+msgid "Timeline"
+msgstr "Времева линия"
+
+#: staff workflow v152
+msgid "Week starting"
+msgstr "Начало на седмицата"
+
+#: staff workflow v152
+msgid "Show dates"
+msgstr "Покажи датите"
+
+#: staff workflow v152
+msgid "free beds"
+msgstr "свободни легла"
+
+#: staff workflow v152
+msgid "free"
+msgstr "свободни"
+
+#: staff workflow v152
+msgid "closed"
+msgstr "затворени"
+
+#: staff workflow v152
+msgid "Confirmed departures"
+msgstr "Потвърдени напускания"
+
+#: staff workflow v152
+msgid "Hut operations"
+msgstr "Работа в хижата"
+
+#: staff workflow v152
+msgid "Hut dashboard"
+msgstr "Преглед на хижата"
+
+#: staff workflow v152
+msgid "Hut arrivals"
+msgstr "Пристигания в хижата"
+
+#: staff workflow v152
+msgid "Hut insights"
+msgstr "Анализи за хижата"
+
+#: staff workflow v152
+msgid "Guest messages"
+msgstr "Съобщения от гости"
+
+#: staff workflow v152
+msgid "Email reminders"
+msgstr "Напомняния по имейл"
+
+#: staff workflow v152
+msgid "HUT MANAGEMENT"
+msgstr "УПРАВЛЕНИЕ НА ХИЖИ"
+
+#: staff workflow v152
+msgid "HUT"
+msgstr "ХИЖА"
+
+#: staff workflow v152
+msgid "Choose hut"
+msgstr "Изберете хижа"
+
+#: staff workflow v152
+msgid "Switch hut"
+msgstr "Смяна на хижата"
+
+#: staff workflow v152
+msgid "Select a hut"
+msgstr "Изберете хижа"
+
+#: staff workflow v152
+msgid "Hut management"
+msgstr "Управление на хижата"
+
+#: staff workflow v152
+msgid "Hut toolbar"
+msgstr "Лента за управление на хижата"
+
+#: staff workflow v152
+msgid "Hut /"
+msgstr "Хижа /"
+
+#: staff workflow v152
+msgid "Expenses"
+msgstr "Разходи"
+
+#: staff workflow v152
+msgid "Deposits"
+msgstr "Депозити"
+
+#: staff workflow v152
+msgid "Reason / message to guest (optional)"
+msgstr "Причина / съобщение до госта (незадължително)"
+
+#: staff workflow v152
+msgid "Decision reason"
+msgstr "Причина за решението"
+
+msgid "This releases the held beds. The reason is saved with the decision."
+msgstr "Това освобождава задържаните легла. Причината се запазва с решението."
+
+msgid "Undo is available for five minutes if the booking is unchanged and beds are still available."
+msgstr "Отмяна е възможна до пет минути, ако резервацията не е променена и леглата все още са свободни."
+
+msgid "The guest receives a status correction."
+msgstr "Гостът получава корекция на статуса."
+
+msgid "bookings"
+msgstr "резервации"
+
+msgid "Guest support"
+msgstr "Обслужване на гости"
+
+msgid "Stay changes & cancellations"
+msgstr "Промени и откази на престои"
+
+msgid "Email templates"
+msgstr "Шаблони за имейли"
+
+msgid "Settings"
+msgstr "Настройки"
+
+msgid "This room is inactive. Choose another room."
+msgstr "Тази стая не е активна. Изберете друга стая."

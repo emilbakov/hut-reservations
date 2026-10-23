@@ -57,8 +57,10 @@ def approval_dashboard(request):
             and len(hut_ids) == 1 and None not in hut_ids
         )
 
+    from .staff_decisions_v152 import decorate_requests, undo_context
+    decorate_requests(page.object_list)
     return render(request, 'bookings/approval_dashboard_v127.html', {
-        'delivery_failures': delivery_failures,
+        'delivery_failures': delivery_failures, 'undo_decision': undo_context(request, scoped),
         'page': page, 'huts': huts, 'selected_hut': selected_hut,
         'selected_slug': selected_slug,
         'manager_mode': not request.user.is_superuser,

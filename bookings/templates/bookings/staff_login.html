@@ -6,21 +6,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#15392e">
   <meta name="robots" content="noindex, nofollow">
-  <title>Staff sign in · SummitDesk</title>
+  <title>Staff sign in · Карлък</title>
+  <link rel="icon" href="{% static 'bookings/karlak-favicon-v153.png' %}" type="image/png">
   <link rel="stylesheet" href="{% static 'bookings/staff_login_v117.css' %}">
 </head>
 <body>
   <main class="sd117-page">
-    <section class="sd117-story" aria-label="About SummitDesk">
+    <section class="sd117-story" aria-label="About Карлък">
       <div class="sd117-story-inner">
-        <a class="sd117-brand sd117-brand-light" href="{% url 'bookings:role_landing' %}" aria-label="SummitDesk home">
-          <span class="sd117-logo" aria-hidden="true">▲</span>
-          <span>Summit<span class="sd117-brand-thin">Desk</span><small>PROPERTY MANAGEMENT</small></span>
+        <a class="sd117-brand sd117-brand-light" href="{% url 'bookings:role_landing' %}" aria-label="Карлък — home">
+          <img class="sd117-logo karlak-login-logo" src="{% static 'bookings/karlak-logo-light-v153.png' %}" width="74" height="74" alt="" decoding="async">
+          <span>КАРЛЪК<small>ТУРИСТИЧЕСКО ДРУЖЕСТВО</small></span>
         </a>
         <div class="sd117-story-content">
           <div class="sd117-kicker"><span class="sd117-dot"></span> YOUR FRONT DESK, SIMPLIFIED</div>
           <h1>Everything your team needs.<br><em>One clear workspace.</em></h1>
-          <p>Bookings, arrivals, room availability and housekeeping — together in SummitDesk.</p>
+          <p>Bookings, arrivals, room availability and housekeeping — together in your Карлък workspace.</p>
           <div class="sd117-highlights" aria-label="Workspace features">
             <span>▤ &nbsp; Reservation calendar</span>
             <span>◷ &nbsp; Daily operations</span>
@@ -42,7 +43,7 @@
 
     <section class="sd117-login-side" aria-labelledby="sd117-title">
       <div class="sd117-mobile-brand">
-        <span class="sd117-logo" aria-hidden="true">▲</span><strong>SummitDesk</strong>
+        <img class="sd117-logo karlak-login-logo-mobile" src="{% static 'bookings/karlak-logo-dark-v153.png' %}" width="52" height="52" alt="" decoding="async"><strong>КАРЛЪК</strong>
       </div>
       <div class="sd117-login-box">
         <div class="sd117-tag">STAFF ACCESS</div>
@@ -77,7 +78,7 @@
         {% endif %}
         <div class="sd117-help"><span aria-hidden="true">◈</span><p>Need an account or forgot your password?<br><strong>Contact your property manager.</strong></p></div>
       </div>
-      <div class="sd117-login-footer"><span>© SummitDesk</span><a href="{% url 'bookings:role_landing' %}">← Back to website</a></div>
+      <div class="sd117-login-footer"><span>© ТД „Карлък“</span><a href="{% url 'bookings:role_landing' %}">← Back to website</a></div>
     </section>
   </main>
   <script>

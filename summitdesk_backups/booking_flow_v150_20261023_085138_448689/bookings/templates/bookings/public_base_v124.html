@@ -1,0 +1,45 @@
+{% load i18n ui_v147 static %}
+<!doctype html>
+{% get_current_language as current_language %}
+<html lang="{{ current_language }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#183c30">
+  {% include "bookings/public_head_v149.html" %}
+  <title>{% block title %}{% translate "Find your mountain stay" %}{% endblock %} · {{ HUT_NAME }}</title>
+  <link rel="stylesheet" href="{% static 'bookings/public_v149.css' %}">
+  <link rel="stylesheet" href="{% static 'bookings/ui_v146.css' %}">
+  <link rel="stylesheet" href="{% static 'bookings/ui_v147.css' %}">
+  <link rel="stylesheet" href="{% static 'bookings/public_shared_v149.css' %}">
+  {{ UI147|json_script:"sd147-i18n" }}
+  <script src="{% static 'bookings/ui_v147.js' %}"></script>
+</head>
+<body class="public-v124">
+  <a class="pub-skip" href="#main-content">{% translate "Skip to content" %}</a>
+  <header class="pub-header">
+    <div class="pub-container pub-header-inner">
+      <a class="pub-brand" href="{% url 'bookings:public_home' %}" aria-label="{% blocktranslate with v0=HUT_NAME %}{{ v0 }} home{% endblocktranslate %}">
+        <span class="pub-brand-icon" aria-hidden="true">
+          <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M2 19 9 7l4 7 2-3 7 8H2Z"/><path d="m7 11 2 2 2-2"/></svg>
+        </span>
+        <span class="pub-brand-name">{{ HUT_NAME }}<small>{% translate "Mountain stays" %}</small></span>
+      </a>
+      <nav class="pub-nav" aria-label="{% translate "Public navigation" %}">
+        <a href="{% url 'bookings:public_home' %}" {% if homepage %}aria-current="page"{% endif %}>{% translate "Home" %}</a>
+        <a href="{% url 'bookings:hut_list' %}" {% if not homepage %}aria-current="page"{% endif %}>{% translate "Explore huts" %}</a>
+      </nav>
+      {% include "bookings/language_v147.html" %}
+      <details class="pub-mobile-menu">
+        <summary aria-label="{% translate "Open navigation menu" %}">{% translate "Menu" %} <span aria-hidden="true">☰</span></summary>
+        <nav aria-label="{% translate "Mobile navigation" %}">
+          <a href="{% url 'bookings:public_home' %}">{% translate "Home" %}</a>
+          <a href="{% url 'bookings:hut_list' %}">{% translate "Explore huts" %}</a>
+        </nav>
+      </details>
+    </div>
+  </header>
+  <main id="main-content">{% block content %}{% endblock %}</main>
+  {% include "bookings/public_footer_v149.html" %}
+</body>
+</html>

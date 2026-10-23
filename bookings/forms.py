@@ -46,19 +46,24 @@ class SearchForm(forms.Form):
 class BookingForm(forms.Form):
     """Guest details plus one "how many beds" field per room with space."""
 
-    name = forms.CharField(max_length=100, label=_("Name"))
-    email = forms.EmailField(label=_("Email"))
-    phone = forms.CharField(max_length=30, required=False, label=_("Phone"))
+    name = forms.CharField(max_length=100, label=_("Name"), widget=forms.TextInput(attrs={"autocomplete": "name"}))
+    email = forms.EmailField(label=_("Email"), widget=forms.EmailInput(attrs={"autocomplete": "email", "inputmode": "email", "autocapitalize": "none", "spellcheck": "false"}))
+    phone = forms.CharField(max_length=30, required=False, label=_("Phone"),
+        widget=forms.TextInput(attrs={"type": "tel", "autocomplete": "tel", "inputmode": "tel"}),
+        help_text=_("Optional. Helps the hut contact you about arrival changes."))
+    contact_url = forms.CharField(required=False, max_length=200,
+        widget=forms.TextInput(attrs={"tabindex": "-1", "autocomplete": "off"}))
     notes = forms.CharField(
         required=False,
         widget=forms.Textarea(attrs={"rows": 3}),
         label=_("Notes for the hut keeper"),
     )
 
-    def __init__(self, *args, rooms, free, **kwargs):
+    def __init__(self, *args, rooms, free, guests=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.rooms = rooms
         self.free = free
+        self.guests = guests
         for room in rooms:
             if free[room.pk] > 0:
                 self.fields[self.field_name(room)] = forms.IntegerField(
@@ -92,6 +97,14 @@ class BookingForm(forms.Form):
 
     def clean(self):
         data = super().clean()
-        if not self.errors and not any(self.beds_by_room().values()):
-            raise forms.ValidationError(_("Choose at least one bed."))
+        if data.get("contact_url"):
+            self.add_error(None, _("We couldn't verify this request. Reload the page and try again."))
+        # Contact errors must not suppress independent bed-count errors.
+        room_fields = [self.field_name(room) for room in self.rooms]
+        if not any(name in self.errors for name in room_fields):
+            selected = sum(data.get(name) or 0 for name in room_fields)
+            if not selected:
+                self.add_error(None, _("Choose at least one bed."))
+            elif self.guests is not None and selected != self.guests:
+                self.add_error(None, _("Select exactly %(count)s beds for your group, or update the group size.") % {"count": self.guests})
         return data

@@ -6,11 +6,20 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#183c30">
-  <meta name="description" content="{% translate "Discover mountain huts, explore rooms and check real bed availability for your next mountain stay." %}">
+  {% include "bookings/public_head_v149.html" %}
   <title>{% block title %}{% translate "Find your mountain stay" %}{% endblock %} · {{ HUT_NAME }}</title>
-  <link rel="stylesheet" href="{% static 'bookings/public_v124.css' %}">
+  <link rel="stylesheet" href="{% static 'bookings/public_v149.css' %}">
   <link rel="stylesheet" href="{% static 'bookings/ui_v146.css' %}">
   <link rel="stylesheet" href="{% static 'bookings/ui_v147.css' %}">
+  <link rel="stylesheet" href="{% static 'bookings/public_shared_v149.css' %}">
+  <link rel="stylesheet" href="{% static 'bookings/booking_flow_v150.css' %}">
+  <link rel="stylesheet" href="{% static 'bookings/karlak_nav_v154.css' %}">
+  <link rel="stylesheet" href="{% static 'bookings/karlak_links_v155.css' %}">
+  <link rel="stylesheet" href="{% static 'bookings/karlak_links_right_v156.css' %}">
+  <link rel="stylesheet" href="{% static 'bookings/karlak_language_nav_v157.css' %}">
+  <link rel="stylesheet" href="{% static 'bookings/karlak_language_last_v158.css' %}">
+  <link rel="stylesheet" href="{% static 'bookings/karlak_footer_right_v160.css' %}">
+  <script src="{% static 'bookings/booking_feedback_v150.js' %}" defer></script>
   {{ UI147|json_script:"sd147-i18n" }}
   <script src="{% static 'bookings/ui_v147.js' %}"></script>
 </head>
@@ -18,16 +27,13 @@
   <a class="pub-skip" href="#main-content">{% translate "Skip to content" %}</a>
   <header class="pub-header">
     <div class="pub-container pub-header-inner">
-      <a class="pub-brand" href="{% url 'bookings:public_home' %}" aria-label="{% blocktranslate with v0=HUT_NAME %}{{ v0 }} home{% endblocktranslate %}">
-        <span class="pub-brand-icon" aria-hidden="true">
-          <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M2 19 9 7l4 7 2-3 7 8H2Z"/><path d="m7 11 2 2 2-2"/></svg>
-        </span>
-        <span class="pub-brand-name">{{ HUT_NAME }}<small>{% translate "Mountain stays" %}</small></span>
+      <a class="pub-brand" href="{% url 'bookings:public_home' %}" aria-label="Karlak home">
+        <img class="pub-brand-icon karlak-public-logo" src="{% static 'bookings/karlak-logo-dark-v153.png' %}" width="60" height="60" alt="" decoding="async">
+        <span class="pub-brand-name">Karlak<small>{% translate "Mountain stays" %}</small></span>
       </a>
       <nav class="pub-nav" aria-label="{% translate "Public navigation" %}">
         <a href="{% url 'bookings:public_home' %}" {% if homepage %}aria-current="page"{% endif %}>{% translate "Home" %}</a>
         <a href="{% url 'bookings:hut_list' %}" {% if not homepage %}aria-current="page"{% endif %}>{% translate "Explore huts" %}</a>
-        <a class="pub-nav-login" href="{% url 'bookings:staff_login' %}">{% translate "Staff login" %} <span aria-hidden="true">↗</span></a>
       </nav>
       {% include "bookings/language_v147.html" %}
       <details class="pub-mobile-menu">
@@ -35,18 +41,11 @@
         <nav aria-label="{% translate "Mobile navigation" %}">
           <a href="{% url 'bookings:public_home' %}">{% translate "Home" %}</a>
           <a href="{% url 'bookings:hut_list' %}">{% translate "Explore huts" %}</a>
-          <a href="{% url 'bookings:staff_login' %}">{% translate "Staff login ↗" %}</a>
         </nav>
       </details>
     </div>
   </header>
-  <main id="main-content">{% block content %}{% endblock %}</main>
-  <footer class="pub-footer">
-    <div class="pub-container pub-footer-inner">
-      <div><strong>{{ HUT_NAME }}</strong><p>{% translate "Find a place to rest. Make room for adventure." %}</p></div>
-      <div class="pub-footer-links"><a href="{% url 'bookings:hut_list' %}">{% translate "Explore huts" %}</a><a href="{% url 'bookings:staff_login' %}">{% translate "Staff portal" %}</a></div>
-    </div>
-    <div class="pub-container pub-footer-bottom"><span>{% translate "Mountain stays, made simpler." %}</span><span>{% translate "Powered by SummitDesk" %}</span></div>
-  </footer>
+  <main id="main-content">{% if messages %}<div class="pub-container pub150-notices">{% for message in messages %}<p role="status">{{ message }}</p>{% endfor %}</div>{% endif %}{% block content %}{% endblock %}</main>
+  {% include "bookings/public_footer_v149.html" %}
 </body>
 </html>

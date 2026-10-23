@@ -241,8 +241,8 @@ class ServiceValidationTests(TestCase):
         self.reserve(beds=2)
         self.client.force_login(user)
         response = self.client.get(reverse("bookings:dashboard"))
-        self.assertContains(response, "Beds reserved today")
-        self.assertContains(response, "Upcoming arrivals")
+        self.assertContains(response, "Beds held tonight")
+        self.assertContains(response, "Confirmed arrivals")
 
 
 class CalendarAndModificationTests(TestCase):
@@ -329,7 +329,7 @@ class DashboardPhaseFourTests(TestCase):
         self.client.force_login(user)
         response = self.client.get(reverse("bookings:dashboard"), {"year": "2026", "month": "10"})
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "October 2026 at a glance")
+        self.assertContains(response, "October 2026")
 
 
 class MultiHutTests(TestCase):

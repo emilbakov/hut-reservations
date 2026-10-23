@@ -1,12 +1,13 @@
 {% extends "bookings/public_base_v124.html" %}
 {% load i18n ui_v147 static %}
-{% block title %}{% blocktranslate with v0=hut.name %}{{ v0 }} · Rooms & booking{% endblocktranslate %}{% endblock %}
+{% block title %}{% if form_errors %}{% translate "Error:" %} {% endif %}{% blocktranslate with v0=hut.name %}{{ v0 }} · Rooms & booking{% endblocktranslate %}{% endblock %}
 {% block content %}
 {% translate "Mountain retreat" as default0 %}
 {% translate "A comfortable place to rest after the trail." as default2 %}
-<link rel="stylesheet" href="{% static 'bookings/public_hut_v125.css' %}">
+<link rel="stylesheet" href="{% static 'bookings/public_hut_v149.css' %}">
 <div class="ph-detail">
   <div class="pub-container ph-crumbs"><a href="{% url 'bookings:public_home' %}">{% translate "Home" %}</a><span aria-hidden="true">/</span><a href="{% url 'bookings:hut_list' %}">{% translate "Explore huts" %}</a><span aria-hidden="true">/</span><span aria-current="page">{{ hut.name }}</span></div>
+  <div class="pub-container">{% include "bookings/errors_v150.html" %}</div>
   <div class="pub-container ph-intro">
     <div class="ph-title-group"><span class="pub-eyebrow">{% translate "YOUR MOUNTAIN STAY" %}</span><h1>{{ hut.name }}</h1><p class="ph-location"><span aria-hidden="true">⌖</span> {{ hut.location|default:default0 }}</p></div>
     <a class="ph-back-link" href="{% url 'bookings:hut_list' %}"><span aria-hidden="true">←</span> {% translate "All mountain huts" %}</a>
@@ -30,13 +31,14 @@
         {% if hut.description %}<div class="ph-description">{{ hut.description|linebreaks }}</div>{% else %}<p class="ph-description">{% translate "Your next mountain stay starts here. Choose your dates to check the rooms and beds at this hut." %}</p>{% endif %}
         <div class="ph-facts"><div><span class="ph-fact-icon" aria-hidden="true">⌂</span><span>{% translate "Mountain accommodation" %}</span></div><div><span class="ph-fact-icon" aria-hidden="true">◷</span><span>{% translate "Book for your selected nights" %}</span></div><div><span class="ph-fact-icon" aria-hidden="true">✓</span><span>{% translate "Live bed availability" %}</span></div></div>
       </section>
-      <section class="ph-section ph-rooms" id="rooms" aria-labelledby="ph-rooms-title">
+      <section class="ph-section ph-rooms" id="rooms" tabindex="-1" aria-labelledby="ph-rooms-title">
         <div class="ph-section-heading"><div><div class="ph-section-kicker"><span class="ph-kicker-line"></span> {% translate "YOUR OPTIONS" %}</div><h2 id="ph-rooms-title">{% translate "Rooms &amp; beds" %}</h2><p>{% translate "Simple choices, clear prices. Every bed is priced per night." %}</p></div>{% if booking %}<span class="ph-dates-pill">{{ nights|night_count }}</span>{% endif %}</div>
         {% if booking %}
           <div class="ph-stay-banner"><span aria-hidden="true">◷</span><div><strong>{{ check_in|date:'D, j M Y' }} — {{ check_out|date:'D, j M Y' }}</strong><span>{% translate "Availability for your entire stay" %}</span></div><a href="#booking-dates">{% translate "Change dates" %}</a></div>
-          <form method="post" action="{% url 'bookings:hut_detail' hut.slug %}" id="ph-reservation-form" class="ph-reservation-form" data-nights="{{ nights }}" data-currency="{{ CURRENCY }}">
+          <form method="post" action="{% url 'bookings:hut_detail' hut.slug %}#sd150-errors" novalidate id="ph-reservation-form" class="ph-reservation-form" data-nights="{{ nights }}" data-currency="{{ CURRENCY }}">
             {% csrf_token %}
 <input type="hidden" name="submission_token" value="{{ submission_token }}">
+{% include "bookings/booking_guard_v150.html" %}
             <input type="hidden" name="check_in" value="{{ check_in|date:'Y-m-d' }}">
             <input type="hidden" name="check_out" value="{{ check_out|date:'Y-m-d' }}">
             {% if booking.non_field_errors %}<div class="ph-error-box" tabindex="-1" role="alert">{{ booking.non_field_errors }}</div>{% endif %}
@@ -57,11 +59,13 @@
              {% if insufficient_party %}<p class="sd146-feedback warning">{% blocktranslate with v0=available_total %}Only {{ v0 }} beds are available for your entire stay. Try another date or adjust your group size.{% endblocktranslate %}</p>{% if alternative_stays %}<p>{% translate "Nearby dates with enough beds:" %}</p>{% for stay in alternative_stays %}<button type="submit" class="sd146-quiet" name="preview_stay" value="{{ stay.check_in|date:'Y-m-d' }}:{{ stay.check_out|date:'Y-m-d' }}" data-apply-stay data-check-in="{{ stay.check_in|date:'Y-m-d' }}" data-check-out="{{ stay.check_out|date:'Y-m-d' }}" formnovalidate>{% blocktranslate with v0=stay.check_in|date:'j M' v1=stay.check_out|date:'j M Y' v2=stay.free %}{{ v0 }} – {{ v1 }} · {{ v2 }} beds available{% endblocktranslate %}</button>{% endfor %}{% endif %}{% endif %}
             </section>
               <section class="ph-guest" {% if not any_free %}hidden{% endif %} id="guest-details" aria-labelledby="ph-guest-title"><div class="ph-section-kicker"><span class="ph-kicker-line"></span> {% translate "ALMOST THERE" %}</div><h2 id="ph-guest-title">{% translate "Your details" %}</h2><p>{% translate "We'll send your request to the hut manager. Your stay is not confirmed until they approve it." %}</p>
-                <div class="ph-guest-grid">{% for field in booking.visible_fields %}{% if field.name == 'name' or field.name == 'email' or field.name == 'phone' or field.name == 'notes' %}<div class="ph-guest-field {% if field.name == 'notes' %}ph-wide{% endif %}">{{ field.label_tag }}{{ field }}{% if field.errors %}<div class="ph-field-errors">{{ field.errors }}</div>{% endif %}</div>{% endif %}{% endfor %}</div>
+                <div class="ph-guest-grid">{% include "bookings/guest_fields_v150.html" %}</div>
+                {% include "bookings/privacy_link_v149.html" %}
                 <section class="ph-review" id="ph-review" aria-labelledby="ph-review-title"><h3 id="ph-review-title">{% translate "Your request summary" %}</h3><p><strong>{{ hut.name }}</strong><br><span id="ph-review-dates">{{ check_in|date:'j M Y' }} – {{ check_out|date:'j M Y' }}</span></p>
                 <div class="ph-party-row"><label for="ph-party-size">{% translate "Guests in your group" %}</label><input id="ph-party-size" type="number" name="beds" min="1" max="30" required value="{{ requested_beds|default:1 }}"></div>
                 <p id="ph-selection-status" class="sd146-feedback" role="status" aria-live="polite">{% blocktranslate with v0=selected_beds v1=requested_beds|default:1 %}{{ v0 }} of {{ v1 }} beds selected.{% endblocktranslate %}</p><ul id="ph-summary-lines">{% for line in summary_rows %}<li><span>{% blocktranslate with v0=line.room.name v1=line.beds v2=nights %}{{ v0 }} · {{ v1 }} beds × {{ v2 }} nights{% endblocktranslate %}</span><strong>{{ line.subtotal|floatformat:2 }} {{ CURRENCY }}</strong></li>{% empty %}<li>{% translate "Choose beds from the rooms above." %}</li>{% endfor %}</ul>
-                <div class="ph-checkout"><div><span>{% translate "Estimated total for" %} <span id="ph-night-count">{{ nights }}</span> {% translate "nights" %}</span><strong><span id="ph-total" aria-live="polite">{{ estimated_total|floatformat:2 }}</span> {{ CURRENCY }}</strong></div><button class="ph-primary" type="submit" id="ph-request-submit">{% translate "Request reservation →" %}</button></div></section>
+                <div class="ph-checkout"><div><span>{% translate "Estimated total for" %} <span id="ph-night-count">{{ nights }}</span> {% translate "nights" %}</span><strong><span id="ph-total-prompt" class="ph-total-prompt" {% if selected_beds %}hidden{% endif %}>{% translate "Choose beds to see the total" %}</span><span id="ph-total-value" {% if not selected_beds %}hidden{% endif %}><span id="ph-total" aria-live="polite">{{ estimated_total|floatformat:2 }}</span> {{ CURRENCY }}</span></strong></div><button class="ph-primary" type="submit" id="ph-request-submit">{% translate "Request reservation →" %}</button></div></section>
+                {% include "bookings/payment_note_v150.html" %}
                 <p class="ph-small-print">{% translate "We check availability again before accepting your request. Selected beds are held while the hut reviews it. You will receive an email when the manager approves or declines." %}</p>
               </section>
           </form>
@@ -88,8 +92,8 @@
       </div>
     </aside>
   </div>
-  {% if booking %}<a class="ph-mobile-review" href="#ph-review" id="ph-mobile-review" {% if not any_free %}hidden{% endif %}><span id="ph-mobile-count">{% blocktranslate with v0=selected_beds %}{{ v0 }} beds selected{% endblocktranslate %}</span><strong id="ph-mobile-total">{{ estimated_total|floatformat:2 }} {{ CURRENCY }}</strong><span>{% translate "Review request ↓" %}</span></a>{% endif %}
+  {% if booking %}<a class="ph-mobile-review" href="#ph-review" id="ph-mobile-review" {% if not any_free %}hidden{% endif %}><span id="ph-mobile-count">{% blocktranslate with v0=selected_beds %}{{ v0 }} beds selected{% endblocktranslate %}</span><strong id="ph-mobile-total" {% if not selected_beds %}class="ph-total-prompt"{% endif %}>{% if selected_beds %}{{ estimated_total|floatformat:2 }} {{ CURRENCY }}{% else %}{% translate "Choose beds to see the total" %}{% endif %}</strong><span>{% translate "Review request ↓" %}</span></a>{% endif %}
   <div class="pub-container ph-bottom"><div><span class="pub-eyebrow">{% translate "READY FOR THE MOUNTAINS?" %}</span><h2>{% translate "Good nights start with a good place." %}</h2><p>{% translate "Find a bed, pack your bag, and head for the trail." %}</p></div><a href="{% url 'bookings:hut_list' %}">{% translate "Explore more huts" %} <span aria-hidden="true">↗</span></a></div>
 </div>
-<script src="{% static 'bookings/public_hut_v147.js' %}" defer></script>
+<script src="{% static 'bookings/public_hut_v150.js' %}" defer></script>
 {% endblock %}

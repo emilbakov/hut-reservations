@@ -1,3 +1,0 @@
-Add this line to the existing floorplans/urls.py urlpatterns (keep every existing route):
-
-path("<int:hut_id>/rooms/<int:room_id>/reservations/", views.room_reservations, name="room_reservations"),

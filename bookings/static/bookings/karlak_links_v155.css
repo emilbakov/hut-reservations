@@ -1,0 +1,48 @@
+/* v155: left-start public navigation and footer link placement.
+   Keep the Karlak logo, language switcher and staff shell unchanged. */
+@media (min-width: 721px) {
+  .public-v124 .pub-header-inner {
+    justify-content: flex-start;
+  }
+  .public-v124 .pub-header .pub-nav {
+    margin-left: 0;
+    margin-right: auto;
+    justify-content: flex-start;
+    text-align: left;
+  }
+  body:not(.sd116-active) .adventure-header .header-inner {
+    justify-content: flex-start;
+  }
+  body:not(.sd116-active) .adventure-header .desktop-nav,
+  body:not(.sd116-active) .adventure-header .sd115-nav {
+    margin-left: 0;
+    margin-right: auto;
+    justify-content: flex-start;
+    text-align: left;
+  }
+}
+/* Footer DOM order is links, brand, contact: left-to-right, including mobile. */
+.pub149-footer .pub149-footer-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr) minmax(0, 1fr);
+  text-align: left;
+}
+.pub149-footer .pub149-footer-grid > nav,
+.pub149-footer .pub149-footer-grid > nav a,
+.pub149-footer .pub149-footer-grid > address {
+  text-align: left;
+  justify-self: start;
+}
+.pub149-footer .pub149-footer-grid > nav a {
+  justify-content: flex-start;
+}
+@media (max-width: 720px) {
+  .pub149-footer .pub149-footer-grid {
+    grid-template-columns: minmax(0, 1fr);
+    text-align: left;
+  }
+  .public-v124 .pub-mobile-menu nav,
+  body:not(.sd116-active) .adventure-header .mobile-nav {
+    text-align: left;
+    align-items: stretch;
+  }
+}

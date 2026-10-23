@@ -1,5 +1,0 @@
-Add this line inside urlpatterns in floorplans/urls.py:
-
-path("<int:hut_id>/availability-map/", views.availability_map, name="availability_map"),
-
-Existing floorplans URLs (editor/data/save/availability) must remain unchanged.

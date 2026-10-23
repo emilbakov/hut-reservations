@@ -1,0 +1,9 @@
+{% load i18n %}
+{% for field in booking.visible_fields %}{% if field.name == 'name' or field.name == 'email' or field.name == 'phone' or field.name == 'notes' %}
+<div class="ph-guest-field field {% if field.name == 'notes' %}ph-wide wide{% endif %}">
+  <label for="{{ field.id_for_label }}">{{ field.label }} <span class="sd150-field-note">{% if field.field.required %}({% translate "required" %}){% else %}({% translate "optional" %}){% endif %}</span></label>
+  {{ field }}
+  {% if field.help_text %}<p class="sd150-help" id="{{ field.auto_id }}_helptext">{{ field.help_text }}</p>{% endif %}
+  {% if field.errors %}<div class="ph-field-errors">{{ field.errors }}</div>{% endif %}
+</div>
+{% endif %}{% endfor %}

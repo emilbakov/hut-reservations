@@ -1,0 +1,24 @@
+{% load static i18n %}
+<link rel="icon" href="{% static 'bookings/favicon-v149.svg' %}" type="image/svg+xml">
+<link rel="icon" href="{% static 'bookings/favicon-v149.png' %}" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="{% static 'bookings/apple-touch-v149.png' %}" sizes="180x180">
+{% if PUBLIC149 %}
+<meta name="description" content="{{ PUBLIC149.description }}">
+{% if PUBLIC149.private %}<meta name="robots" content="noindex, nofollow, noarchive">{% else %}<link rel="canonical" href="{{ PUBLIC149.canonical }}">{% endif %}
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="{{ PUBLIC149.brand }}">
+<meta property="og:title" content="{{ PUBLIC149.brand }} · {% translate 'Mountain stays' %}">
+<meta property="og:description" content="{{ PUBLIC149.description }}">
+<meta property="og:url" content="{{ PUBLIC149.canonical }}">
+<meta property="og:locale" content="{{ PUBLIC149.locale }}">
+<meta property="og:image" content="{{ PUBLIC149.social_image }}">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="{% translate 'Green fields and forested ridges in the Rhodope Mountains, Bulgaria' %}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ PUBLIC149.brand }} · {% translate 'Mountain stays' %}">
+<meta name="twitter:description" content="{{ PUBLIC149.description }}">
+<meta name="twitter:image" content="{{ PUBLIC149.social_image }}">
+<meta name="twitter:image:alt" content="{% translate 'Green fields and forested ridges in the Rhodope Mountains, Bulgaria' %}">
+{% endif %}

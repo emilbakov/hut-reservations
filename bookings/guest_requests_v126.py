@@ -4,6 +4,7 @@ from django.core.exceptions import PermissionDenied
 from django.template.loader import render_to_string
 
 from .models import Hut
+from .booking_flow_v150 import hut_information
 
 
 def _hut(reservation):
@@ -23,6 +24,7 @@ def _guest_context(request, reservation):
         'hut_name': hut.name if hut else settings.HUT_NAME,
         'link': link,
         'currency': settings.BOOKING_CURRENCY,
+        'hut_info': hut_information(hut) if hut else None,
     }
 
 
@@ -31,12 +33,14 @@ def send_guest_request_received(request, reservation):
     queue_request_received(request, reservation)
 
 
-def send_guest_request_declined(request, reservation):
+def send_guest_request_declined(request, reservation, *, reason='', event=''):
     from .notifications_v145 import supersede_request_notifications
     supersede_request_notifications(reservation)
     if not reservation.email:
         return
     context = _guest_context(request, reservation)
     body = render_to_string('bookings/email_request_declined_v126.txt', context)
+    if reason:
+        body += '\nMessage from the hut keeper:\n' + reason + '\n'
     from .notifications_v145 import queue_notification
-    queue_notification(reservation, 'declined_guest', 'Reservation request declined or cancelled', body, reservation.email)
+    queue_notification(reservation, 'declined_guest', 'Reservation request declined or cancelled', body, reservation.email, event=event)

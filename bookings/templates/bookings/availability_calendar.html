@@ -1,5 +1,6 @@
 {% extends "bookings/base.html" %}
-{% block title %}Room availability | SummitDesk{% endblock %}
+{% load i18n %}
+{% block title %}Bed availability | SummitDesk{% endblock %}
 {% block content %}
 <style>
 /* SummitDesk v136 — scoped, read-only monthly availability UI. */
@@ -75,8 +76,8 @@
 <section class="sd136" aria-labelledby="sd136-title">
   <header class="sd136-top">
     <div>
-      <p class="sd136-eyebrow">SummitDesk / Room management</p>
-      <h1 id="sd136-title">Room availability</h1>
+      <p class="sd136-eyebrow">Карлък / Room management</p>
+      <h1 id="sd136-title">{% translate "Bed availability" %}</h1>
       <p class="sd136-intro">Plan every bed with confidence. View room capacity, occupied nights and upcoming stays across the month.</p>
     </div>
     <div class="sd136-actions">
@@ -85,8 +86,9 @@
     </div>
   </header>
 
-  <form class="sd136-filter" method="get" aria-label="Calendar filters">
-    <label class="sd136-field hut">Mountain hut
+{% include "bookings/calendar_views_v152.html" %}
+  <details class="sd152-filters"><summary>{% translate "Filters" %} · {{ selected_hut.name|default:"All huts" }}</summary><form class="sd136-filter" method="get" data-sd152-auto aria-label="Calendar filters">
+    <label class="sd136-field hut">Hut
       <select name="hut">
         {% if request.user.is_superuser %}<option value="">All huts</option>{% endif %}
         {% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_slug == hut.slug %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}
@@ -113,7 +115,7 @@
     </label>
     {% if room_filter %}<input type="hidden" name="room" value="{{ room_filter }}">{% endif %}
     <button class="sd136-btn primary" type="submit">Apply filters</button>
-  </form>
+  </form></details>
 
   <div class="sd136-period">
     <div class="sd136-period-name">
@@ -149,11 +151,11 @@
       <tbody>
         {% for row in rows %}
           <tr>
-            <th scope="row"><span class="sd136-roomhut">{{ row.room.hut.name }}</span><strong class="sd136-roomname">{{ row.room.name }}</strong><span class="sd136-roomcap">{{ row.room.capacity }} beds total</span></th>
+            <th scope="row"><span class="sd136-roomhut">{{ row.room.hut.name }}</span><strong class="sd136-roomname">{{ row.room.name }}</strong><span class="sd136-roomcap">{{ row.room.capacity }} beds total{% if not row.room.is_active %} · {% translate "Inactive room" %}{% endif %}</span></th>
             {% for cell in row.days %}
               <td class="{% if cell.overbooked %}over{% elif cell.full %}full{% elif cell.available <= 2 %}limited{% else %}open{% endif %}" title="{{ cell.day|date:'d M Y' }}: {{ cell.booked }} occupied of {{ row.room.capacity }}">
-                <strong class="sd136-available">{{ cell.available }}</strong><span class="sd136-free">free</span>
-                <a class="sd136-book" href="{% url 'bookings:calendar_create' %}?check_in={{ cell.day|date:'Y-m-d' }}&amp;room={{ row.room.pk }}{% if selected_slug %}&amp;hut={{ selected_slug|urlencode }}{% endif %}" aria-label="Create reservation for {{ row.room.name }} on {{ cell.day|date:'d M Y' }}">+ Book</a>
+                <strong class="sd136-available">{{ cell.available }}</strong><span class="sd136-free">free</span>{% if cell.blocked %}<small>{{ cell.blocked }} {% translate "closed" %}</small>{% endif %}
+                {% if row.room.is_active %}<a class="sd136-book" href="{% url 'bookings:calendar_create' %}?check_in={{ cell.day|date:'Y-m-d' }}&amp;room={{ row.room.pk }}{% if selected_slug %}&amp;hut={{ selected_slug|urlencode }}{% endif %}" aria-label="Create reservation for {{ row.room.name }} on {{ cell.day|date:'d M Y' }}">+ Book</a>{% endif %}
                 {% if cell.reservations %}
                   <details class="sd136-details"><summary>{{ cell.booked }} booked</summary>
                     {% for r in cell.reservations %}<div class="sd136-reservation"><a href="{% url 'bookings:calendar_edit' r.code %}{% if selected_slug %}?hut={{ selected_slug|urlencode }}{% endif %}">{{ r.code }}</a><em>{{ r.guest }} · {{ r.beds }} bed{{ r.beds|pluralize }} · {{ r.status }}</em></div>{% endfor %}

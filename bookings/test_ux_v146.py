@@ -128,7 +128,7 @@ class Ux146Tests(TestCase):
         self.assertNotContains(page,'Hidden Mixed Guest')
         self.assertNotContains(page,mixed.code)
         self.assertContains(page,'Monthly stay planner')
-        self.assertContains(page,'Weekly reservation calendar')
+        self.assertContains(page,'Booking calendar')
         self.assertNotContains(page,'Django admin')
         self.client.force_login(self.superuser)
         self.assertContains(self.client.get(reverse('floorplans:staff_calendar',args=[self.hut.pk])),'Django admin')

@@ -7,12 +7,12 @@ from django.http import Http404
 from django.shortcuts import render
 from django.utils import timezone
 from django.views.decorators.http import require_GET
-from .models import Reservation, ReservationItem, Room
-from .views import permitted_hut_selection
+from .models import BedClosure, Reservation, ReservationItem, Room
+from .views import manageable_reservations, permitted_hut_selection
 
 
-def build_month(first, rooms):
-    """Return room/day rows using a single bounded reservation-item query."""
+def build_month(first, rooms, *, visible_ids=None):
+    """Return room/day availability, counting closures and all holding items."""
     last_day = monthrange(first.year, first.month)[1]
     end = date(first.year, first.month, last_day) + timedelta(days=1)
     room_list = list(rooms)
@@ -32,21 +32,24 @@ def build_month(first, rooms):
             occupancy[item.room_id].setdefault(day, []).append(item)
             day += timedelta(days=1)
     rows = []
+    closures = list(BedClosure.objects.filter(bed__room_id__in=room_ids, start__lt=end, end__gt=first)
+                    .values_list('bed__room_id', 'bed_id', 'start', 'end'))
     for room in room_list:
         cells = []
         for number in range(1, last_day + 1):
             day = first.replace(day=number)
             active = occupancy[room.pk].get(day, [])
             booked = sum(item.beds for item in active)
-            available = max(room.capacity - booked, 0)
+            blocked = len({bed for room_id, bed, start, stop in closures if room_id == room.pk and start <= day < stop})
+            available = max(room.capacity - booked - blocked, 0) if room.is_active else 0
             cells.append({
                 'day': day, 'booked': booked, 'available': available,
-                'overbooked': booked > room.capacity,
-                'full': booked >= room.capacity,
+                'overbooked': booked + blocked > room.capacity,
+                'blocked': blocked, 'full': not room.is_active or booked + blocked >= room.capacity,
                 'reservations': [
                     {'code': item.reservation.code, 'guest': item.reservation.name,
                      'beds': item.beds, 'status': item.reservation.status}
-                    for item in active
+                    for item in active if visible_ids is None or item.reservation_id in visible_ids
                 ],
             })
         rows.append({'room': room, 'days': cells})
@@ -80,7 +83,8 @@ def availability_calendar(request):
         rooms = rooms.filter(pk=int(requested_room))
         if not rooms.exists():
             raise Http404
-    rows = build_month(first, rooms)
+    visible_ids = set(manageable_reservations(request.user).filter(check_in__lt=first+timedelta(days=monthrange(first.year, first.month)[1]), check_out__gt=first).values_list('pk', flat=True))
+    rows = build_month(first, rooms, visible_ids=visible_ids)
     prev_month = first - timedelta(days=1)
     next_month = first.replace(day=monthrange(first.year, first.month)[1]) + timedelta(days=1)
     days = [first.replace(day=n) for n in range(1, monthrange(first.year, first.month)[1] + 1)]

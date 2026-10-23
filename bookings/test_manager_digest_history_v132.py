@@ -37,14 +37,16 @@ class ManagerDigestHistoryV132Tests(TestCase):
         return self.client.get(self.url + query)
 
     def test_only_own_history_is_shown(self):
-        self.add_log(days_ago=1, requests=3)
+        own = self.add_log(days_ago=1, requests=3)
         self.add_log(self.other, days_ago=1, requests=99, recipient='private@example.com')
         response = self.view()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['record_count'], 1)
         self.assertEqual(response.context['total_requests'], 3)
         self.assertNotContains(response, 'private@example.com')
-        self.assertNotContains(response, '99')
+        self.assertEqual([entry.pk for entry in response.context['page']], [own.pk])
+        # A random CSRF token can contain "99"; inspect the rendered cell.
+        self.assertNotContains(response, '<td>99</td>', html=True)
 
     def test_period_boundary_and_totals(self):
         self.add_log(days_ago=6, requests=2, huts=1)

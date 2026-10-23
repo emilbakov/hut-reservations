@@ -1,7 +1,0 @@
-SummitDesk v147 validation
-488 Django tests: 484 passed, 4 PostgreSQL-only concurrency tests skipped.
-83 DOM interaction assertions passed across English/Bulgarian public booking and desktop/mobile planner.
-28 installer safety assertions passed across v143, v145, v145.1 and v146.
-30-day hut-scoped availability: 62 queries (v146) -> 4 (v147); daily JSON matched exactly.
-System checks, JavaScript syntax, translation placeholder validation and migration drift checks pass.
-Real browser rendering, live deployment, real SMTP delivery and PostgreSQL concurrency remain unverified.

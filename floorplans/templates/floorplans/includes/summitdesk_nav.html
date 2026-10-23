@@ -1,28 +1,31 @@
 {% load i18n ui_v147 static %}
 {% if visible %}
 <link rel="stylesheet" href="{% static 'floorplans/summitdesk_shell_v116.css' %}">
+<link rel="stylesheet" href="{% static 'bookings/local_fonts_v152.css' %}">
+<link rel="stylesheet" href="{% static 'bookings/staff_v152.css' %}">
+<link rel="stylesheet" href="{% static 'bookings/karlak_nav_v154.css' %}">
 <a class="sd116-skip" href="#main-content">{% translate "Skip to main content" %}</a>
 <div class="sd116-backdrop" id="sd116-backdrop" hidden></div>
-<aside class="sd116-sidebar" id="sd116-sidebar" aria-label="{% translate "SummitDesk navigation" %}">
+<aside class="sd116-sidebar" id="sd116-sidebar" aria-label="{% translate "Карлък navigation" %}">
   <div class="sd116-brand-row">
-    <a class="sd116-brand" href="{{ dashboard_url }}" aria-label="{% translate "SummitDesk home" %}">
-      <span class="sd116-mark" aria-hidden="true">▲</span>
-      <span>Summit<span class="sd116-brand-light">Desk</span><small>{% translate "PROPERTY MANAGEMENT" %}</small></span>
+    <a class="sd116-brand" href="{{ dashboard_url }}" aria-label="Karlak — {% translate 'Hut management home' %}">
+      <img class="sd116-mark karlak-staff-logo" src="{% static 'bookings/karlak-logo-light-v153.png' %}" width="60" height="60" alt="" decoding="async">
+      <span>Karlak<small>ТУРИСТИЧЕСКО ДРУЖЕСТВО</small></span>
     </a>
     <button class="sd116-close" id="sd116-close" type="button" aria-label="{% translate "Close menu" %}">✕</button>
   </div>
   <div class="sd116-property">
-    <span class="sd116-property-caption">{% translate "WORKSPACE" %}</span>
+    <span class="sd116-property-caption">{% translate "HUT" %}</span>
     {% if property_options|length > 1 %}
-      <label class="sd116-select-label" for="sd116-property-select">{% translate "Choose property" %}</label>
-      <select id="sd116-property-select" aria-label="{% translate "Switch property" %}">
-        <option value="">{% translate "Select a property" %}</option>
+      <label class="sd116-select-label" for="sd116-property-select">{% translate "Choose hut" %}</label>
+      <select id="sd116-property-select" aria-label="{% translate "Switch hut" %}">
+        <option value="">{% translate "Select a hut" %}</option>
         {% for option in property_options %}<option value="{{ option.url }}" {% if option.selected %}selected{% endif %}>{{ option.name }}</option>{% endfor %}
       </select>
     {% elif property_options %}
       <span class="sd116-property-name">{{ property_options.0.name }}</span>
     {% else %}
-      <span class="sd116-property-name">{% translate "All properties" %}</span>
+      <span class="sd116-property-name">{% translate "All huts" %}</span>
     {% endif %}
   </div>
   <nav class="sd116-navigation" aria-label="{% translate "Main staff navigation" %}">
@@ -47,7 +50,7 @@
       {% csrf_token %}
       <button type="submit" class="sd117-signout-button">{% translate "↪ &nbsp; Sign out" %}</button>
     </form>
-    <span>{% translate "SummitDesk · Staff workspace" %}</span>
+    <span>ТД „Карлък“ · {% translate "Hut management" %}</span>
   </div>
   <style>
     .sd117-signout-form{margin:0!important;padding:0!important}
@@ -56,14 +59,14 @@
     .sd117-signout-button:focus-visible{outline:3px solid #b6e57d!important;outline-offset:4px!important}
   </style>
 </aside>
-<header class="sd116-topbar" aria-label="{% translate "Workspace toolbar" %}">
+<header class="sd116-topbar" aria-label="{% translate "Hut toolbar" %}">
   <div class="sd116-top-left">
     <button id="sd116-open" class="sd116-menu-button" type="button" aria-label="{% translate "Open navigation" %}" aria-controls="sd116-sidebar" aria-expanded="false">☰</button>
-    <div class="sd116-top-title"><span>{% translate "Workspace /" %} {% if hut %}{{ hut.name }}{% else %}{% translate "All properties" %}{% endif %}</span><strong>{% translate title %}</strong></div>
+    <div class="sd116-top-title"><span>{% translate "Hut /" %} {% if hut %}{{ hut.name }}{% else %}{% translate "All huts" %}{% endif %}</span><strong>{% translate title %}</strong></div>
   </div>
   <div class="sd116-top-actions">
     {% if search_url %}<form class="sd116-top-search" method="get" action="{{ search_url }}" role="search"><label class="sd116-sr-only" for="sd116-search">{% translate "Search reservations" %}</label><input id="sd116-search" type="search" name="q" placeholder="{% translate "Search reservations" %}" maxlength="100" required><button type="submit" aria-label="{% translate "Search" %}">⌕</button></form>{% endif %}
-    {% if new_booking_url %}<a class="sd116-create" href="{{ new_booking_url }}"><span aria-hidden="true">＋</span> {% translate "New reservation" %}</a>{% endif %}
+    {% if new_booking_url %}<a class="sd116-create" aria-label="{% translate 'New reservation' %}" href="{{ new_booking_url }}"><span aria-hidden="true">＋</span> {% translate "New reservation" %}</a>{% endif %}
     {% include "bookings/language_v147.html" %}
     <span class="sd116-avatar" title="{{ user.get_username }}" aria-label="{% blocktranslate with v0=user.get_username %}Signed in as {{ v0 }}{% endblocktranslate %}">{{ user.get_username|slice:':1'|upper }}</span>
   </div>

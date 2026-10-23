@@ -1,0 +1,24 @@
+/* Guest shell and policy pages. Loaded separately so staff layouts stay scoped. */
+.pub149-footer{margin-top:60px;padding:48px max(24px,calc((100vw - 1250px)/2)) 24px;background:#102e24;color:#f7faf5;font:400 15px/1.6 Inter,"Segoe UI",Arial,sans-serif}
+.pub149-footer-grid{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:36px}
+.pub149-footer-brand{font-size:1.25rem;overflow-wrap:anywhere}
+.pub149-footer p{color:#c3d6c8;margin:10px 0;max-width:35ch;overflow-wrap:anywhere}
+.pub149-footer h2{font:750 .8rem/1.4 Inter,"Segoe UI",Arial,sans-serif;text-transform:uppercase;letter-spacing:.1em;margin:0 0 10px;color:#d6f2a0}
+.pub149-footer address{font-style:normal}
+.pub149-footer a{display:flex;align-items:center;min-height:44px;width:fit-content;max-width:100%;padding:8px 4px;color:#e1efdf!important;text-decoration:underline;text-underline-offset:4px;overflow-wrap:anywhere}
+.pub149-footer a:hover{color:#d6f2a0!important}
+.pub149-footer a:focus-visible{outline:3px solid #d6f2a0;outline-offset:3px}
+.pub149-footer-bottom{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;border-top:1px solid #466455;padding-top:22px;margin-top:32px;color:#c3d6c8;font-size:.75rem}
+.pub149-footer-bottom>span:last-child{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.pub149-footer-bottom a{display:inline-flex}
+.pub149-policy{max-width:850px;padding-top:64px;padding-bottom:64px}
+.pub149-policy h1{font-size:clamp(2rem,5vw,3.4rem);letter-spacing:-.04em;line-height:1.15}
+.pub149-policy-meta{color:#4e6355}
+.pub149-policy-text{font-size:1rem;line-height:1.85;overflow-wrap:anywhere}
+.pub149-policy-text p{margin-bottom:1.5em}
+.pub149-policy-fallback{background:#eaf0e6;padding:16px;border-left:4px solid #42623e}
+.pub149-policy a,.pub149-privacy-link a{display:inline-flex;align-items:center;min-height:44px;color:#285e40;text-decoration:underline;text-underline-offset:3px}
+body:not(.sd116-active) .adventure-header :is(.desktop-nav a,.brand,.mobile-menu summary){min-height:44px;display:inline-flex;align-items:center}
+body:not(.sd116-active) .adventure-header .desktop-nav a{padding-block:12px}
+body:not(.sd116-active) .sd147-language button{min-width:44px;min-height:44px}
+@media(max-width:720px){.pub149-footer-grid{grid-template-columns:1fr;gap:28px}.pub149-footer-bottom{align-items:flex-start;flex-direction:column}.pub149-policy{padding-top:40px}.pub149-footer{margin-top:36px}}

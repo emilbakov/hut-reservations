@@ -100,3 +100,8 @@ body.sd116-active .scroll,body.sd116-active .sd-timeline-scroll{max-width:100%;o
   .sd116-avatar { display: none; }
   body.sd116-active #main-content.shell { overflow-wrap: anywhere; }
 }
+
+/* v153: supplied Карлък logo replaces the staff product mark. */
+.sd116-brand .sd116-mark.karlak-staff-logo{display:block;width:60px;height:60px;object-fit:contain;flex:none;background:transparent;border:0;border-radius:0;padding:0}
+.sd116-brand:has(.karlak-staff-logo){gap:9px;font-size:19px!important;letter-spacing:.015em}
+.sd116-brand:has(.karlak-staff-logo) small{font-size:9px!important;letter-spacing:.035em!important;line-height:1.35;white-space:normal}

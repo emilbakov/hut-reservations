@@ -1,0 +1,29 @@
+/* v154: Navbar emblem and brand typography. Scoped to navigation only.
+   The supplied v153 PNG already has transparent pixels; remove all CSS badges. */
+.public-v124 .pub-header .pub-brand .pub-brand-icon.karlak-public-logo,
+.adventure-header .brand .brand-icon.karlak-legacy-logo,
+body.sd116-active .sd116-sidebar .sd116-brand .sd116-mark.karlak-staff-logo {
+  display: block !important;
+  width: 72px !important;
+  height: 72px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  object-fit: contain !important;
+  flex: none !important;
+}
+.public-v124 .pub-header .pub-brand .pub-brand-icon.karlak-public-logo::before,
+.public-v124 .pub-header .pub-brand .pub-brand-icon.karlak-public-logo::after {
+  content: none !important;
+}
+.public-v124 .pub-header .pub-brand-name { font-size: 1.28rem; }
+body.sd116-active .sd116-sidebar .sd116-brand { gap: 10px; }
+body.sd116-active .sd116-sidebar .sd116-brand > span { font-size: 20px; }
+@media (max-width: 720px) {
+  .public-v124 .pub-header .pub-brand .pub-brand-icon.karlak-public-logo,
+  .adventure-header .brand .brand-icon.karlak-legacy-logo { width: 58px !important; height: 58px !important; }
+}

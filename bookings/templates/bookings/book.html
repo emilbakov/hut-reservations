@@ -1,11 +1,13 @@
 {% extends "bookings/base.html" %}
-{% load static %}
+{% load static i18n %}
 
 {% block title %}
+    {% if form_errors %}{% translate "Error:" %} {% endif %}
     {% if hut %}Book {{ hut.name }}{% else %}Book a bed{% endif %}
 {% endblock %}
 
 {% block content %}
+{% include "bookings/errors_v150.html" %}
 <style>
 /* Adventure booking page — scoped to this template */
 .adventure-booking { --ab-ink:#14201d; --ab-muted:#64736b; --ab-lime:#d5ff52; --ab-line:#dce5db; --ab-paper:#f5f7f1; color:var(--ab-ink); max-width:1220px; margin:0 auto; padding:18px 20px 80px; }
@@ -148,12 +150,12 @@
     {% if hut %}
         <form
             method="get"
-            action="{% url 'bookings:hut_detail' hut.slug %}"
+            action="{% url 'bookings:hut_detail' hut.slug %}#sd150-errors"
         >
     {% else %}
         <form
             method="get"
-            action="{% url 'bookings:book' %}"
+            action="{% url 'bookings:book' %}#sd150-errors"
         >
     {% endif %}
 
@@ -242,21 +244,23 @@
     {% if hut %}
         <form
             method="post"
-            action="{% url 'bookings:hut_detail' hut.slug %}"
+            action="{% url 'bookings:hut_detail' hut.slug %}#sd150-errors"
             class="card booking-card"
-            id="booking-form"
+            id="booking-form" novalidate
         >
     {% else %}
         <form
             method="post"
-            action="{% url 'bookings:book' %}"
+            action="{% url 'bookings:book' %}#sd150-errors"
             class="card booking-card"
-            id="booking-form"
+            id="booking-form" novalidate
         >
     {% endif %}
 
         {% csrf_token %}
 <input type="hidden" name="submission_token" value="{{ submission_token }}">
+{% include "bookings/booking_guard_v150.html" %}
+<div id="rooms" tabindex="-1"></div>
 
         <input
             type="hidden"
@@ -369,10 +373,8 @@
             <span>Estimated total</span>
 
             <strong>
-                <span id="total" aria-live="polite">
-                    0.00
-                </span>
-                {{ CURRENCY }}
+                <span id="total" aria-live="polite">{% if selected_beds %}{{ estimated_total|floatformat:2 }}{% else %}{% translate "Choose beds to see the total" %}{% endif %}</span>
+                <span id="legacy-currency" {% if not selected_beds %}hidden{% endif %}>{{ CURRENCY }}</span>
             </strong>
         </div>
 
@@ -385,15 +387,7 @@
                 <h2>Your details</h2>
 
                 <div class="guest-grid">
-                    {% for field in booking.visible_fields %}
-                        {% if field.name == 'name' or field.name == 'email' or field.name == 'phone' or field.name == 'notes' %}
-                            <div class="field {% if field.name == 'notes' %}wide{% endif %}">
-                                {{ field.label_tag }}
-                                {{ field }}
-                                {{ field.errors }}
-                            </div>
-                        {% endif %}
-                    {% endfor %}
+                    {% include "bookings/guest_fields_v150.html" %}
                 </div>
 
                 <p class="muted">
@@ -402,11 +396,13 @@
                 </p>
 
                 <button type="submit" class="primary">
-                    Confirm reservation →
+                    {% translate "Request reservation →" %}
                 </button>
             </div>
         {% endif %}
 
+    {% include "bookings/privacy_link_v149.html" %}
+    {% include "bookings/payment_note_v150.html" %}
     </form>
 
     <script>
@@ -416,7 +412,7 @@
             const nights = {{ nights }};
 
             function updateTotal() {
-                let cents = 0;
+                let cents = 0, selected = 0;
 
                 inputs.forEach((input) => {
                     const beds = Math.max(
@@ -424,13 +420,15 @@
                         parseInt(input.value, 10) || 0
                     );
 
+                    selected += beds;
                     const price = Number(input.dataset.price) || 0;
 
                     cents += Math.round(price * 100) * beds * nights;
                 });
 
                 if (total) {
-                    total.textContent = (cents / 100).toFixed(2);
+                    total.textContent = selected ? (cents / 100).toFixed(2) : "{{ empty_total_message|escapejs }}";
+                    document.getElementById('legacy-currency').hidden = selected === 0;
                 }
             }
 

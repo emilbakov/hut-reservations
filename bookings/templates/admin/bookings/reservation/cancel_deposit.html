@@ -1,0 +1,54 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">Home</a> &rsaquo;
+  <a href="{% url 'admin:bookings_reservation_changelist' %}">Reservations</a> &rsaquo;
+  <a href="{{ change_url }}">{{ reservation.code }}</a> &rsaquo; Cancel / deposit
+</div>
+{% endblock %}
+{% block content %}
+<div style="max-width:850px">
+  <h1>Cancel reservation and handle deposit</h1>
+  <p><strong>{{ reservation.name }}</strong> &middot; {{ reservation.code }} &middot; {{ reservation.check_in }} to {{ reservation.check_out }}</p>
+  {% if already_cancelled %}
+  <p class="messagelist warning" style="padding:12px;background:#fff2cc">This reservation is already cancelled. You can record the outstanding deposit decision here.</p>
+  {% else %}
+  <p>Cancellation releases the booked beds. The reservation and its financial history remain in Django Admin.</p>
+  {% endif %}
+  <fieldset class="module aligned">
+    <h2>Payment ledger before cancellation</h2>
+    <div style="padding:16px">
+      <p>Deposits received: <strong>{{ amounts.deposits|floatformat:2 }} {{ currency }}</strong></p>
+      <p>Other payments: <strong>{{ amounts.payments|floatformat:2 }} {{ currency }}</strong></p>
+      <p>Previous refunds: <strong>{{ amounts.refunded|floatformat:2 }} {{ currency }}</strong></p>
+      <p>Net received / maximum new refund: <strong>{{ amounts.net|floatformat:2 }} {{ currency }}</strong></p>
+    </div>
+  </fieldset>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="errornote">{{ form.non_field_errors }}</div>{% endif %}
+    <fieldset class="module aligned">
+      <h2>Deposit decision</h2>
+      <div style="padding:16px">
+        <p><strong>{{ form.outcome.label }}</strong></p>
+        {{ form.outcome }} {{ form.outcome.errors }}
+        <p class="help">Retain keeps the received funds in the ledger. Refund records money you have already returned. Partial refunds retain the remainder.</p>
+        {% for field in form %}
+          {% if field.name != 'outcome' and field.name != 'confirm_cancel' %}
+          <div class="form-row" style="padding:10px 0">
+            <div><label for="{{ field.id_for_label }}">{{ field.label }}</label> {{ field }} {{ field.errors }}</div>
+          </div>
+          {% endif %}
+        {% endfor %}
+        <p><strong>{{ form.confirm_cancel }} {{ form.confirm_cancel.label }}</strong> {{ form.confirm_cancel.errors }}</p>
+      </div>
+    </fieldset>
+    <p class="help" style="margin:16px 0">This action does not send money or trigger a bank/card refund. For a refund, complete the payment externally first, then confirm it here. The decision is recorded in an audit entry and cannot be submitted twice.</p>
+    <div class="submit-row">
+      <input type="submit" value="Confirm cancellation and deposit decision" class="default">
+      <a href="{{ change_url }}" class="button" style="margin-left:12px">Back without changes</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

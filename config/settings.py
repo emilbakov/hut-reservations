@@ -1,20 +1,49 @@
 """Settings for the hut reservations site.
 
-Development defaults work out of the box. For production set the
-environment variables DJANGO_SECRET_KEY, DJANGO_DEBUG=0 and
-DJANGO_ALLOWED_HOSTS, and switch the database to PostgreSQL.
+DEBUG is off unless DJANGO_DEBUG=1 is explicitly set for development.
+Production requires DJANGO_SECRET_KEY. Set DJANGO_ALLOWED_HOSTS to a
+comma-separated list of hostnames/IPs and use PostgreSQL. Uploaded photos
+use DJANGO_MEDIA_ROOT, defaulting to /var/www/hut-media in production.
 """
 
 import os
 from pathlib import Path
+from ipaddress import ip_network
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-DEBUG = os.environ.get("DJANGO_DEBUG", "1") == "1"
+# Shared database submission budgets; forwarded IP headers are never trusted.
+BOOKING_BROWSER_LIMIT = int(os.environ.get("DJANGO_BOOKING_BROWSER_LIMIT", "12"))
+BOOKING_EMAIL_LIMIT = int(os.environ.get("DJANGO_BOOKING_EMAIL_LIMIT", "6"))
+BOOKING_IP_LIMIT = int(os.environ.get("DJANGO_BOOKING_IP_LIMIT", "60"))
+if min(BOOKING_BROWSER_LIMIT, BOOKING_EMAIL_LIMIT, BOOKING_IP_LIMIT) < 1:
+    raise RuntimeError("Booking request limits must be positive")
+
+# No forwarding header is trusted unless its transport/peer is explicitly enabled.
+# With these unset, Unix-socket clients use separate browser/account budgets.
+TRUST_UNIX_PROXY = os.environ.get("DJANGO_TRUST_UNIX_PROXY", "0") == "1"
+TRUSTED_PROXY_CIDRS = tuple(value.strip() for value in os.environ.get(
+    "DJANGO_TRUSTED_PROXY_CIDRS", "").split(",") if value.strip())
+for proxy_network in TRUSTED_PROXY_CIDRS:
+    if ip_network(proxy_network).prefixlen == 0:
+        raise RuntimeError("Do not trust every address as a reverse proxy")
+
+LOGIN_PAIR_LIMIT = int(os.environ.get("DJANGO_LOGIN_PAIR_LIMIT", "5"))
+LOGIN_IP_LIMIT = int(os.environ.get("DJANGO_LOGIN_IP_LIMIT", "20"))
+LOGIN_BROWSER_LIMIT = int(os.environ.get("DJANGO_LOGIN_BROWSER_LIMIT", "20"))
+LOGIN_ACCOUNT_LIMIT = int(os.environ.get("DJANGO_LOGIN_ACCOUNT_LIMIT", "20"))
+if min(LOGIN_PAIR_LIMIT, LOGIN_IP_LIMIT, LOGIN_BROWSER_LIMIT, LOGIN_ACCOUNT_LIMIT) < 1:
+    raise RuntimeError("Login attempt limits must be positive")
+
+DEBUG = os.environ.get("DJANGO_DEBUG", "0") == "1"
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-only-change-me")
-if not DEBUG and SECRET_KEY == "dev-only-change-me":
+if not DEBUG and (not SECRET_KEY.strip() or SECRET_KEY == "dev-only-change-me"):
     raise RuntimeError("Set DJANGO_SECRET_KEY before running in production")
-ALLOWED_HOSTS = ['167.233.96.3','127.0.0.1']
+ALLOWED_HOSTS = [host.strip() for host in os.environ.get(
+    "DJANGO_ALLOWED_HOSTS", "167.233.96.3,127.0.0.1,localhost"
+).split(",") if host.strip()]
+if not DEBUG and not ALLOWED_HOSTS:
+    raise RuntimeError("Set DJANGO_ALLOWED_HOSTS to the hostnames/IPs this site serves")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -36,6 +65,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "bookings.login_guard_v151.LoginThrottleMiddleware",
     "bookings.staff_auth_v117.StaffLoginRedirectMiddleware",
     "floorplans.audit_actor.ReservationAuditActorMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -91,6 +121,14 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = "/var/www/hut-static"
+
+# nginx serves public hut photos in production; Django serves them only in DEBUG.
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.environ.get("DJANGO_MEDIA_ROOT") or (
+    str(BASE_DIR / "media") if DEBUG else "/var/www/hut-media"
+)
+if not DEBUG and not Path(MEDIA_ROOT).is_absolute():
+    raise RuntimeError("DJANGO_MEDIA_ROOT must be an absolute directory in production")
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 

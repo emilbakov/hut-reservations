@@ -1,0 +1,23 @@
+{% load i18n static %}
+<footer class="pub149-footer">
+  <div class="pub149-footer-grid">
+
+    <div><div class="karlak-footer-brand"><img src="{% static 'bookings/karlak-logo-light-v153.png' %}" width="66" height="66" alt="" decoding="async"><strong class="pub149-footer-brand">{{ HUT_NAME }}</strong></div><p>{% translate "Find a place to rest. Make room for adventure." %}</p></div>
+    {% if PUBLIC149.phone or PUBLIC149.email or PUBLIC149.address or PUBLIC149.map_url %}
+    <div><h2>{% translate "Contact" %}</h2><address>
+      {% if PUBLIC149.phone %}<a href="tel:{{ PUBLIC149.tel }}">{{ PUBLIC149.phone }}</a>{% endif %}
+      {% if PUBLIC149.email %}<a href="mailto:{{ PUBLIC149.email }}">{{ PUBLIC149.email }}</a>{% endif %}
+      {% if PUBLIC149.address %}<p lang="{{ PUBLIC149.address_lang }}">{{ PUBLIC149.address }}</p>{% endif %}
+      {% if PUBLIC149.map_url %}<a href="{{ PUBLIC149.map_url }}" rel="external nofollow">{% translate "View on map" %} <span aria-hidden="true">↗</span></a>{% endif %}
+    </address></div>
+    {% endif %}
+    <nav aria-label="{% translate 'Footer navigation' %}"><h2>{% translate "Useful links" %}</h2>
+      <a href="{% url 'bookings:hut_list' %}">{% translate "Explore huts" %}</a>
+      <a href="{% url 'bookings:public_home' %}#questions">{% translate "Booking questions" %}</a>
+      {% if PUBLIC149.cancellation %}<a href="{% url 'bookings:public_policy' 'cancellation' %}">{% translate "Cancellation policy" %}</a>{% endif %}
+      {% if PUBLIC149.privacy %}<a href="{% url 'bookings:public_policy' 'privacy' %}">{% translate "Privacy notice" %}</a>{% endif %}
+      <a href="{% url 'bookings:staff_login' %}">{% translate "Staff portal" %} <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <div class="pub149-footer-bottom"><span>{% translate "Powered by SummitDesk" %}</span><span>{% translate "Landscape photo:" %} <a href="https://commons.wikimedia.org/wiki/File:Green_fields_and_mountains_-_Flickr_-_blooddrainer.jpg">Anton Atanasov</a> · <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a> · {% translate "cropped and compressed" %}</span></div>
+</footer>

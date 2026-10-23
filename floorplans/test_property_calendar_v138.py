@@ -70,6 +70,38 @@ class PropertyCalendarV138Tests(TestCase):
         self.assertContains(response, 'Alpine Guest')
         self.assertContains(response, reverse('floorplans:staff_reservation', args=[self.hut.pk, rows[0]['days'][0]['reservations'][0]['code']]))
 
+    def test_preview_shows_reference_and_existing_reservation_destination(self):
+        """The quick preview uses only authorized data already in the calendar."""
+        reservation = self.reserve(
+            self.room, self.first, self.first + timedelta(days=2), 2,
+            name='Preview Guest', status=Reservation.Status.PENDING,
+        )
+        self.client.force_login(self.manager)
+        response = self.client.get(self.url(), {
+            'year': self.first.year, 'month': self.first.month,
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'id="sd146-preview"')
+        self.assertContains(response, 'id="sd146-preview-code"')
+        self.assertContains(response, 'id="sd146-preview-status"')
+        self.assertContains(response, 'id="sd146-preview-arrival"')
+        self.assertContains(response, 'id="sd146-preview-departure"')
+        self.assertContains(response, 'data-code="%s"' % reservation.code)
+        self.assertContains(response, 'data-status="pending"')
+        self.assertContains(response, reverse(
+            'floorplans:staff_reservation', args=[self.hut.pk, reservation.code],
+        ))
+        self.assertNotContains(response, 'Secret Other Hut')
+
+    def test_calendar_preview_script_handles_reference_and_inactive_rooms(self):
+        from pathlib import Path
+
+        script = (Path(__file__).resolve().parent / 'static' / 'floorplans'
+                  / 'property_planner_v147.js').read_text(encoding='utf-8')
+        self.assertIn("$('sd146-preview-code').textContent=entry.code", script)
+        self.assertIn("row.dataset.active!=='1'", script)
+        self.assertIn("$('sd146-preview-link').href=entry.href", script)
+
     def test_maintenance_distinct_beds_and_cancelled_excluded(self):
         bed = Bed.objects.create(room=self.room, number=1)
         BedClosure.objects.create(bed=bed, start=self.first, end=self.first + timedelta(days=2))

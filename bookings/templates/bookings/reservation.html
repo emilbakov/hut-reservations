@@ -1,302 +1,15 @@
 
-{% extends "bookings/base.html" %}
-{% load i18n ui_v147 %}
+{% extends reservation_base_template|default:"bookings/public_base_v124.html" %}
+{% load i18n ui_v147 static %}
 {% block title %}{% blocktranslate with v0=reservation.code %}Reservation {{ v0 }}{% endblocktranslate %}{% endblock %}
 
 {% block content %}
-<style>
-  .rs-page {
-    --ink: #172a20;
-    --muted: #65756c;
-    --green: #173d2d;
-    --lime: #c7f36b;
-    --line: #e2e9e2;
-    --surface: #f5f8f3;
-    max-width: 1120px;
-    margin: 0 auto;
-    padding: 28px 0 80px;
-    color: var(--ink);
-  }
+<link rel="stylesheet" href="{% static 'bookings/reservation_v150.css' %}">
 
-  .rs-page * { box-sizing: border-box; }
-  .rs-page a { text-decoration: none; }
-
-  .rs-hero {
-    position: relative;
-    overflow: hidden;
-    border-radius: 28px;
-    background: linear-gradient(120deg, #10291e, #28543b);
-    color: white;
-    padding: clamp(26px, 5vw, 48px);
-  }
-
-  .rs-hero::after {
-    content: "";
-    position: absolute;
-    width: 350px;
-    height: 350px;
-    right: -100px;
-    bottom: -210px;
-    border: 65px solid rgba(199,243,107,.10);
-    border-radius: 50%;
-    pointer-events: none;
-  }
-
-  .rs-eyebrow {
-    color: var(--lime);
-    font-size: .76rem;
-    letter-spacing: .16em;
-    text-transform: uppercase;
-    font-weight: 800;
-    margin: 0 0 12px;
-  }
-
-  .rs-hero h1 {
-    color: white;
-    font-size: clamp(2rem, 5vw, 3.5rem);
-    letter-spacing: -.055em;
-    line-height: 1.1;
-    margin: 0 0 14px;
-  }
-
-  .rs-hero-description {
-    color: #dbe9df;
-    max-width: 600px;
-    line-height: 1.6;
-    margin: 0;
-  }
-
-  .rs-status {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    border-radius: 999px;
-    padding: 8px 13px;
-    font-size: .78rem;
-    font-weight: 800;
-    margin-bottom: 20px;
-  }
-
-  .rs-status::before {
-    content: "";
-    width: 8px;
-    height: 8px;
-    background: currentColor;
-    border-radius: 50%;
-  }
-
-  .rs-confirmed { background: var(--lime); color: #214018; }
-  .rs-pending { background: #fff0b3; color: #745300; }
-  .rs-cancelled { background: #ffe1dd; color: #922e26; }
-
-  .rs-ref {
-    margin-top: 25px;
-    display: inline-flex;
-    gap: 10px;
-    align-items: center;
-    padding: 10px 14px;
-    background: rgba(255,255,255,.10);
-    border: 1px solid rgba(255,255,255,.15);
-    border-radius: 12px;
-    font-size: .85rem;
-  }
-
-  .rs-ref strong {
-    color: white;
-    font-family: ui-monospace, monospace;
-    overflow-wrap: anywhere;
-  }
-
-  .rs-date-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 14px;
-    margin-top: 22px;
-  }
-
-  .rs-date-card {
-    background: white;
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    padding: 22px;
-    min-width: 0;
-  }
-
-  .rs-label {
-    color: var(--muted);
-    font-size: .77rem;
-    font-weight: 750;
-    letter-spacing: .06em;
-    text-transform: uppercase;
-    margin-bottom: 10px;
-  }
-
-  .rs-date-value {
-    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
-    font-weight: 850;
-    letter-spacing: -.04em;
-  }
-
-  .rs-date-sub {
-    color: var(--muted);
-    font-size: .83rem;
-    margin-top: 5px;
-  }
-
-  .rs-layout {
-    display: grid;
-    grid-template-columns: minmax(0, 1.3fr) minmax(280px, .85fr);
-    gap: 22px;
-    margin-top: 22px;
-    align-items: start;
-  }
-
-  .rs-panel {
-    background: white;
-    border: 1px solid var(--line);
-    border-radius: 22px;
-    padding: clamp(22px, 3vw, 30px);
-    min-width: 0;
-  }
-
-  .rs-panel h2 {
-    color: var(--ink);
-    font-size: 1.35rem;
-    letter-spacing: -.035em;
-    margin: 0 0 22px;
-  }
-
-  .rs-section-tag {
-    color: #547557;
-    text-transform: uppercase;
-    letter-spacing: .13em;
-    font-size: .7rem;
-    font-weight: 800;
-    margin: 0 0 7px;
-  }
-
-  .rs-info-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 22px;
-  }
-
-  .rs-info-item { min-width: 0; }
-
-  .rs-info-value {
-    font-weight: 750;
-    overflow-wrap: anywhere;
-  }
-
-  .rs-note {
-    padding: 15px 17px;
-    border-radius: 13px;
-    margin-bottom: 24px;
-    font-size: .9rem;
-    line-height: 1.6;
-    background: #f0f7e8;
-    color: #315326;
-  }
-
-  .rs-note.pending { background: #fff7dc; color: #795700; }
-  .rs-note.cancelled { background: #fff0ee; color: #8d3028; }
-
-  .rs-room {
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 17px 0;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .rs-room:first-of-type { padding-top: 0; }
-
-  .rs-room-name { font-weight: 800; }
-  .rs-room-beds { color: var(--muted); font-size: .85rem; margin-top: 5px; }
-  .rs-room-price { font-weight: 800; white-space: nowrap; text-align: right; }
-
-  .rs-total {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 12px;
-    padding-top: 24px;
-  }
-
-  .rs-total span { color: var(--muted); font-weight: 700; }
-
-  .rs-total strong {
-    font-size: 1.8rem;
-    letter-spacing: -.045em;
-  }
-
-  .rs-actions {
-    margin-top: 22px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-
-  .rs-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 48px;
-    border-radius: 12px;
-    padding: 13px 18px;
-    font-weight: 800;
-    font-size: .9rem;
-    cursor: pointer;
-    text-align: center;
-    transition: background .15s ease;
-  }
-
-  .rs-button-primary {
-    background: var(--green);
-    color: white !important;
-    border: 1px solid var(--green);
-  }
-
-  .rs-button-primary:hover { background: #28563c; }
-
-  .rs-button-danger {
-    background: white;
-    color: #a53b30;
-    border: 1px solid #e8c4be;
-  }
-
-  .rs-button-danger:hover { background: #fff1ef; }
-
-  .rs-help {
-    color: var(--muted);
-    font-size: .83rem;
-    line-height: 1.6;
-    margin: 22px 0 0;
-  }
-
-  @media (max-width: 780px) {
-    .rs-layout { grid-template-columns: 1fr; }
-    .rs-date-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .rs-date-card:last-child { grid-column: 1 / -1; }
-  }
-
-  @media (max-width: 480px) {
-    .rs-page { padding-top: 12px; }
-    .rs-hero { border-radius: 20px; }
-    .rs-date-grid { gap: 10px; }
-    .rs-date-card { padding: 17px; }
-    .rs-panel { border-radius: 18px; }
-    .rs-info-grid { gap: 20px 12px; }
-    .rs-actions, .rs-actions form, .rs-actions .rs-button {
-      width: 100%;
-    }
-  }
-</style>
-
-<main class="rs-page">
+<div class="pub-container rs-page">
 
   <header class="rs-hero">
-    <p class="rs-eyebrow">{% translate "SummitDesk / Your mountain stay" %}</p>
+    <p class="rs-eyebrow">{{ HUT_NAME }}</p>
 
     {% if reservation.status == 'cancelled' %}
       <span class="rs-status rs-cancelled">{% translate "Cancelled" %}</span>
@@ -313,7 +26,7 @@
           {% translate "Awaiting confirmation" %}
         {% endif %}
       </span>
-      <h1>{% translate "Your adventure awaits." %}</h1>
+      <h1>{% translate "Request received." %}</h1>
       <p class="rs-hero-description">
         {% if reservation.guest_request %}
           {% translate "Your request has been received. Your selected beds are held while the hut manager reviews your reservation." %}
@@ -336,6 +49,7 @@
     </div>
   </header>
 
+  {% for hut_info in receipt_huts %}{% include "bookings/hut_contact_v150.html" %}{% endfor %}
   <section class="rs-date-grid" aria-label="{% translate "Stay dates" %}">
     <div class="rs-date-card">
       <div class="rs-label">{% translate "Check-in" %}</div>
@@ -403,7 +117,7 @@
         </div>
 
         {% if reservation.email %}
-          <div class="rs-info-item">
+          <div class="rs-info-item rs-email">
             <div class="rs-label">{% translate "Email address" %}</div>
             <div class="rs-info-value">{{ reservation.email }}</div>
           </div>
@@ -434,12 +148,14 @@
               {% translate "Cancel reservation" %}
             </button>
           </form>
-        {% else %}
+        {% elif can_request_changes %}
           <a class="rs-button rs-button-primary" href="{{ guest_portal_url }}">{% translate "Request a change or cancellation &rarr;" %}</a>
         {% endif %}
         </div>
       {% endif %}
 
+      {% if reservation.status != 'cancelled' and not can_request_changes and not can_manage_directly %}<p class="rs-note">{% translate "This stay has started or passed. Please contact the hut about changes." %}</p>{% endif %}
+      {% if reservation.status == 'pending' %}<section class="sd150-next"><h3>{% translate "What happens next?" %}</h3><p>{% translate "The hut manager will email their decision. Please wait for approval before travelling." %}</p>{% for hut_info in receipt_huts %}{% if hut_info.reply %}<p lang="{{ hut_info.reply_lang }}">{{ hut_info.reply }}</p>{% endif %}{% endfor %}<p>{% translate "If your arrival is soon, contact the hut directly." %}</p></section>{% endif %}
       <p class="rs-help">
         {% translate "This page is accessible through your private reservation link. Please avoid sharing it publicly." %}
       </p>
@@ -458,7 +174,7 @@
       {% for item in reservation.items.all %}
         <div class="rs-room">
           <div>
-            <div class="rs-room-name">{{ item.room.name }}</div>
+            <div class="rs-hut-name">{{ item.room.hut.name }}</div><div class="rs-room-name">{{ item.room.name }}</div>
             <div class="rs-room-beds">
               {{ item.beds|bed_count }}
             </div>
@@ -473,11 +189,12 @@
       {% endfor %}
 
       <div class="rs-total">
-        <span>{% translate "Total price" %}</span>
+        <span>{% if reservation.status == 'pending' %}{% translate "Estimated total" %}{% else %}{% translate "Total price" %}{% endif %}</span>
         <strong>{{ reservation.total_price }} {{ CURRENCY }}</strong>
       </div>
     </section>
 
   </div>
-</main>
+  {% if reservation.status != 'cancelled' %}{% if receipt_huts %}{% for hut_info in receipt_huts %}{% include "bookings/payment_note_v150.html" %}{% endfor %}{% else %}{% include "bookings/payment_note_v150.html" %}{% endif %}{% endif %}
+</div>
 {% endblock %}

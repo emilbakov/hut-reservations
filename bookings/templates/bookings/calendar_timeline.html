@@ -1,5 +1,6 @@
 {% extends "bookings/base.html" %}
-{% block title %}Reservation calendar{% endblock %}
+{% load i18n %}
+{% block title %}Booking calendar{% endblock %}
 {% block content %}
 <style>
 .sd-timeline{--ink:#173b30;--muted:#63786d;--line:#dce8df;--green:#195b42;--lime:#d7efbd;color:var(--ink);font-family:'DM Sans',system-ui,sans-serif;max-width:1500px;margin:0 auto;padding:12px 0 40px}
@@ -87,14 +88,22 @@
 }
 </style>
 <div class="sd-timeline">
-<header class="sd-head"><div><p class="sd-eyebrow">SummitDesk / Reservations</p><h1>Reservation calendar</h1><p class="sd-sub">A clear view of who is staying, in which room, and for how long. Select a booking to review it.</p></div>
+<header class="sd-head"><div><p class="sd-eyebrow">Карлък / Reservations</p><h1>{% translate "Booking calendar" %}</h1><p class="sd-sub">A clear view of who is staying, in which room, and for how long. Select a booking to review it.</p></div>
 <div class="sd-actions"><a class="sd-button" href="{% url 'bookings:manager_reservations' %}">All reservations</a><a class="sd-button primary" href="{% url 'bookings:manual_booking' %}">+ New reservation</a></div></header>
-<form class="sd-toolbar" method="get">
-<label class="sd-field" for="sd-start">Week starting<input id="sd-start" type="date" name="start" value="{{ start|date:'Y-m-d' }}"></label>
-<label class="sd-field" for="sd-hut">Mountain hut<select id="sd-hut" name="hut">{% if request.user.is_superuser %}<option value="">All huts</option>{% endif %}{% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_slug == hut.slug %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}</select></label>
-<button class="sd-button primary" type="submit">Show dates</button>
-<nav class="sd-nav" aria-label="Calendar navigation"><a class="sd-button" href="?start={{ prev|date:'Y-m-d' }}{% if selected_slug %}&amp;hut={{ selected_slug|urlencode }}{% endif %}">← Previous</a><strong>{{ start|date:'d M' }} – {{ last_day|date:'d M Y' }}</strong><a class="sd-button" href="?start={{ next|date:'Y-m-d' }}{% if selected_slug %}&amp;hut={{ selected_slug|urlencode }}{% endif %}">Next →</a></nav>
-</form>
+{% include "bookings/calendar_views_v152.html" %}
+<details class="sd152-filters"><summary>{% translate "Filters" %} · {{ selected_hut.name|default:"All huts" }} · {{ start|date:'j M Y' }}</summary>
+<form class="sd-toolbar" method="get" data-sd152-auto>
+<label class="sd-field" for="sd-start">{% translate "Week starting" %}<input id="sd-start" type="date" name="start" min="2000-01-01" max="2100-12-31" value="{{ start|date:'Y-m-d' }}"></label>
+<label class="sd-field" for="sd-hut">{% translate "Hut" %}<select id="sd-hut" name="hut">{% if request.user.is_superuser %}<option value="">All huts</option>{% endif %}{% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_slug == hut.slug %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}</select></label>
+<button class="sd-button primary" type="submit">{% translate "Show dates" %}</button></form></details>
+<nav class="sd-nav" aria-label="Calendar navigation"><a class="sd-button" href="?start={{ prev|date:'Y-m-d' }}{% if selected_slug %}&amp;hut={{ selected_slug|urlencode }}{% endif %}">← Previous</a><strong>{{ start|date:'d M' }} – {{ last_day|date:'d M Y' }}</strong><a class="sd-button" href="?start={{ today|date:'Y-m-d' }}{% if selected_slug %}&amp;hut={{ selected_slug|urlencode }}{% endif %}">Today</a><a class="sd-button" href="?start={{ next|date:'Y-m-d' }}{% if selected_slug %}&amp;hut={{ selected_slug|urlencode }}{% endif %}">Next →</a></nav>
+<div class="sd152-view-toggle" role="group" aria-label="Calendar view"><button type="button" class="sd152-quiet" data-sd152-view="list" aria-pressed="true">{% translate "Week list" %}</button><button type="button" class="sd152-quiet" data-sd152-view="grid" aria-pressed="false">{% translate "Timeline" %}</button></div>
+<div class="sd152-agenda">
+{% for day in agenda %}<details class="sd152-day" {% if forloop.first %}open{% endif %}><summary><strong>{% if day.day == today %}Today · {% endif %}{{ day.day|date:"D, j M" }}</strong><span>{{ day.free }} {% translate "free beds" %}</span></summary>
+{% for cell in day.rooms %}<div class="sd152-agenda-room"><p><strong>{{ cell.room.hut.name }} · {{ cell.room.name }}</strong> · {{ cell.free }} {% translate "free" %}{% if cell.blocked %} · {{ cell.blocked }} {% translate "closed" %}{% endif %}{% if not cell.room.is_active %} · Inactive room{% endif %}{% if cell.over %} · Over capacity{% endif %}</p>
+{% for item in cell.items %}<a class="sd152-agenda-booking {% if item.reservation.status == 'pending' %}pending{% endif %}" href="{% url 'bookings:calendar_edit' item.reservation.code %}" data-code="{{ item.reservation.code }}" data-guest="{{ item.reservation.name }}" data-beds="{{ item.beds }}" data-status="{{ item.reservation.status }}" data-check-in="{{ item.reservation.check_in|date:'Y-m-d' }}" data-check-out="{{ item.reservation.check_out|date:'Y-m-d' }}" data-room-name="{{ cell.room.name }}" data-hut-name="{{ cell.room.hut.name }}"><span>{{ item.reservation.name }} · {{ item.reservation.get_status_display }}</span><small>{{ item.beds }} {% translate "beds" %}</small></a>{% endfor %}</div>{% empty %}<p>No rooms available for this hut.</p>{% endfor %}</details>{% endfor %}
+</div>
+
 <div class="sd-legend"><span><i class="sd-dot"></i>Confirmed</span><span><i class="sd-dot pending"></i>Pending</span><span><i class="sd-dot over"></i>Over capacity</span><span>Bars represent booked nights; departure day is excluded.</span></div>
 <p class="sd-mobile-scroll-hint" id="sd-mobile-scroll-hint">↔ Swipe sideways to view the full week.</p>
 <div class="sd-board" role="region" aria-label="Scrollable seven-day reservation timeline" tabindex="0">
@@ -102,9 +111,10 @@
 <div class="sd-corner">ROOM / NIGHT</div>{% for day in days %}<div class="sd-dayhead {% if day == today %}today{% endif %}">{{ day|date:'D' }}<strong>{{ day|date:'d' }}</strong></div>{% endfor %}
 {% for row in rows %}
 <div class="sd-room"><span class="hut">{{ row.room.hut.name }}</span><strong>{{ row.room.name }}</strong><small>{{ row.room.capacity }} beds</small></div>
-<div class="sd-track" style="grid-template-rows:repeat({{ row.track_count }},42px)" data-room="{{ row.room.pk }}" data-hut="{{ row.room.hut_id }}">
-{% for cell in row.cells %}<div class="sd-bg {% if cell.free < 0 %}over{% endif %}" style="grid-column:{{ forloop.counter }};grid-row:1 / {{ row.grid_end }}" data-room="{{ row.room.pk }}" data-day="{{ cell.day|date:'Y-m-d' }}" data-hut="{{ row.room.hut_id }}" title="{{ cell.free }} free beds on {{ cell.day|date:'d M Y' }}"></div>{% endfor %}
-{% for bar in row.bars %}<a class="sd-booking {% if bar.status == 'pending' %}pending{% endif %}" draggable="true" href="{% url 'bookings:calendar_edit' bar.code %}" style="grid-column:{{ bar.first }} / span {{ bar.span }};grid-row:{{ bar.track }}" data-code="{{ bar.code }}" data-start="{{ bar.check_in|date:'Y-m-d' }}" data-hut="{{ row.room.hut_id }}" data-guest="{{ bar.guest }}" data-beds="{{ bar.beds }}" data-status="{{ bar.status }}" data-check-in="{{ bar.check_in|date:'Y-m-d' }}" data-check-out="{{ bar.check_out|date:'Y-m-d' }}" data-room-name="{{ row.room.name }}" data-hut-name="{{ row.room.hut.name }}" title="{{ bar.guest }} · {{ bar.beds }} beds · {{ bar.check_in|date:'d M' }} to {{ bar.check_out|date:'d M' }} · Select to review"><span>{{ bar.guest }}</span><small>· {{ bar.beds }} bed{{ bar.beds|pluralize }}</small></a>{% endfor %}
+<div class="sd-track" style="grid-template-rows:repeat({{ row.track_count }},48px)" data-room="{{ row.room.pk }}" data-hut="{{ row.room.hut_id }}">
+{% for cell in row.cells %}<div class="sd-bg {% if cell.over %}over{% endif %}" style="grid-column:{{ forloop.counter }};grid-row:1 / {{ row.grid_end }}" data-room="{{ row.room.pk }}" data-day="{{ cell.day|date:'Y-m-d' }}" data-hut="{{ row.room.hut_id }}" title="{{ cell.free }} {% translate "free" %} beds on {{ cell.day|date:'d M Y' }}"></div>{% endfor %}
+{% for cell in row.cells %}<span class="sd152-free" style="left:calc({{ forloop.counter0 }} * 100% / 7)">{{ cell.free }} {% translate "free" %}{% if cell.over %} !{% endif %}</span>{% endfor %}
+{% for bar in row.bars %}<a class="sd-booking {% if bar.status == 'pending' %}pending{% endif %}" draggable="true" href="{% url 'bookings:calendar_edit' bar.code %}" style="grid-column:{{ bar.first }} / span {{ bar.span }};grid-row:{{ bar.track }}" data-code="{{ bar.code }}" data-start="{{ bar.check_in|date:'Y-m-d' }}" data-hut="{{ row.room.hut_id }}" data-guest="{{ bar.guest }}" data-beds="{{ bar.beds }}" data-status="{{ bar.status }}" data-check-in="{{ bar.check_in|date:'Y-m-d' }}" data-check-out="{{ bar.check_out|date:'Y-m-d' }}" data-room-name="{{ row.room.name }}" data-hut-name="{{ row.room.hut.name }}" title="{{ bar.guest }} · {{ bar.beds }} {% translate "beds" %} · {{ bar.check_in|date:'d M' }} to {{ bar.check_out|date:'d M' }} · Select to review"><span>{{ bar.guest }}</span><small>{{ bar.beds }} {% translate "beds" %}</small></a>{% endfor %}
 </div>
 {% empty %}<div class="sd-empty">No rooms available for this hut.</div>{% endfor %}
 </div></div>
@@ -170,7 +180,7 @@ document.querySelectorAll('.sd-bg').forEach(cell=>{
   'use strict';
   const dialog = document.getElementById('sd-quickview');
   if (!dialog || typeof dialog.showModal !== 'function') return;
-  const bookings = document.querySelectorAll('.sd-timeline .sd-booking');
+  const bookings = document.querySelectorAll('.sd-timeline .sd-booking, .sd152-agenda-booking');
   if (!bookings.length) return;
 
   const fields = {
@@ -204,7 +214,7 @@ document.querySelectorAll('.sd-bg').forEach(cell=>{
     return String(Math.round((b - a) / 86400000));
   }
   bookings.forEach(link => {
-    link.title = 'View reservation details';
+    if (!link.title) link.title = 'View reservation details';
     link.setAttribute('aria-haspopup', 'dialog');
     link.addEventListener('dragstart', () => {dragging = true;});
     link.addEventListener('dragend', () => {dragging = false; ignoreClicksUntil = Date.now() + 450;});

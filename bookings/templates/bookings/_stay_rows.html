@@ -8,7 +8,7 @@
     {% for reservation in reservations %}
     <tr>
       <td><span class="stay-guest">{{ reservation.name }}</span><span class="stay-code">Ref. {{ reservation.code }}</span></td>
-      <td class="stay-contact" data-label="Contact">{% if reservation.email %}<div>{{ reservation.email }}</div>{% endif %}{% if reservation.phone %}<div>{{ reservation.phone }}</div>{% endif %}{% if not reservation.email and not reservation.phone %}<span class="stay-muted">—</span>{% endif %}</td>
+      <td class="stay-contact" data-label="Contact">{% if reservation.email %}<div><a href="mailto:{{ reservation.email }}">{{ reservation.email }}</a></div>{% endif %}{% if reservation.phone %}<div><a href="tel:{{ reservation.phone }}">{{ reservation.phone }}</a></div>{% endif %}{% if not reservation.email and not reservation.phone %}<span class="stay-muted">—</span>{% endif %}</td>
       <td data-label="Dates">{{ reservation.check_in|date:"j M" }} – {{ reservation.check_out|date:"j M Y" }}</td>
       <td data-label="Rooms / beds">{% for item in reservation.items.all %}{{ item.room.name }} ({{ item.beds }}){% if not forloop.last %}, {% endif %}{% empty %}<span class="stay-muted">—</span>{% endfor %}</td>
       <td data-label="Actual stay">

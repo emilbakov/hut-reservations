@@ -1,0 +1,58 @@
+/* v157: compact public language control, navigation links flush right.
+   Loaded after v156; staff sidebar/topbar language controls are unaffected. */
+@media (min-width: 721px) {
+  .public-v124 .pub-header-inner {
+    flex-wrap: nowrap;
+    gap: clamp(10px, 1.4vw, 22px);
+  }
+  .public-v124 .pub-header .pub-brand { flex: 0 1 auto; }
+  .public-v124 .pub-header .sd147-language {
+    order: 2;
+    margin-left: auto !important;
+  }
+  .public-v124 .pub-header .pub-nav {
+    order: 3;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    flex: 0 0 auto;
+    justify-content: flex-end;
+  }
+}
+@media (min-width: 1051px) {
+  body:not(.sd116-active) .adventure-header .header-inner { gap: clamp(10px, 1.3vw, 22px); }
+  body:not(.sd116-active) .adventure-header .brand { flex: 0 1 auto; }
+  body:not(.sd116-active) .adventure-header .sd147-language {
+    order: 2;
+    margin-left: auto !important;
+  }
+  body:not(.sd116-active) .adventure-header .desktop-nav,
+  body:not(.sd116-active) .adventure-header .sd115-nav {
+    order: 3;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    justify-content: flex-end;
+  }
+}
+/* Smaller visual footprint without changing the actual language form action. */
+.public-v124 .pub-header .sd147-language,
+body:not(.sd116-active) .adventure-header .sd147-language {
+  gap: 2px;
+  padding: 2px !important;
+  border-radius: 8px;
+}
+.public-v124 .pub-header .sd147-language button,
+body:not(.sd116-active) .adventure-header .sd147-language button {
+  min-width: 36px;
+  min-height: 36px;
+  padding: 4px !important;
+  font-size: 12px;
+  border-radius: 6px;
+}
+@media (max-width: 720px) {
+  .public-v124 .pub-header .pub-mobile-menu { margin-left: 0; }
+  .public-v124 .pub-header .sd147-language { margin-left: auto !important; }
+}
+@media (max-width: 1050px) {
+  body:not(.sd116-active) .adventure-header .sd147-language { margin-left: auto !important; }
+  body:not(.sd116-active) .adventure-header .mobile-menu { margin-left: 0; }
+}

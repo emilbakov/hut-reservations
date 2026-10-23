@@ -1,0 +1,6 @@
+{% load i18n %}
+<nav class="sd152-calendar-views" aria-label="{% translate 'Calendar views' %}">
+<a href="{% url 'bookings:calendar_timeline' %}{% if selected_slug %}?hut={{ selected_slug|urlencode }}{% endif %}" {% if request.resolver_match.url_name == 'calendar_timeline' %}aria-current="page"{% endif %}>{% translate 'Bookings' %}</a>
+<a href="{% url 'bookings:availability_calendar' %}{% if selected_slug %}?hut={{ selected_slug|urlencode }}{% endif %}" {% if request.resolver_match.url_name == 'availability_calendar' %}aria-current="page"{% endif %}>{% translate 'Free beds' %}</a>
+<a href="{% url 'bookings:room_calendar' %}{% if selected_slug %}?hut={{ selected_slug|urlencode }}{% elif selected_hut %}?hut={{ selected_hut.slug|urlencode }}{% endif %}" {% if request.resolver_match.url_name == 'room_calendar' %}aria-current="page"{% endif %}>{% translate 'Room ledger' %}</a>
+</nav>

@@ -48,17 +48,17 @@ GLOBAL_WORKSPACE = {
     'dashboard': 'dashboard', 'calendar_timeline': 'calendar',
     'calendar_create': 'new', 'calendar_edit': 'reservations',
     'calendar_move': 'calendar', 'manager_reservations': 'reservations',
-    'manager_reservation_action': 'reservations',
+    'manager_reservation_action': 'reservations', 'undo_decision': 'approvals',
     'manager_stays': 'stays', 'manager_stay_action': 'stays',
-    'manual_booking': 'new', 'room_calendar': 'beds',
-    'bed_management': 'beds', 'availability_calendar': 'beds',
+    'manual_booking': 'new', 'room_calendar': 'room_ledger',
+    'bed_management': 'beds', 'availability_calendar': 'availability',
     'financial_dashboard': 'finances', 'financial_export': 'finances',
-    'expense_dashboard': 'finances', 'expense_export': 'finances',
-    'deposit_dashboard': 'finances', 'lifecycle_dashboard': 'finances',
+    'expense_dashboard': 'expenses', 'expense_export': 'expenses',
+    'deposit_dashboard': 'deposits', 'lifecycle_dashboard': 'deposits',
     'reservation_payments': 'finances',
     'stay_history': 'reports', 'stay_history_export': 'reports',
     'yearly_performance': 'reports', 'yearly_performance_export': 'reports',
-    'communications_dashboard': 'guests', 'guest_requests_dashboard': 'guests',
+    'communications_dashboard': 'email_templates', 'guest_requests_dashboard': 'stay_changes',
     'conversation_inbox': 'guests', 'conversation_thread': 'guests',
     'quick_replies': 'guests',
     'guest_link_controls': 'guests',
@@ -129,12 +129,7 @@ def summitdesk_nav(context):
         if not (manager or cleaner):
             return {'visible': False}
     if user.is_staff:
-        allowed_huts = list(
-            Hut.objects.filter(
-                is_active=True,
-                managers=user,
-            ).order_by('name').distinct()
-        )
+        allowed_huts = list(Hut.objects.filter(is_active=True, managers=user).order_by('name').distinct())
         if not hut:
             selected_slug = context.get('selected_slug') or request.GET.get('hut', '')
             hut = next((h for h in allowed_huts if h.slug == selected_slug), None)
@@ -163,50 +158,58 @@ def summitdesk_nav(context):
     if user.is_staff:
         group('Front desk', [
             b('dashboard', 'Overview', 'layout-dashboard', 'dashboard'),
-            b('calendar_timeline', 'Weekly reservation calendar', 'calendar-days', 'calendar'),
+            b('approval_dashboard', 'Needs your decision', 'clipboard-list', 'approvals'),
+            b('calendar_timeline', 'Booking calendar', 'calendar-days', 'calendar'),
+            b('availability_calendar', 'Bed availability', 'bed-double', 'availability'),
             b('manager_reservations', 'Reservations', 'book-open', 'reservations'),
             b('manager_stays', 'Arrivals & departures', 'arrow-left-right', 'stays'),
         ])
     if hut and manager:
-        group('Property operations', [
-            f('staff_hub', 'Property dashboard', 'house', 'property'),
+        group('Hut operations', [
+            f('staff_hub', 'Hut dashboard', 'house', 'property'),
             f('staff_calendar', 'Monthly stay planner', 'calendar-range', 'property_calendar'),
-            f('staff_arrivals', 'Property arrivals', 'arrow-left-right', 'property_stays'),
+            f('staff_arrivals', 'Hut arrivals', 'arrow-left-right', 'property_stays'),
             f('staff_overview', 'Daily operations', 'clipboard-list', 'operations'),
             f('visual_beds', 'Rooms & beds', 'bed-double', 'beds'),
             f('staff_housekeeping', 'Housekeeping', 'sparkles', 'housekeeping'),
             f('staff_tasks', 'Cleaning tasks', 'list-checks', 'tasks'),
         ])
-        group('Property insights', [
+        group('Hut insights', [
             f('staff_analytics', 'Occupancy analytics', 'chart-no-axes-column', 'property_reports'),
             f('staff_financial_analytics', 'Booking value', 'wallet', 'property_finances'),
             f('staff_audit_dashboard', 'Audit trail', 'clipboard-list', 'audit'),
         ])
-        group('Property team', [
+        group('Hut team', [
             f('cleaner_team', 'Cleaning team', 'users', 'team'),
             f('cleaner_invitations', 'Invitations', 'mail', 'invites'),
         ])
     elif hut and cleaner:
-        group('Your workspace', [
+        group('Your hut', [
             _link('floorplans', 'staff_hub', 'My dashboard', 'house', 'property', section, hut_id=hut.pk),
             _link('floorplans', 'staff_tasks', 'My cleaning tasks', 'list-checks', 'tasks', section, hut_id=hut.pk),
         ])
     if user.is_staff:
         group('Business', [
             b('financial_dashboard', 'Finances', 'wallet', 'finances'),
+            b('expense_dashboard', 'Expenses', 'wallet', 'expenses'),
+            b('deposit_dashboard', 'Deposits', 'wallet', 'deposits'),
             b('stay_history', 'Reports & history', 'chart-no-axes-column', 'reports'),
-            b('communications_dashboard', 'Guest communication', 'messages-square', 'guests'),
-            b('conversation_inbox', 'Guest inbox', 'mail', 'guests'),
-            b('approval_dashboard', 'Guest approvals', 'clipboard-list', 'approvals'),
+        ])
+        group('Guest support', [
+            b('conversation_inbox', 'Guest messages', 'mail', 'guests'),
+            b('guest_requests_dashboard', 'Stay changes & cancellations', 'clipboard-list', 'stay_changes'),
+        ])
+        group('Settings', [
+            b('communications_dashboard', 'Email templates', 'messages-square', 'email_templates'),
             b('notification_deliveries', 'Email delivery', 'mail', 'email_delivery'),
-            b('manager_digest_preferences', 'Reminder settings', 'mail', 'reminders'),
+            b('manager_digest_preferences', 'Email reminders', 'mail', 'reminders'),
         ])
 
     if user.is_superuser:
         group('Administration', [{'url': reverse('admin:index'), 'label': 'Django admin', 'icon': 'settings', 'active': False, 'key': 'admin'}])
 
     current_link = next((link for g in groups for link in g['links'] if link['active']), None)
-    title = current_link['label'] if current_link else 'Workspace'
+    title = current_link['label'] if current_link else 'Hut management'
     if match.url_name in ('staff_new_booking', 'manual_booking', 'calendar_create'):
         title = 'New reservation'
     if match.url_name in ('staff_reservation', 'calendar_edit'):

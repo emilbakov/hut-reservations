@@ -5,6 +5,7 @@ from django.conf import settings
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.validators import RegexValidator, URLValidator
 from django.db import models
 from django.db.models import F, Q
 from django.urls import reverse
@@ -18,6 +19,14 @@ def make_code():
 
 class Hut(models.Model):
     """A mountain hut containing rooms and beds."""
+
+    public_phone = models.CharField(max_length=40, blank=True, validators=[RegexValidator(r"^\+?[0-9][0-9 ().-]{4,38}[0-9]$", "Enter a public phone number, including country code.")])
+    public_email = models.EmailField(blank=True)
+    directions_url = models.URLField(max_length=500, blank=True, validators=[URLValidator(schemes=["http", "https"])], help_text="Actual hut location/directions link. Never the operator's office location.")
+    reply_time_en = models.CharField(max_length=300, blank=True, help_text="A realistic reply expectation, e.g. during staffed hours. Leave blank if not agreed.")
+    reply_time_bg = models.CharField(max_length=300, blank=True)
+    payment_instructions_en = models.TextField(blank=True, help_text="Actual payment methods, timing and any deposit rules. Public plain text; no card details.")
+    payment_instructions_bg = models.TextField(blank=True)
 
     name = models.CharField(max_length=150)
     slug = models.SlugField(max_length=160, unique=True)
@@ -316,6 +325,64 @@ class PaymentTransaction(models.Model):
 
     def __str__(self):
         return f'{self.kind} {self.amount} for {self.reservation.code}'
+
+class DepositEntry(PaymentTransaction):
+    """Read-only admin view of deposits in the existing payment ledger.
+
+    A proxy model creates no separate table and does not duplicate money.
+    """
+    class Meta:
+        proxy = True
+        verbose_name = "Deposit"
+        verbose_name_plural = "Deposits"
+
+
+class CancellationSettlement(models.Model):
+    """Immutable snapshot of the admin cancellation decision and its ledger effect.
+
+    Later manual refunds may change the live payment balance; this snapshot
+    describes only the cancellation decision at the time it was recorded.
+    """
+    class Outcome(models.TextChoices):
+        NO_FUNDS = "no_funds", "No funds received"
+        RETAIN = "retain", "Retained funds"
+        REFUND = "refund", "Refund recorded"
+
+    reservation = models.OneToOneField(
+        Reservation, on_delete=models.PROTECT, related_name="cancellation_settlement",
+    )
+    outcome = models.CharField(max_length=12, choices=Outcome.choices)
+    net_received_at_cancellation = models.DecimalField(max_digits=10, decimal_places=2)
+    refunded_at_cancellation = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    retained_at_cancellation = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    method = models.CharField(max_length=12, choices=PaymentTransaction.Method.choices, blank=True)
+    note = models.CharField(max_length=500, blank=True)
+    recorded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,
+        related_name="recorded_cancellation_settlements",
+    )
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created", "-pk"]
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(net_received_at_cancellation__gte=0),
+                name="cancel_settlement_nonnegative_net",
+            ),
+            models.CheckConstraint(
+                condition=Q(refunded_at_cancellation__gte=0),
+                name="cancel_settlement_nonnegative_refund",
+            ),
+            models.CheckConstraint(
+                condition=Q(retained_at_cancellation__gte=0),
+                name="cancel_settlement_nonnegative_retained",
+            ),
+        ]
+
+    def __str__(self):
+        return f"Cancellation settlement for {self.reservation.code}"
+
 
 class HutExpense(models.Model):
     """Recorded operational expense, allocated to one hut and expense date."""
@@ -630,3 +697,94 @@ class ReservationNotification(models.Model):
 
     class Meta:
         indexes = [models.Index(fields=['status', 'next_attempt_at'], name='sd145_notification_due')]
+
+
+class PublicWebsiteSettings(models.Model):
+    """One owner-managed public profile; blank contact details stay private."""
+    id = models.PositiveSmallIntegerField(primary_key=True, default=1, editable=False)
+    brand_name = models.CharField(max_length=80, blank=True)
+    operator_name = models.CharField(max_length=200, blank=True, help_text="Legal operator / data controller, for published policies.")
+    contact_phone = models.CharField(max_length=40, blank=True)
+    contact_email = models.EmailField(blank=True)
+    privacy_email = models.EmailField(blank=True)
+    address_en = models.CharField(max_length=300, blank=True)
+    address_bg = models.CharField(max_length=300, blank=True)
+    map_url = models.URLField(max_length=500, blank=True, help_text="Public HTTPS map link; no embedded third-party map.")
+    hero_image = models.ImageField(upload_to="site/", blank=True, width_field="hero_width", height_field="hero_height", help_text="Your own licensed landscape, at least 1920 px wide, up to 12 MB. Prefer optimized WebP.")
+    hero_width = models.PositiveIntegerField(null=True, blank=True, editable=False)
+    hero_height = models.PositiveIntegerField(null=True, blank=True, editable=False)
+    hero_alt_en = models.CharField(max_length=200, blank=True)
+    hero_alt_bg = models.CharField(max_length=200, blank=True)
+    privacy_en = models.TextField(blank=True, help_text="Reviewed plain text. Include operator, purposes, legal bases, recipients, retention, rights and complaint details.")
+    privacy_bg = models.TextField(blank=True)
+    privacy_published = models.BooleanField(default=False)
+    cancellation_en = models.TextField(blank=True, help_text="Reviewed terms, including hut-specific rules, deadlines, fees and refunds where applicable.")
+    cancellation_bg = models.TextField(blank=True)
+    cancellation_published = models.BooleanField(default=False)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Public website settings"
+        verbose_name_plural = "Public website settings"
+        constraints = [models.CheckConstraint(condition=models.Q(id=1), name="sd149_single_public_profile")]
+
+    def __str__(self):
+        return "Public website settings"
+
+    def clean(self):
+        import re
+        from django.core.validators import URLValidator
+        errors = {}
+        if self.pk != 1:
+            errors["id"] = "Only one public website profile is supported."
+        if self.contact_phone and not re.fullmatch(r"\+?[0-9 () .-]{6,40}", self.contact_phone):
+            errors["contact_phone"] = "Use a phone number with digits, spaces, +, brackets or dashes."
+        if self.map_url:
+            try:
+                URLValidator(schemes=["https", "http"])(self.map_url)
+            except ValidationError:
+                errors["map_url"] = "Use an HTTP or HTTPS map link."
+        if self.hero_image:
+            if not self.hero_width or self.hero_width < 1920:
+                errors["hero_image"] = "The original image must be at least 1920 px wide. Do not upscale a small photo."
+            if not (self.hero_alt_en.strip() or self.hero_alt_bg.strip()):
+                errors["hero_alt_en"] = "Describe the image in at least one language."
+            if not self.hero_image._committed and self.hero_image.size > 12 * 1024 * 1024:
+                errors["hero_image"] = "Upload an image smaller than 12 MB."
+        for kind in ("privacy", "cancellation"):
+            if getattr(self, kind + "_published"):
+                if not self.operator_name.strip():
+                    errors["operator_name"] = "Name the operator before publishing policies."
+                if not any(getattr(self, kind + "_" + lang).strip() for lang in ("en", "bg")):
+                    errors[kind + "_en"] = "Enter reviewed policy text in at least one language before publishing."
+        if self.privacy_published and not (self.privacy_email or self.contact_email):
+            errors["privacy_email"] = "Provide a privacy contact email before publishing."
+        if errors:
+            raise ValidationError(errors)
+
+
+class PublicBookingRateBucket(models.Model):
+    """Short-lived HMAC identifiers; no raw email, IP or browser secret."""
+    key = models.CharField(max_length=64, primary_key=True)
+    attempts = models.PositiveIntegerField(default=0)
+    expires_at = models.DateTimeField(db_index=True)
+
+
+class LoginThrottleBucket(models.Model):
+    """Shared short-lived failure counts and password checks already in progress."""
+    key = models.CharField(max_length=64, primary_key=True)
+    failures = models.PositiveIntegerField(default=0)
+    pending = models.PositiveIntegerField(default=0)
+    expires_at = models.DateTimeField(db_index=True)
+
+
+class ReservationDecision(models.Model):
+    """A staff status decision and its short, guarded undo window."""
+    reservation = models.ForeignKey(Reservation, on_delete=models.CASCADE, related_name='staff_decisions')
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
+    before = models.CharField(max_length=20)
+    after = models.CharField(max_length=20)
+    reason = models.TextField(blank=True, max_length=1000)
+    fingerprint = models.CharField(max_length=64)
+    created_at = models.DateTimeField(auto_now_add=True)
+    undone_at = models.DateTimeField(null=True, blank=True)

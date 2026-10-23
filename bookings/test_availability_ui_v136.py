@@ -29,7 +29,7 @@ class AvailabilityUIV136Tests(TestCase):
         response = self.client.get(self.url(), {'year': self.first.year, 'month': self.first.month})
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'SummitDesk v136')
-        self.assertContains(response, 'Room availability')
+        self.assertContains(response, 'Bed availability')
         self.assertContains(response, 'Weekly timeline')
         self.assertContains(response, 'Apply filters')
         self.assertContains(response, 'Over-capacity nights')

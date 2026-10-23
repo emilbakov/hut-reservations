@@ -1,0 +1,14 @@
+/* v158: brand left, links then language at far right on desktop. */
+@media (min-width: 721px) {
+  .public-v124 .pub-header-inner { display:flex; align-items:center; flex-wrap:nowrap; }
+  .public-v124 .pub-header .pub-brand { order:0; flex:0 1 auto; }
+  .public-v124 .pub-header .pub-nav { order:1; margin-left:auto !important; margin-right:0 !important; flex:0 0 auto; justify-content:flex-end; }
+  .public-v124 .pub-header .sd147-language { order:2; margin-left:0 !important; margin-right:0 !important; flex:0 0 auto; }
+}
+@media (min-width: 1051px) {
+  body:not(.sd116-active) .adventure-header .brand { order:0; }
+  body:not(.sd116-active) .adventure-header .desktop-nav,
+  body:not(.sd116-active) .adventure-header .sd115-nav { order:1; margin-left:auto !important; margin-right:0 !important; justify-content:flex-end; }
+  body:not(.sd116-active) .adventure-header .sd147-language { order:2; margin-left:0 !important; margin-right:0 !important; flex:0 0 auto; }
+}
+/* Mobile: preserve the existing responsive menu and compact language control. */

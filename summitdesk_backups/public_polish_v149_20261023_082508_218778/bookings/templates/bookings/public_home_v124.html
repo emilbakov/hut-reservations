@@ -1,0 +1,31 @@
+{% extends "bookings/public_base_v124.html" %}
+{% load i18n ui_v147 %}
+{% block title %}{% translate "Find your place in the mountains" %}{% endblock %}
+{% block content %}
+<section class="pub-hero">
+  <div class="pub-hero-image" aria-hidden="true"></div>
+  <div class="pub-hero-shade" aria-hidden="true"></div>
+  <div class="pub-container pub-hero-content">
+    <span class="pub-kicker"><span class="pub-kicker-line"></span> {% translate "YOUR NEXT ADVENTURE STARTS HERE" %}</span>
+    <h1>{% translate "Closer to nature." %}<br><em>{% translate "Closer to everything." %}</em></h1>
+    <p>{% translate "Find mountain huts, choose your dates and reserve a bed. Less planning, more time outside." %}</p>
+    <div class="pub-hero-trust"><span>{% translate "Mountain huts" %}</span><span aria-hidden="true">✳</span><span>{% translate "Real bed availability" %}</span><span aria-hidden="true">✳</span><span>{% translate "Simple reservations" %}</span></div>
+  </div>
+</section>
+<div class="pub-container pub-search-position">
+  <div class="pub-search-panel">
+    <div class="pub-search-panel-title"><span>{% translate "FIND YOUR MOUNTAIN STAY" %}</span><span class="pub-search-hint">{% translate "Search huts and check beds for your dates" %}</span></div>
+    {% include "bookings/public_search_v124.html" %}
+  </div>
+</div>
+<section class="pub-container pub-section" id="explore">
+  <div class="pub-section-heading"><div><span class="pub-eyebrow">{% translate "THE PLACES WE LOVE" %}</span><h2>{% translate "Stay a little" %} <em>{% translate "closer to the wild." %}</em></h2></div><a class="pub-text-link" href="{% url 'bookings:hut_list' %}">{% translate "Explore all huts" %} <span aria-hidden="true">↗</span></a></div>
+  <p class="pub-section-lead">{% translate "From quiet forest escapes to high mountain trails, find a hut that feels like the start of something good." %}</p>
+  {% include "bookings/public_cards_v124.html" %}
+</section>
+<section class="pub-container pub-steps-section" id="how-it-works">
+  <div class="pub-steps-heading"><span class="pub-eyebrow">{% translate "BOOKING MADE SIMPLE" %}</span><h2>{% translate "Three steps." %}<br><em>{% translate "Then the mountains." %}</em></h2><p>{% translate "Everything you need to plan your next night in the mountains, without the extra steps." %}</p></div>
+  <div class="pub-steps-list"><div class="pub-step"><span>01</span><div><h3>{% translate "Find your hut" %}</h3><p>{% translate "Browse real mountain huts and discover where to stay." %}</p></div></div><div class="pub-step"><span>02</span><div><h3>{% translate "Check your dates" %}</h3><p>{% translate "See beds available for your entire stay, room by room." %}</p></div></div><div class="pub-step"><span>03</span><div><h3>{% translate "Request your stay" %}</h3><p>{% translate "Choose beds and send your request. The hut manager will review it and confirm by email." %}</p></div></div></div>
+</section>
+<section class="pub-container pub-bottom-cta"><div><span class="pub-eyebrow">{% translate "THE TRAIL IS WAITING" %}</span><h2>{% translate "Ready for your next escape?" %}</h2><p>{% translate "Find your place in the mountains." %}</p></div><a href="{% url 'bookings:hut_list' %}" class="pub-button-light">{% translate "Explore mountain huts" %} <span aria-hidden="true">↗</span></a></section>
+{% endblock %}

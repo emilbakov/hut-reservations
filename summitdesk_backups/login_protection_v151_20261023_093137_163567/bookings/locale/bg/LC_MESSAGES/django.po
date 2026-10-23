@@ -1,0 +1,1501 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: SummitDesk v150\n"
+"Language: bg\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "%(selected)s of %(target)s beds"
+msgstr "%(selected)s от %(target)s легла"
+
+msgid "%(selected)s of %(target)s beds selected. Choose %(remaining)s more."
+msgstr "Избрани легла: %(selected)s от %(target)s. Избери още %(remaining)s."
+
+msgid "%(v0)s available for your stay"
+msgstr "Налични за престоя: %(v0)s"
+
+msgid "%(v0)s beds selected"
+msgstr "Избрани легла: %(v0)s"
+
+msgid "%(v0)s beds · %(v1)s %(v2)s / bed / night"
+msgstr "Легла: %(v0)s · %(v1)s %(v2)s / легло / нощ"
+
+msgid "%(v0)s closed"
+msgstr "Затворени: %(v0)s"
+
+msgid "%(v0)s free"
+msgstr "Свободни: %(v0)s"
+
+msgid "%(v0)s free for your stay"
+msgstr "Свободни за престоя: %(v0)s"
+
+msgid "%(v0)s home"
+msgstr "%(v0)s — начало"
+
+msgid "%(v0)s mountain hut"
+msgstr "Хижа %(v0)s"
+
+msgid "%(v0)s of %(v1)s beds selected."
+msgstr "Избрани легла: %(v0)s от %(v1)s."
+
+msgid "%(v0)s rooms · %(v1)s beds"
+msgstr "Стаи: %(v0)s · легла: %(v1)s"
+
+msgid "%(v0)s total"
+msgstr "Общо: %(v0)s"
+
+msgid "%(v0)s · %(v1)s beds"
+msgstr "%(v0)s · легла: %(v1)s"
+
+msgid "%(v0)s · %(v1)s beds × %(v2)s nights"
+msgstr "%(v0)s · %(v1)s легла × %(v2)s нощувки"
+
+msgid "%(v0)s · %(v1)s free · %(v2)s %(v3)s / bed / night"
+msgstr "%(v0)s · свободни: %(v1)s · %(v2)s %(v3)s / легло / нощ"
+
+msgid "%(v0)s · Property planner"
+msgstr "%(v0)s · Планер на хижата"
+
+msgid "%(v0)s · Rooms & booking"
+msgstr "%(v0)s · Стаи и резервации"
+
+msgid "%(v0)s · Stay planner"
+msgstr "%(v0)s · Планер на престои"
+
+msgid "%(v0)s – %(v1)s · %(v2)s beds available"
+msgstr "%(v0)s – %(v1)s · свободни легла: %(v2)s"
+
+msgid "%(v0)s — home"
+msgstr "%(v0)s — начало"
+
+msgid "%(v0)s: %(v1)s beds free; %(v2)s reserved; %(v3)s closed"
+msgstr "%(v0)s: свободни легла: %(v1)s; резервирани: %(v2)s; затворени: %(v3)s"
+
+msgid "+ Book"
+msgstr "+ Резервирай"
+
+msgid "/ bed / night"
+msgstr "/ легло / нощ"
+
+msgid "1 guest · beds"
+msgstr "1 гост · легла"
+
+msgid "14 days"
+msgstr "14 дни"
+
+msgid "7 days"
+msgstr "7 дни"
+
+msgid "A comfortable base for your next mountain adventure."
+msgstr "Удобен подслон за следващото ти планинско приключение."
+
+msgid "A comfortable place to rest after the trail."
+msgstr "Удобно място за почивка след прехода."
+
+msgid "A place to call basecamp."
+msgstr "Твоят подслон в планината."
+
+msgid "A place to pause, explore and recharge"
+msgstr "Място за почивка, открития и нови сили"
+
+msgid "ALMOST THERE"
+msgstr "ОЩЕ МАЛКО"
+
+msgid "Accommodation"
+msgstr "Настаняване"
+
+msgid "Add one bed in %(v0)s"
+msgstr "Добави едно легло в %(v0)s"
+
+msgid "Additional details"
+msgstr "Допълнителна информация"
+
+msgid "Admin"
+msgstr "Администрация"
+
+msgid "Administration"
+msgstr "Администрация"
+
+msgid "All %(target)s beds selected. Review your details and send the request."
+msgstr "Всички %(target)s легла са избрани. Прегледай данните и изпрати заявката."
+
+msgid "All mountain huts"
+msgstr "Всички хижи"
+
+msgid "All properties"
+msgstr "Всички хижи"
+
+msgid "All rooms"
+msgstr "Всички стаи"
+
+msgid "Anyone with this link can view your reservation and submit requests on your behalf."
+msgstr "Всеки с този линк може да види резервацията и да изпраща заявки от твое име."
+
+msgid "Arrival"
+msgstr "Пристигане"
+
+msgid "Arrival cannot be in the past."
+msgstr "Датата на пристигане не може да е в миналото."
+
+msgid "Arrival: %(date)s · choose departure"
+msgstr "Пристигане: %(date)s · избери напускане"
+
+msgid "Arrival: %(date)s. Choose a later departure in this room."
+msgstr "Пристигане: %(date)s. Избери по-късна дата на напускане в същата стая."
+
+msgid "Arrivals & departures"
+msgstr "Пристигания и напускания"
+
+msgid "Ask a question about your stay..."
+msgstr "Задай въпрос за престоя си…"
+
+msgid "Audit trail"
+msgstr "История на действията"
+
+msgid "Availability for your entire stay"
+msgstr "Свободни места за целия престой"
+
+msgid "Availability is checked for your full stay"
+msgstr "Наличността се проверява за целия престой"
+
+msgid "Availability updated. Review your beds."
+msgstr "Наличността е обновена. Прегледай избраните легла."
+
+msgid "Available"
+msgstr "Свободно"
+
+msgid "Available alternatives"
+msgstr "Свободни алтернативи"
+
+msgid "Available alternatives — your guest details are kept:"
+msgstr "Свободни алтернативи — данните за госта се запазват:"
+
+msgid "Available beds are calculated for every night from %(v0)s to %(v1)s. Availability can change before you complete your booking."
+msgstr "Свободните легла се изчисляват за всяка нощ от %(v0)s до %(v1)s. Наличността може да се промени преди изпращане на заявката."
+
+msgid "Available for %(count)s %(unit)s · checkout is not charged."
+msgstr "Свободно за %(count)s %(unit)s · денят на напускане не се таксува."
+
+msgid "Awaiting approval"
+msgstr "Очаква одобрение"
+
+msgid "Awaiting confirmation"
+msgstr "Очаква потвърждение"
+
+msgid "Awaiting hut approval"
+msgstr "Очаква одобрение от хижата"
+
+msgid "BOOKING MADE SIMPLE"
+msgstr "ЛЕСНО ПЛАНИРАНЕ"
+
+msgid "Beds"
+msgstr "Легла"
+
+msgid "Beds available — choose below"
+msgstr "Има свободни легла — избери по-долу"
+
+msgid "Beds needed"
+msgstr "Брой легла"
+
+msgid "Beds requested"
+msgstr "Заявени легла"
+
+msgid "Beds to reserve"
+msgstr "Легла за резервация"
+
+msgid "Book for your selected nights"
+msgstr "Нощувки за избраните дати"
+
+msgid "Booking reference"
+msgstr "Номер на резервация"
+
+msgid "Booking steps"
+msgstr "Стъпки за резервация"
+
+msgid "Booking value"
+msgstr "Стойност на резервациите"
+
+msgid "Browse real mountain huts and discover where to stay."
+msgstr "Разгледай планинските хижи и избери къде да отседнеш."
+
+msgid "Built for adventure"
+msgstr "С мисъл за приключенията"
+
+msgid "Business"
+msgstr "Финанси и комуникация"
+
+msgid "Calendar"
+msgstr "Календар"
+
+msgid "Calendar legend"
+msgstr "Легенда на календара"
+
+msgid "Calendar navigation"
+msgstr "Навигация в календара"
+
+msgid "Cancel reservation"
+msgstr "Отмяна на резервация"
+
+msgid "Cancelled"
+msgstr "Отменена"
+
+msgid "Change dates"
+msgstr "Промени датите"
+
+msgid "Change dates / booking"
+msgstr "Промяна на дати / резервация"
+
+msgid "Change dates or beds &rarr;"
+msgstr "Промяна на дати или легла →"
+
+msgid "Check availability"
+msgstr "Провери наличността"
+
+msgid "Check booking availability"
+msgstr "Проверка на свободни места"
+
+msgid "Check dates for availability"
+msgstr "Избери дати за проверка"
+
+msgid "Check your dates"
+msgstr "Провери датите"
+
+msgid "Check your dates."
+msgstr "Провери датите."
+
+msgid "Check-in"
+msgstr "Пристигане"
+
+msgid "Check-in / out"
+msgstr "Пристигане / напускане"
+
+msgid "Check-out"
+msgstr "Напускане"
+
+msgid "Checking availability. Your guest details are kept."
+msgstr "Проверка на наличността. Данните за госта се запазват."
+
+msgid "Choose a room"
+msgstr "Избери стая"
+
+msgid "Choose a room or click an available arrival."
+msgstr "Избери стая или свободна дата на пристигане."
+
+msgid "Choose a stay of up to %(count)s nights."
+msgstr "Избери престой до %(count)s нощувки."
+
+msgid "Choose an arrival within the permitted booking period."
+msgstr "Избери пристигане в разрешения период за резервации."
+
+msgid "Choose arrival and departure in one room, then review the stay before confirming."
+msgstr "Избери пристигане и напускане в една стая, после прегледай престоя преди потвърждение."
+
+msgid "Choose arrival and departure in the same room. Checkout is not charged."
+msgstr "Избери пристигане и напускане в една стая. Денят на напускане не се таксува."
+
+msgid "Choose at least one bed."
+msgstr "Избери поне едно легло."
+
+msgid "Choose beds"
+msgstr "Избери легла"
+
+msgid "Choose beds and send your request. The hut manager will review it and confirm by email."
+msgstr "Избери легла и изпрати заявка. Управителят ще я прегледа и ще потвърди по имейл."
+
+msgid "Choose beds from the rooms above."
+msgstr "Избери легла от стаите по-горе."
+
+msgid "Choose between 1 and 30 beds."
+msgstr "Избери между 1 и 30 легла."
+
+msgid "Choose between 1 and 30 guests."
+msgstr "Избери между 1 и 30 гости."
+
+msgid "Choose other dates →"
+msgstr "Избери други дати →"
+
+msgid "Choose property"
+msgstr "Избери хижа"
+
+msgid "Choose your arrival date."
+msgstr "Избери дата на пристигане."
+
+msgid "Choose your check-in and check-out dates above to see how many beds are free."
+msgstr "Избери дати на пристигане и напускане, за да видиш свободните легла."
+
+msgid "Choose your dates to see exactly what's free."
+msgstr "Избери дати, за да видиш свободните места."
+
+msgid "Cleaning tasks"
+msgstr "Задачи за почистване"
+
+msgid "Cleaning team"
+msgstr "Екип за почистване"
+
+msgid "Close"
+msgstr "Затвори"
+
+msgid "Close menu"
+msgstr "Затвори менюто"
+
+msgid "Closer to everything."
+msgstr "По-близо до важните неща."
+
+msgid "Closer to nature."
+msgstr "По-близо до природата."
+
+msgid "Confirm reservation →"
+msgstr "Потвърди резервацията →"
+
+msgid "Confirmation details were sent to %(v0)s."
+msgstr "Данните за потвърждение са изпратени до %(v0)s."
+
+msgid "Confirmed"
+msgstr "Потвърдена"
+
+msgid "Confirmed booking · server validates every night"
+msgstr "Потвърдена резервация · проверява се всяка нощ"
+
+msgid "Confirmed reservation"
+msgstr "Потвърдена резервация"
+
+msgid "Conversation messages"
+msgstr "Съобщения в разговора"
+
+msgid "Could not refresh availability. Your details are kept. Please try again."
+msgstr "Наличността не може да се обнови. Данните са запазени. Опитай отново."
+
+msgid "Daily operations"
+msgstr "Дневни задачи"
+
+msgid "Dashboard"
+msgstr "Табло"
+
+msgid "Dates &amp; guests"
+msgstr "Дати и гости"
+
+msgid "Departure"
+msgstr "Напускане"
+
+msgid "Departure must be after arrival."
+msgstr "Напускането трябва да е след пристигането."
+
+msgid "Deposit due date"
+msgstr "Срок за депозит"
+
+msgid "Deposit overview"
+msgstr "Информация за депозита"
+
+msgid "Deposit remaining"
+msgstr "Остатък по депозита"
+
+msgid "Deposit required"
+msgstr "Необходим депозит"
+
+msgid "Destination or hut"
+msgstr "Място или хижа"
+
+msgid "Detailed timeline"
+msgstr "Подробен календар"
+
+msgid "Discover mountain huts, explore rooms and check real bed availability for your next mountain stay."
+msgstr "Открий планински хижи, разгледай стаите и провери свободните места за следващия си престой."
+
+msgid "Django admin"
+msgstr "Django администрация"
+
+msgid "Duration"
+msgstr "Продължителност"
+
+msgid "EXPLORE THE MOUNTAINS"
+msgstr "ОТКРИЙ ПЛАНИНАТА"
+
+msgid "Email"
+msgstr "Имейл"
+
+msgid "Email (optional)"
+msgstr "Имейл (незадължително)"
+
+msgid "Email address"
+msgstr "Имейл адрес"
+
+msgid "Email delivery"
+msgstr "Доставка на имейли"
+
+msgid "Email my private link"
+msgstr "Изпрати личния линк по имейл"
+
+msgid "Estimated stay total"
+msgstr "Прогнозна обща цена"
+
+msgid "Estimated total for"
+msgstr "Прогнозна обща цена за"
+
+msgid "Everything you need to plan your next night in the mountains, without the extra steps."
+msgstr "Всичко необходимо за следващата ти нощувка в планината."
+
+msgid "Everything you need to review your booking and contact the hut team about changes."
+msgstr "Данните за резервацията и връзка с екипа на хижата при нужда от промяна."
+
+msgid "Explore %(v0)s"
+msgstr "Разгледай %(v0)s"
+
+msgid "Explore all huts"
+msgstr "Разгледай всички хижи"
+
+msgid "Explore huts"
+msgstr "Разгледай хижите"
+
+msgid "Explore more huts"
+msgstr "Разгледай още хижи"
+
+msgid "Explore mountain huts"
+msgstr "Разгледай планинските хижи"
+
+msgid "FIND YOUR MOUNTAIN STAY"
+msgstr "НАМЕРИ НОЩУВКА В ПЛАНИНАТА"
+
+msgid "Finances"
+msgstr "Финанси"
+
+msgid "Find a bed, pack your bag, and head for the trail."
+msgstr "Намери легло, стегни раницата и тръгни по пътеката."
+
+msgid "Find a place to rest. Make room for adventure."
+msgstr "Намери място за почивка. Остави време за приключения."
+
+msgid "Find a stay"
+msgstr "Намери нощувка"
+
+msgid "Find available mountain huts"
+msgstr "Намери хижи със свободни места"
+
+msgid "Find mountain huts, choose your dates and reserve a bed. Less planning, more time outside."
+msgstr "Намери хижа, избери дати и заяви нощувка. По-малко планиране, повече време навън."
+
+msgid "Find your"
+msgstr "Намери своя"
+
+msgid "Find your bed."
+msgstr "Намери своето легло."
+
+msgid "Find your hut"
+msgstr "Намери своята хижа"
+
+msgid "Find your mountain stay"
+msgstr "Намери нощувка в планината"
+
+msgid "Find your place in the mountains"
+msgstr "Намери своето място в планината"
+
+msgid "Find your place in the mountains."
+msgstr "Намери своето място в планината."
+
+msgid "Find your stay"
+msgstr "Намери нощувка"
+
+msgid "Find your stay ↗"
+msgstr "Намери нощувка ↗"
+
+msgid "For payment questions, contact the hut directly."
+msgstr "За въпроси относно плащанията се свържи с хижата."
+
+msgid "For your privacy, a booking reference alone no longer opens reservation details."
+msgstr "За защита на данните номерът на резервацията вече не отваря подробностите самостоятелно."
+
+msgid "From"
+msgstr "От"
+
+msgid "From quiet forest escapes to high mountain trails, find a hut that feels like the start of something good."
+msgstr "От тихите горски пътеки до високите върхове — намери хижата за следващото си приключение."
+
+msgid "Front desk"
+msgstr "Рецепция"
+
+msgid "Full"
+msgstr "Заето"
+
+msgid "Full for these dates"
+msgstr "Заето за тези дати"
+
+msgid "Full month + 14 days"
+msgstr "Целият месец + 14 дни"
+
+msgid "Fully booked for these dates."
+msgstr "Няма свободни места за тези дати."
+
+msgid "GO BEYOND THE ORDINARY"
+msgstr "ОТКРИЙ НЕОБИКНОВЕНОТО"
+
+msgid "Good nights start with a good place."
+msgstr "Добрата почивка започва с добро място."
+
+msgid "Guest"
+msgstr "Гост"
+
+msgid "Guest &amp; review ↓"
+msgstr "Гост и преглед ↓"
+
+msgid "Guest approvals"
+msgstr "Одобрения на заявки"
+
+msgid "Guest communication"
+msgstr "Комуникация с гостите"
+
+msgid "Guest inbox"
+msgstr "Входящи съобщения от гости"
+
+msgid "Guest name"
+msgstr "Име на госта"
+
+msgid "Guests"
+msgstr "Гости"
+
+msgid "Guests / beds"
+msgstr "Гости / легла"
+
+msgid "Guests in your group"
+msgstr "Гости в групата"
+
+msgid "Guests must be between 1 and %(count)s for this room."
+msgstr "Броят гости за тази стая трябва да е между 1 и %(count)s."
+
+msgid "Home"
+msgstr "Начало"
+
+msgid "Housekeeping"
+msgstr "Почистване"
+
+msgid "How it works"
+msgstr "Как работи"
+
+msgid "Hut photograph"
+msgstr "Снимка на хижата"
+
+msgid "Hut team"
+msgstr "Екип на хижата"
+
+msgid "Huts with space for you"
+msgstr "Хижи със свободни места"
+
+msgid "Illustration of a mountain landscape"
+msgstr "Илюстрация на планински пейзаж"
+
+msgid "Important:"
+msgstr "Важно:"
+
+msgid "Inactive"
+msgstr "Неактивна"
+
+msgid "Invitations"
+msgstr "Покани"
+
+msgid "Keep this link private."
+msgstr "Пази този линк личен."
+
+msgid "Keyboard: use arrows to move between dates and rooms, Page Up or Page Down to change periods, and Enter or Space to select."
+msgstr "Клавиатура: използвай стрелките за дати и стаи, Page Up или Page Down за периодите и Enter или интервал за избор."
+
+msgid "Live availability appears after you choose your dates."
+msgstr "Актуалната наличност се показва след избор на дати."
+
+msgid "Live bed availability"
+msgstr "Актуални свободни легла"
+
+msgid "Made for the mountains"
+msgstr "Създадено за планината"
+
+msgid "Main navigation"
+msgstr "Основна навигация"
+
+msgid "Main staff navigation"
+msgstr "Основна служебна навигация"
+
+msgid "Maintenance closure"
+msgstr "Затворено за поддръжка"
+
+msgid "Manage your reservation"
+msgstr "Управление на резервацията"
+
+msgid "Manager approval required · no account needed"
+msgstr "Нужно е одобрение от управителя · без регистрация"
+
+msgid "Manager's note:"
+msgstr "Бележка от управителя:"
+
+msgid "Menu"
+msgstr "Меню"
+
+msgid "Messages with the hut team"
+msgstr "Съобщения с екипа на хижата"
+
+msgid "Messaging for this stay is closed."
+msgstr "Съобщенията за този престой са затворени."
+
+msgid "Mobile navigation"
+msgstr "Мобилна навигация"
+
+msgid "Monthly stay planner"
+msgstr "Месечен планер на престои"
+
+msgid "Mountain accommodation"
+msgstr "Настаняване в планината"
+
+msgid "Mountain adventures"
+msgstr "Планински приключения"
+
+msgid "Mountain huts"
+msgstr "Планински хижи"
+
+msgid "Mountain retreat"
+msgstr "Планински подслон"
+
+msgid "Mountain stays"
+msgstr "Нощувки в планината"
+
+msgid "Mountain stays, made simpler."
+msgstr "Нощувки в планината — лесно и удобно."
+
+msgid "My cleaning tasks"
+msgstr "Моите задачи за почистване"
+
+msgid "My dashboard"
+msgstr "Моето табло"
+
+msgid "Name"
+msgstr "Име"
+
+msgid "Nearby dates with enough beds:"
+msgstr "Близки дати с достатъчно легла:"
+
+msgid "Need to change your dates or cancel? Send a request to the hut manager."
+msgstr "Искаш промяна на датите или отмяна? Изпрати заявка до управителя."
+
+msgid "Net payments received"
+msgstr "Получени нетни плащания"
+
+msgid "New reservation"
+msgstr "Нова резервация"
+
+msgid "Next date window"
+msgstr "Следващ период"
+
+msgid "Next month"
+msgstr "Следващ месец"
+
+msgid "No beds are listed for this reservation."
+msgstr "Няма добавени легла към тази резервация."
+
+msgid "No beds available for these dates"
+msgstr "Няма свободни легла за тези дати"
+
+msgid "No dates"
+msgstr "Няма дати"
+
+msgid "No deposit details are currently available for this reservation."
+msgstr "В момента няма данни за депозит към тази резервация."
+
+msgid "No huts have %(v0)s available for the selected stay. Try different dates or fewer beds."
+msgstr "Няма хижи с налични %(v0)s за избрания престой. Опитай други дати или по-малко легла."
+
+msgid "No longer have access to the booking email? Contact the hut directly."
+msgstr "Нямаш достъп до имейла за резервацията? Свържи се с хижата."
+
+msgid "No matching huts found"
+msgstr "Няма намерени хижи"
+
+msgid "No messages yet."
+msgstr "Все още няма съобщения."
+
+msgid "No rooms are accepting bookings at this hut."
+msgstr "В момента няма стаи за резервация в тази хижа."
+
+msgid "No rooms are listed at this hut yet."
+msgstr "Все още няма добавени стаи в тази хижа."
+
+msgid "No rooms configured for this hut."
+msgstr "Няма добавени стаи към тази хижа."
+
+msgid "No rooms listed for this reservation."
+msgstr "Няма добавени стаи към тази резервация."
+
+msgid "Not available"
+msgstr "Няма наличност"
+
+msgid "Not enough beds on %(date)s. Choose an alternative below or adjust your stay."
+msgstr "Няма достатъчно легла на %(date)s. Избери алтернатива по-долу или промени престоя."
+
+msgid "Notes (optional)"
+msgstr "Бележки (незадължително)"
+
+msgid "Notes for the hut keeper"
+msgstr "Бележки за хижаря"
+
+msgid "Occupancy analytics"
+msgstr "Анализ на заетостта"
+
+msgid "Online bookings are limited to %(count)s nights."
+msgstr "Онлайн резервациите са ограничени до %(count)s нощувки."
+
+msgid "Only %(count)s left in %(room)s."
+msgstr "В %(room)s остават само %(count)s легла."
+
+msgid "Only %(v0)s beds are available for your entire stay. Try another date or adjust your group size."
+msgstr "Само %(v0)s легла са налични за целия престой. Опитай други дати или промени броя гости."
+
+msgid "Open navigation"
+msgstr "Отвори менюто"
+
+msgid "Open navigation menu"
+msgstr "Отвори менюто"
+
+msgid "Open reservation details"
+msgstr "Отвори данните за резервацията"
+
+msgid "Open your private reservation link"
+msgstr "Отвори личния линк за резервацията"
+
+msgid "Overview"
+msgstr "Общ преглед"
+
+msgid "PLAN YOUR STAY"
+msgstr "ПЛАНИРАЙ ПРЕСТОЯ"
+
+msgid "PROPERTY MANAGEMENT"
+msgstr "УПРАВЛЕНИЕ НА ХИЖИ"
+
+msgid "Pending"
+msgstr "Чакаща"
+
+msgid "Pending request"
+msgstr "Чакаща заявка"
+
+msgid "Phone"
+msgstr "Телефон"
+
+msgid "Phone (optional)"
+msgstr "Телефон (незадължително)"
+
+msgid "Phone number"
+msgstr "Телефонен номер"
+
+msgid "Please check back later."
+msgstr "Провери отново по-късно."
+
+msgid "Powered by SummitDesk"
+msgstr "Създадено със SummitDesk"
+
+msgid "Preview %(guest)s reservation"
+msgstr "Преглед на резервацията на %(guest)s"
+
+msgid "Previous date window"
+msgstr "Предишен период"
+
+msgid "Previous month"
+msgstr "Предишен месец"
+
+msgid "Price per night"
+msgstr "Цена за нощ"
+
+msgid "Private reservation access"
+msgstr "Личен достъп до резервацията"
+
+msgid "Property arrivals"
+msgstr "Пристигания в хижата"
+
+msgid "Property dashboard"
+msgstr "Табло на хижата"
+
+msgid "Property insights"
+msgstr "Отчети за хижата"
+
+msgid "Property operations"
+msgstr "Управление на хижата"
+
+msgid "Property team"
+msgstr "Екип на хижата"
+
+msgid "Public navigation"
+msgstr "Основна навигация"
+
+msgid "Public site ↗"
+msgstr "Публичен сайт ↗"
+
+msgid "READY FOR THE MOUNTAINS?"
+msgstr "ГОТОВ ЛИ СИ ЗА ПЛАНИНАТА?"
+
+msgid "ROOM / NIGHT"
+msgstr "СТАЯ / НОЩ"
+
+msgid "Ready for your next escape?"
+msgstr "Готов ли си за следващото приключение?"
+
+msgid "Real bed availability"
+msgstr "Актуални свободни места"
+
+msgid "Reference:"
+msgstr "Номер:"
+
+msgid "Reminder settings"
+msgstr "Настройки за напомняния"
+
+msgid "Remove one bed from %(v0)s"
+msgstr "Премахни едно легло от %(v0)s"
+
+msgid "Reports & history"
+msgstr "Отчети и история"
+
+msgid "Request a change"
+msgstr "Заяви промяна"
+
+msgid "Request a change or cancellation &rarr;"
+msgstr "Заявка за промяна или отмяна →"
+
+msgid "Request cancellation"
+msgstr "Заявка за отмяна"
+
+msgid "Request reservation →"
+msgstr "Изпрати заявка →"
+
+msgid "Request type"
+msgstr "Вид заявка"
+
+msgid "Request your stay"
+msgstr "Изпрати заявка"
+
+msgid "Requested arrival (for changes)"
+msgstr "Желана дата на пристигане (при промяна)"
+
+msgid "Requested departure (for changes)"
+msgstr "Желана дата на напускане (при промяна)"
+
+msgid "Reservation %(v0)s"
+msgstr "Резервация %(v0)s"
+
+msgid "Reservation cancelled."
+msgstr "Резервацията е отменена."
+
+msgid "Reservation details"
+msgstr "Данни за резервацията"
+
+msgid "Reservation preview"
+msgstr "Преглед на резервация"
+
+msgid "Reservation status"
+msgstr "Статус на резервацията"
+
+msgid "Reservation total"
+msgstr "Обща стойност"
+
+msgid "Reservations"
+msgstr "Резервации"
+
+msgid "Reservations for %(v0)s"
+msgstr "Резервации за %(v0)s"
+
+msgid "Reservations remain protected by server-side availability checks. Reservation bars show confirmed and pending stays, as in the weekly Reservation Calendar. This view covers the month plus 14 days; the"
+msgstr "Наличността се проверява отново при запис. Лентите показват потвърдени и чакащи резервации. Изгледът включва месеца и още 14 дни;"
+
+msgid "Reserved beds"
+msgstr "Резервирани легла"
+
+msgid "Reset stay"
+msgstr "Изчисти престоя"
+
+msgid "Review request"
+msgstr "Преглед на заявката"
+
+msgid "Review request ↓"
+msgstr "Преглед на заявката ↓"
+
+msgid "Room"
+msgstr "Стая"
+
+msgid "Room availability calendar"
+msgstr "Календар на свободните места"
+
+msgid "Rooms"
+msgstr "Стаи"
+
+msgid "Rooms & beds"
+msgstr "Стаи и легла"
+
+msgid "Rooms &amp; beds"
+msgstr "Стаи и легла"
+
+msgid "SEARCH MOUNTAIN HUTS"
+msgstr "ТЪРСЕНЕ НА ХИЖИ"
+
+msgid "Saving reservation…"
+msgstr "Запазване на резервацията…"
+
+msgid "Search"
+msgstr "Търсене"
+
+msgid "Search by hut or location, check availability and book your mountain stay."
+msgstr "Потърси по хижа или местоположение, провери наличността и заяви нощувка."
+
+msgid "Search huts and check beds for your dates"
+msgstr "Потърси хижа и провери местата за избраните дати"
+
+msgid "Search reservations"
+msgstr "Търсене на резервации"
+
+msgid "Search results"
+msgstr "Резултати от търсенето"
+
+msgid "See all huts →"
+msgstr "Всички хижи →"
+
+msgid "See beds available for your entire stay, room by room."
+msgstr "Виж свободните легла за целия престой във всяка стая."
+
+msgid "See you in the mountains."
+msgstr "До скоро в планината."
+
+msgid "Select %(v0)s on %(v1)s; %(v2)s beds free"
+msgstr "Избери %(v0)s на %(v1)s; свободни легла: %(v2)s"
+
+msgid "Select a property"
+msgstr "Избери хижа"
+
+msgid "Select an available arrival, then a later departure in the same room. Departure is not charged. Use the preview button on a reservation to inspect its details."
+msgstr "Избери свободна дата на пристигане, после по-късна дата на напускане в същата стая. Денят на напускане не се таксува. Бутонът за преглед показва данните за резервацията."
+
+msgid "Select arrival and departure"
+msgstr "Избери пристигане и напускане"
+
+msgid "Select beds to continue"
+msgstr "Избери легла, за да продължиш"
+
+msgid "Select both dates to see availability for your stay."
+msgstr "Избери двете дати, за да видиш наличността за престоя."
+
+msgid "Select dates in the calendar, then add a guest."
+msgstr "Избери дати в календара, после добави гост."
+
+msgid "Select exactly %(count)s beds for your group, or update the group size."
+msgstr "Избери точно %(count)s легла за групата или промени броя гости."
+
+msgid "Select your beds"
+msgstr "Избери легла"
+
+msgid "Selected nights"
+msgstr "Избрани нощувки"
+
+msgid "Send message →"
+msgstr "Изпрати съобщение →"
+
+msgid "Sending a request does not change or cancel your booking automatically. The hut manager must review it."
+msgstr "Изпращането на заявка не променя и не отменя резервацията автоматично. Управителят трябва да я прегледа."
+
+msgid "Sending request…"
+msgstr "Изпращане на заявката…"
+
+msgid "Show"
+msgstr "Покажи"
+
+msgid "Signed in as %(v0)s"
+msgstr "Вход като %(v0)s"
+
+msgid "Simple choices, clear prices. Every bed is priced per night."
+msgstr "Лесен избор, ясни цени. Цената е за едно легло на нощ."
+
+msgid "Simple reservations"
+msgstr "Лесни резервации"
+
+msgid "Skip to content"
+msgstr "Към съдържанието"
+
+msgid "Skip to main content"
+msgstr "Към основното съдържание"
+
+msgid "Some nights are outside this calendar. Full availability is checked when you confirm."
+msgstr "Някои нощувки са извън този календар. Пълната наличност се проверява при потвърждение."
+
+msgid "Some quantities exceed availability. Adjust the room selections."
+msgstr "Избраните количества надвишават наличността. Коригирай броя легла."
+
+msgid "Some quantities were reduced to match availability."
+msgstr "Някои количества са намалени според наличността."
+
+msgid "Staff login"
+msgstr "Вход за служители"
+
+msgid "Staff login ↗"
+msgstr "Вход за служители ↗"
+
+msgid "Staff portal"
+msgstr "Портал за служители"
+
+msgid "Staff sign in"
+msgstr "Вход за служители"
+
+msgid "Stay a little"
+msgstr "Остани малко"
+
+msgid "Stay dates"
+msgstr "Дати на престоя"
+
+msgid "Stay selection reset. Your guest details are kept."
+msgstr "Престоят е изчистен. Данните за госта се запазват."
+
+msgid "Stay summary"
+msgstr "Обобщение на престоя"
+
+msgid "Submit request →"
+msgstr "Изпрати заявка →"
+
+msgid "SummitDesk / Property management"
+msgstr "SummitDesk / Управление на хижата"
+
+msgid "SummitDesk / Your mountain stay"
+msgstr "SummitDesk / Твоят престой"
+
+msgid "SummitDesk home"
+msgstr "SummitDesk — начало"
+
+msgid "SummitDesk management navigation"
+msgstr "Навигация за управление на SummitDesk"
+
+msgid "SummitDesk navigation"
+msgstr "Навигация на SummitDesk"
+
+msgid "SummitDesk · Staff workspace"
+msgstr "SummitDesk · Служебно пространство"
+
+msgid "Switch property"
+msgstr "Смени хижата"
+
+msgid "THE HUT"
+msgstr "ХИЖАТА"
+
+msgid "THE PLACES WE LOVE"
+msgstr "ЛЮБИМИ МЕСТА"
+
+msgid "THE TRAIL IS WAITING"
+msgstr "ПЪТЕКАТА ТЕ ОЧАКВА"
+
+msgid "Tell the hut manager what you'd like to change or why you need to cancel."
+msgstr "Опиши какво искаш да промениш или защо се налага отмяна."
+
+msgid "That is too far ahead to book online."
+msgstr "Тази дата е извън периода за онлайн резервации."
+
+msgid "Then the mountains."
+msgstr "После — в планината."
+
+msgid "These rooms can fit your group for the same dates:"
+msgstr "Тези стаи имат място за групата ти на същите дати:"
+
+msgid "This page is accessible through your private reservation link. Please avoid sharing it publicly."
+msgstr "Тази страница се отваря чрез личния линк за резервацията. Не го споделяй публично."
+
+msgid "This reservation has been cancelled."
+msgstr "Тази резервация е отменена."
+
+msgid "This sends a message inside SummitDesk, not an email. For urgent matters, contact the hut directly."
+msgstr "Съобщението се изпраща в SummitDesk. За спешни въпроси се свържи директно с хижата."
+
+msgid "Those beds were just taken. Please try again."
+msgstr "Тези легла току-що бяха заети. Опитай отново."
+
+msgid "Three steps."
+msgstr "Три стъпки."
+
+msgid "Today"
+msgstr "Днес"
+
+msgid "Toggle navigation"
+msgstr "Покажи или скрий менюто"
+
+msgid "Total price"
+msgstr "Обща цена"
+
+msgid "Try a different arrival or departure date to see more options."
+msgstr "Опитай други дати на пристигане или напускане."
+
+msgid "Try another destination or clear your search."
+msgstr "Опитай друго място или изчисти търсенето."
+
+msgid "Use the private link from your email, or request another copy below. A hut manager must reissue access if the previous link was disabled."
+msgstr "Използвай личния линк от имейла или поискай ново копие по-долу. Ако линкът е спрян, управителят трябва да издаде нов достъп."
+
+msgid "View hut &amp; availability"
+msgstr "Виж хижата и свободните места"
+
+msgid "WORKSPACE"
+msgstr "РАБОТНО ПРОСТРАНСТВО"
+
+msgid "We check availability again before accepting your request. Selected beds are held while the hut reviews it. You will receive an email when the manager approves or declines."
+msgstr "Проверяваме наличността отново при изпращане. Избраните легла се задържат, докато хижата разглежда заявката. Ще получиш имейл при одобрение или отказ."
+
+msgid "We'll send your request to the hut manager. Your stay is not confirmed until they approve it."
+msgstr "Ще изпратим заявката до управителя на хижата. Престоят е потвърден едва след неговото одобрение."
+
+msgid "Website language"
+msgstr "Език на сайта"
+
+msgid "Weekly reservation calendar"
+msgstr "Седмичен календар на резервациите"
+
+msgid "Where to next?"
+msgstr "Накъде този път?"
+
+msgid "Wild places. Good nights. Great stories."
+msgstr "Дива природа. Спокойни нощи. Хубави истории."
+
+msgid "Workspace"
+msgstr "Работно пространство"
+
+msgid "Workspace /"
+msgstr "Работно пространство /"
+
+msgid "Workspace toolbar"
+msgstr "Лента с инструменти"
+
+msgid "YOUR MOUNTAIN STAY"
+msgstr "ТВОЯТ ПРЕСТОЙ В ПЛАНИНАТА"
+
+msgid "YOUR MOUNTAIN STAYS"
+msgstr "ТВОЯТА НОЩУВКА В ПЛАНИНАТА"
+
+msgid "YOUR NEXT ADVENTURE STARTS HERE"
+msgstr "СЛЕДВАЩОТО ТИ ПРИКЛЮЧЕНИЕ ЗАПОЧВА ТУК"
+
+msgid "YOUR OPTIONS"
+msgstr "ТВОЯТ ИЗБОР"
+
+msgid "YOUR STAY"
+msgstr "ТВОЯТ ПРЕСТОЙ"
+
+msgid "You"
+msgstr "Ти"
+
+msgid "You can send messages here and read replies from the hut team. Refresh the page to see new replies. Email replies are not imported into this conversation."
+msgstr "Тук можеш да пишеш и да четеш отговорите на екипа. Обнови страницата за нови отговори. Отговорите по имейл не се добавят в този разговор."
+
+msgid "You haven't submitted any requests yet."
+msgstr "Все още няма изпратени заявки."
+
+msgid "You selected %(selected)s beds for %(target)s guests. Adjust beds or update your group size."
+msgstr "Избрани са %(selected)s легла за %(target)s гости. Коригирай леглата или броя гости."
+
+msgid "Your adventure awaits."
+msgstr "Приключението те очаква."
+
+msgid "Your beds are currently on hold. Your reservation is not yet confirmed."
+msgstr "Леглата са временно задържани. Резервацията все още не е потвърдена."
+
+msgid "Your booking"
+msgstr "Твоята резервация"
+
+msgid "Your booking has been cancelled. You can still review the reservation details below."
+msgstr "Резервацията е отменена. Все още можеш да видиш подробностите по-долу."
+
+msgid "Your details"
+msgstr "Твоите данни"
+
+msgid "Your message"
+msgstr "Твоето съобщение"
+
+msgid "Your mountain stay"
+msgstr "Твоят престой в планината"
+
+msgid "Your mountain stay · Reservation details"
+msgstr "Твоят престой · Данни за резервацията"
+
+msgid "Your next mountain stay starts here. Choose your dates to check the rooms and beds at this hut."
+msgstr "Следващият ти престой започва тук. Избери дати, за да провериш стаите и леглата в хижата."
+
+msgid "Your previous selection is kept."
+msgstr "Предишният избор се запазва."
+
+msgid "Your request has been received. Your selected beds are held while the hut manager reviews your reservation."
+msgstr "Заявката е получена. Избраните легла се задържат, докато управителят разглежда резервацията."
+
+msgid "Your request is saved. Your stay is not confirmed until the hut manager approves it."
+msgstr "Заявката е запазена. Престоят е потвърден едва след одобрение от управителя."
+
+msgid "Your request summary"
+msgstr "Обобщение на заявката"
+
+msgid "Your requests"
+msgstr "Твоите заявки"
+
+msgid "Your reservation at %(v0)s"
+msgstr "Твоята резервация в %(v0)s"
+
+msgid "Your reservation includes the rooms and beds listed below."
+msgstr "Резервацията включва стаите и леглата по-долу."
+
+msgid "Your reservation is awaiting confirmation."
+msgstr "Резервацията очаква потвърждение."
+
+msgid "Your reservation is confirmed."
+msgstr "Резервацията е потвърдена."
+
+msgid "Your reservation is confirmed. Keep this private booking link to review or manage your stay."
+msgstr "Резервацията е потвърдена. Запази личния линк за преглед и управление на престоя."
+
+msgid "Your reservation is saved. Email delivery is delayed. Keep this page and check your status here."
+msgstr "Резервацията е запазена. Имейлът се забавя. Запази тази страница и следи статуса тук."
+
+msgid "Your reservation is saved. Email delivery is delayed. You can continue checking the status on this page."
+msgstr "Резервацията е запазена. Имейлът се забавя. Можеш да следиш статуса на тази страница."
+
+msgid "Your reservation request is awaiting approval from the hut manager."
+msgstr "Заявката очаква одобрение от управителя на хижата."
+
+msgid "Your stay"
+msgstr "Твоят престой"
+
+msgid "Your workspace"
+msgstr "Твоето работно пространство"
+
+msgid "bed"
+msgstr "легло"
+
+msgid "beds"
+msgstr "легла"
+
+msgid "closer to the wild."
+msgstr "по-близо до дивата природа."
+
+msgid "detailed timeline"
+msgstr "подробният календар"
+
+msgid "e.g. Alex Morgan"
+msgstr "напр. Иван Петров"
+
+msgid "guest"
+msgstr "гост"
+
+msgid "guests"
+msgstr "гости"
+
+msgid "next basecamp."
+msgstr "следващ подслон."
+
+msgid "night"
+msgstr "нощувка"
+
+msgid "nights"
+msgstr "нощувки"
+
+msgid "per bed / night"
+msgstr "за легло / нощ"
+
+msgid "remains available."
+msgstr "също е достъпен."
+
+msgid "select dates"
+msgstr "избери дати"
+
+msgid "· %(v0)s needed"
+msgstr "· необходими: %(v0)s"
+
+msgid "↗ &nbsp; Open public website"
+msgstr "↗ &nbsp; Отвори публичния сайт"
+
+msgid "↪ &nbsp; Sign out"
+msgstr "↪ &nbsp; Изход"
+
+msgid "① &nbsp; The stay"
+msgstr "① &nbsp; Престой"
+
+msgid "② &nbsp; The guest"
+msgstr "② &nbsp; Гост"
+
+msgid "▤ &nbsp; Plan a stay"
+msgstr "▤ &nbsp; Планирай престой"
+
+msgid "%(count)s bed"
+msgid_plural "%(count)s beds"
+msgstr[0] "%(count)s легло"
+msgstr[1] "%(count)s легла"
+
+msgid "%(count)s night"
+msgid_plural "%(count)s nights"
+msgstr[0] "%(count)s нощувка"
+msgstr[1] "%(count)s нощувки"
+
+msgid "%(count)s guest"
+msgid_plural "%(count)s guests"
+msgstr[0] "%(count)s гост"
+msgstr[1] "%(count)s гости"
+
+msgid "%(count)s room"
+msgid_plural "%(count)s rooms"
+msgstr[0] "%(count)s стая"
+msgstr[1] "%(count)s стаи"
+
+msgid "%(count)s hut"
+msgid_plural "%(count)s huts"
+msgstr[0] "%(count)s хижа"
+msgstr[1] "%(count)s хижи"
+
+
+msgid "Green fields and forested ridges in the Rhodope Mountains, Bulgaria"
+msgstr "Зелени поля и планински хребети в Родопите, България"
+
+msgid "Contact"
+msgstr "Контакти"
+
+msgid "View on map"
+msgstr "Виж на картата"
+
+msgid "Footer navigation"
+msgstr "Навигация в долната част"
+
+msgid "Useful links"
+msgstr "Полезни връзки"
+
+msgid "Booking questions"
+msgstr "Често задавани въпроси"
+
+msgid "Cancellation policy"
+msgstr "Условия за анулиране"
+
+msgid "Privacy notice"
+msgstr "Уведомление за поверителност"
+
+msgid "Landscape photo:"
+msgstr "Пейзажна снимка:"
+
+msgid "cropped and compressed"
+msgstr "изрязана и компресирана"
+
+msgid "Last updated"
+msgstr "Последна актуализация"
+
+msgid "This policy is currently available in the language shown below."
+msgstr "В момента тези условия са достъпни на езика, показан по-долу."
+
+msgid "BEFORE YOU SET OFF"
+msgstr "ПРЕДИ ДА ТРЪГНЕШ"
+
+msgid "A little help with your stay."
+msgstr "Полезно за твоя престой."
+
+msgid "The essentials, before you head for the mountains."
+msgstr "Най-важното, преди да поемеш към планината."
+
+msgid "Is my reservation confirmed immediately?"
+msgstr "Резервацията ми потвърждава ли се веднага?"
+
+msgid "Your booking starts as a request. The hut manager reviews it and sends the decision by email. Please wait for confirmation before travelling."
+msgstr "Резервацията започва като заявка. Управителят на хижата я преглежда и изпраща отговора по имейл. Моля, изчакай потвърждение, преди да пътуваш."
+
+msgid "Can I request a change or cancellation?"
+msgstr "Мога ли да поискам промяна или анулиране?"
+
+msgid "Use the private link in your booking email to send a request to the hut manager. A request does not change your booking until the manager approves it."
+msgstr "Използвай личната връзка от имейла за резервацията, за да изпратиш заявка до управителя на хижата. Заявката не променя резервацията, докато управителят не я одобри."
+
+msgid "Read the cancellation policy"
+msgstr "Прочети условията за анулиране"
+
+msgid "Which dates does availability cover?"
+msgstr "За кои дати важат свободните места?"
+
+msgid "Search results show beds available for every night of your selected stay. Check-out day is not an overnight stay."
+msgstr "Резултатите показват свободни легла за всяка нощ от избрания престой. Денят на напускане не включва нощувка."
+
+msgid "How we use your booking details — privacy notice"
+msgstr "Как използваме данните за резервацията — уведомление за поверителност"
+
+msgid "Please check your request"
+msgstr "Провери заявката си"
+
+msgid "Your request has not been sent. Fix the following and try again."
+msgstr "Заявката не е изпратена. Поправи следното и опитай отново."
+
+msgid "required"
+msgstr "задължително"
+
+msgid "optional"
+msgstr "незадължително"
+
+msgid "Optional. Helps the hut contact you about arrival changes."
+msgstr "Незадължително. Помага на хижата да се свърже с теб при промяна в пристигането."
+
+msgid "Leave this field blank"
+msgstr "Остави това поле празно"
+
+msgid "We couldn't verify this request. Reload the page and try again."
+msgstr "Не успяхме да проверим заявката. Презареди страницата и опитай отново."
+
+msgid "Too many booking requests. Your details are kept. Please wait a little and try again, or contact the hut."
+msgstr "Твърде много заявки за резервация. Данните ти са запазени. Изчакай малко и опитай отново или се свържи с хижата."
+
+msgid "When and how do I pay?"
+msgstr "Кога и как се плаща?"
+
+msgid "No payment is collected by this booking request form. The hut manager will confirm how and when to pay, including any deposit."
+msgstr "Чрез този формуляр за заявка не се извършва плащане. Управителят на хижата ще потвърди как и кога да платиш, включително евентуален депозит."
+
+msgid "Your hut"
+msgstr "Твоята хижа"
+
+msgid "Location and directions"
+msgstr "Местоположение и упътвания"
+
+msgid "Booking support"
+msgstr "Съдействие за резервации"
+
+msgid "We use your details to process this request and communicate about your stay."
+msgstr "Използваме данните ти, за да обработим заявката и да се свържем с теб относно престоя."
+
+msgid "Choose beds to see the total"
+msgstr "Избери легла, за да видиш общата сума"
+
+msgid "Error:"
+msgstr "Грешка:"
+
+msgid "Request received."
+msgstr "Заявката е получена."
+
+msgid "Estimated total"
+msgstr "Приблизителна обща сума"
+
+msgid "This stay has started or passed. Please contact the hut about changes."
+msgstr "Този престой вече е започнал или приключил. За промени се свържи с хижата."
+
+msgid "What happens next?"
+msgstr "Какво следва?"
+
+msgid "The hut manager will email their decision. Please wait for approval before travelling."
+msgstr "Управителят на хижата ще изпрати отговора по имейл. Изчакай одобрение, преди да пътуваш."
+
+msgid "If your arrival is soon, contact the hut directly."
+msgstr "Ако пристигането ти е скоро, свържи се директно с хижата."
+
+msgid "Hello %(name)s,"
+msgstr "Здравей, %(name)s,"
+
+msgid "We received your reservation request for %(name)s."
+msgstr "Получихме заявката ти за резервация в %(name)s."
+
+msgid "Hut phone"
+msgstr "Телефон на хижата"
+
+msgid "Hut email"
+msgstr "Имейл на хижата"
+
+msgid "Your request is AWAITING APPROVAL. Your stay is not confirmed yet."
+msgstr "Заявката ти ОЧАКВА ОДОБРЕНИЕ. Престоят все още не е потвърден."
+
+msgid "The selected beds are held while the hut manager reviews your request."
+msgstr "Избраните легла се задържат, докато управителят на хижата прегледа заявката."
+
+msgid "View your request status or ask for changes using your private link:"
+msgstr "Провери състоянието на заявката или поискай промени чрез личната си връзка:"
+
+msgid "We will email you when the hut manager approves or declines your request."
+msgstr "Ще получиш имейл, когато управителят на хижата одобри или откаже заявката."
+
+msgid "Please do not travel assuming the request is confirmed."
+msgstr "Моля, не пътувай с предположението, че заявката е потвърдена."

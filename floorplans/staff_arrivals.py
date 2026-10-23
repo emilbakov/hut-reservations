@@ -28,8 +28,16 @@ def staff_arrivals(request, hut_id):
             messages.error(request, 'Invalid reservation.')
             return redirect('floorplans:staff_arrivals', hut_id=hut.pk)
         with transaction.atomic():
+            # Lock only the reservation row. PostgreSQL rejects SELECT FOR UPDATE
+            # combined with DISTINCT, and joining items duplicates multi-room stays.
+            # The subquery enforces the same hut scope without an outer join.
+            hut_reservations = ReservationItem.objects.filter(
+                room__hut=hut
+            ).values('reservation_id')
             reservation = get_object_or_404(
-                Reservation.objects.select_for_update().filter(items__room__hut=hut).distinct(),
+                Reservation.objects.select_for_update().filter(
+                    pk__in=hut_reservations
+                ),
                 pk=reservation_id,
             )
             if reservation.status != 'confirmed':

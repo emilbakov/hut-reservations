@@ -1,18 +1,28 @@
-Hello {{ reservation.name }},
+{% load i18n %}{% blocktranslate with name=reservation.name %}Hello {{ name }},{% endblocktranslate %}
 
-We received your reservation request for {{ hut_name }}.
+{% blocktranslate with name=hut_name %}We received your reservation request for {{ name }}.{% endblocktranslate %}
+{% if hut_info.hut.location %}{{ hut_info.hut.location }}
+{% endif %}{% if hut_info.phone %}{% translate "Hut phone" %}: {{ hut_info.phone }}
+{% endif %}{% if hut_info.email %}{% translate "Hut email" %}: {{ hut_info.email }}
+{% endif %}{% if hut_info.directions %}{% translate "Location and directions" %}: {{ hut_info.directions }}
+{% endif %}
 
-Your request is AWAITING APPROVAL. Your stay is not confirmed yet.
-The selected beds are held while the hut manager reviews your request.
+{% translate "Your request is AWAITING APPROVAL. Your stay is not confirmed yet." %}
+{% translate "The selected beds are held while the hut manager reviews your request." %}
 
-Arrival: {{ reservation.check_in|date:"j F Y" }}
-Departure: {{ reservation.check_out|date:"j F Y" }}
-Beds requested: {{ reservation.total_beds }}
-Estimated total: {{ reservation.total_price }} {{ currency }}
-Reference: {{ reservation.code }}
+{% translate "Arrival" %}: {{ reservation.check_in|date:"j F Y" }}
+{% translate "Departure" %}: {{ reservation.check_out|date:"j F Y" }}
+{% translate "Beds requested" %}: {{ reservation.total_beds }}
+{% translate "Estimated total" %}: {{ reservation.total_price }} {{ currency }}
+{% translate "Reference:" %} {{ reservation.code }}
 
-Check your request status or cancel it using your private link:
+{% translate "View your request status or ask for changes using your private link:" %}
 {{ link }}
 
-We will email you when the hut manager approves or declines your request.
-Please do not travel assuming the request is confirmed.
+{% translate "We will email you when the hut manager approves or declines your request." %}
+{% if hut_info.reply %}{{ hut_info.reply }}
+{% endif %}{% translate "If your arrival is soon, contact the hut directly." %}
+{% translate "Please do not travel assuming the request is confirmed." %}
+
+{% translate "When and how do I pay?" %}
+{% if hut_info.payment %}{{ hut_info.payment }}{% else %}{% translate "No payment is collected by this booking request form. The hut manager will confirm how and when to pay, including any deposit." %}{% endif %}

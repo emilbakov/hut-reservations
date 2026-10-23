@@ -1,0 +1,9 @@
+{% load i18n %}
+<section class="pub-container pub149-faq" id="questions" aria-labelledby="pub149-faq-title">
+  <div><span class="pub-eyebrow">{% translate "BEFORE YOU SET OFF" %}</span><h2 id="pub149-faq-title">{% translate "A little help with your stay." %}</h2><p>{% translate "The essentials, before you head for the mountains." %}</p></div>
+  <div class="pub149-faq-list">
+    <details><summary>{% translate "Is my reservation confirmed immediately?" %}</summary><p>{% translate "Your booking starts as a request. The hut manager reviews it and sends the decision by email. Please wait for confirmation before travelling." %}</p></details>
+    <details><summary>{% translate "Can I request a change or cancellation?" %}</summary><p>{% translate "Use the private link in your booking email to send a request to the hut manager. A request does not change your booking until the manager approves it." %} {% if PUBLIC149.cancellation %}<a href="{% url 'bookings:public_policy' 'cancellation' %}">{% translate "Read the cancellation policy" %}</a>{% endif %}</p></details>
+    <details><summary>{% translate "Which dates does availability cover?" %}</summary><p>{% translate "Search results show beds available for every night of your selected stay. Check-out day is not an overnight stay." %}</p></details>
+  </div>
+</section>

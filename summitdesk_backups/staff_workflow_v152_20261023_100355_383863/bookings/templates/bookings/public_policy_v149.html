@@ -1,0 +1,12 @@
+{% extends "bookings/public_base_v124.html" %}
+{% load i18n %}
+{% block title %}{{ policy_title }}{% endblock %}
+{% block content %}
+<article class="pub-container pub149-policy">
+  <span class="pub-eyebrow">{{ HUT_NAME }}</span><h1>{{ policy_title }}</h1>
+  <p class="pub149-policy-meta">{{ policy_operator }}{% if policy_updated %} · {% translate "Last updated" %}: {{ policy_updated|date:"DATE_FORMAT" }}{% endif %}</p>
+  {% if policy_fallback %}<p class="pub149-policy-fallback" role="note">{% translate "This policy is currently available in the language shown below." %}</p>{% endif %}
+  <div class="pub149-policy-text" lang="{{ policy_lang }}">{{ policy_text|linebreaks }}</div>
+  {% if policy_email %}<p><a href="mailto:{{ policy_email }}">{{ policy_email }}</a></p>{% endif %}
+</article>
+{% endblock %}

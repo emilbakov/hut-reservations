@@ -20,6 +20,7 @@ from django.views.decorators.cache import never_cache
 from .deposits import deposit_summary, single_hut_id
 from .models import GuestAccessLink, GuestChangeRequest, GuestConversationMessage, Hut, Reservation
 from .views import manageable_reservations, permitted_hut_selection
+from .booking_flow_v150 import hut_information
 
 def issue_guest_link(reservation, request=None):
     """Return a newly created or existing URL. Never expose token in staff listings."""
@@ -95,6 +96,7 @@ def guest_self_service(request, token):
         "guest_token": token,
         "can_request": reservation.status in Reservation.HOLDING and reservation.check_in > timezone.localdate(),
         "currency": getattr(settings, "BOOKING_CURRENCY", "EUR"),
+        "hut_info": hut_information(hut),
     })
 
 @staff_member_required

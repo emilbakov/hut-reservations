@@ -22,6 +22,8 @@ from .reliability_v145 import (submission_token, submission_identity, completed_
 from .forms import BookingForm, SearchForm
 from .models import GuestStay, Hut, Reservation, ReservationItem, Room
 from .services import NotAvailable, create_reservation, free_beds, modify_reservation
+from .booking_flow_v150 import error_summary, hut_information, receipt_context
+from .booking_guard_v150 import BookingRateLimited, reserve_budget
 
 logger = logging.getLogger(__name__)
 
@@ -30,15 +32,6 @@ def role_landing(request):
     return render(request, "bookings/role_landing.html")
 
 
-def hut_list(request):
-    """Homepage showing all active mountain huts."""
-    huts = Hut.objects.filter(is_active=True).order_by("name")
-
-    return render(
-        request,
-        "bookings/hut_list.html",
-        {"huts": huts},
-    )
 def hut_detail(request, slug):
     """Booking page for one selected mountain hut."""
     hut = get_object_or_404(
@@ -63,15 +56,19 @@ def book(request, hut=None, *, template_name="bookings/book.html"):
         params['check_out'] = dates[1] if len(dates) == 2 else ''
     from .ux_v146 import party_size, selected_summary, nearby_stays
     requested_beds, beds_error = party_size(params)
-    has_dates = "check_in" in params
+    has_dates = request.method == "POST" or "check_in" in params or "check_out" in params
     search = SearchForm(params if has_dates else None)
 
     context = {
-        "search": search,
+        "search": search, "empty_total_message": _("Choose beds to see the total"),
         "hut": hut, "requested_beds": requested_beds, "party_error": beds_error,
         "submission_token": request.POST.get("submission_token") or submission_token(request, hut),
     }
+    response_status = 200
+    retry_after = None
+    booking = None
     if hut is not None:
+        context["hut_info"] = hut_information(hut)
         context["public_rooms"] = Room.objects.filter(hut=hut, is_active=True).order_by("position", "name")
 
     if has_dates and search.is_valid():
@@ -91,6 +88,7 @@ def book(request, hut=None, *, template_name="bookings/book.html"):
                 initial=request.POST.dict() if preview_only else None,
                 rooms=rooms,
                 free=free_beds(rooms, check_in, check_out),
+                guests=requested_beds,
             )
 
         booking = booking_form()
@@ -110,10 +108,6 @@ def book(request, hut=None, *, template_name="bookings/book.html"):
                     grant_guest_access(request, previous)
                     return redirect(previous)
 
-        if request.method == 'POST' and not preview_only and not identity_error and booking.is_valid() and requested_beds is not None:
-            if sum(booking.beds_by_room().values()) != requested_beds:
-                booking.add_error(None, _('Select exactly %(count)s beds for your group, or update the group size.') % {'count': requested_beds})
-
         if request.method == "POST" and not preview_only and not identity_error and booking.is_valid():
             guest = {
                 key: booking.cleaned_data[key]
@@ -122,6 +116,8 @@ def book(request, hut=None, *, template_name="bookings/book.html"):
 
             try:
                 def save_request():
+                    # Called only for a new idempotent submission, under its lock.
+                    reserve_budget(request, guest["email"])
                     reservation = create_reservation(
                         check_in=check_in, check_out=check_out,
                         beds_by_room=booking.beds_by_room(),
@@ -131,6 +127,10 @@ def book(request, hut=None, *, template_name="bookings/book.html"):
                     return reservation
                 reservation = create_public_submission(identity, save_request)
 
+            except BookingRateLimited as exc:
+                retry_after = exc.retry_after
+                response_status = 429
+                booking.add_error(None, _("Too many booking requests. Your details are kept. Please wait a little and try again, or contact the hut."))
             except ValidationError as exc:
                 booking.add_error(None, "; ".join(exc.messages))
             except ValueError as exc:
@@ -139,11 +139,8 @@ def book(request, hut=None, *, template_name="bookings/book.html"):
             except NotAvailable:
                 booking = booking_form()
 
-                if booking.is_valid():
-                    booking.add_error(
-                        None,
-                        _("Those beds were just taken. Please try again."),
-                    )
+                booking.is_valid()
+                booking.add_error(None, _("Those beds were just taken. Please try again."))
 
             else:
                 grant_guest_access(request, reservation)
@@ -164,7 +161,11 @@ def book(request, hut=None, *, template_name="bookings/book.html"):
             any_free=any(booking.free.values()),
         )
 
-    return render(request, template_name, context)
+    context["form_errors"] = error_summary(search, booking, beds_error)
+    response = render(request, template_name, context, status=response_status)
+    if retry_after:
+        response["Retry-After"] = str(retry_after)
+    return response
 
 
 
@@ -262,7 +263,7 @@ def dashboard(request):
 
     occupancy = round(booked_nights * 100 / (capacity * len(daily))) if capacity and daily else 0
     upcoming_reservations = list(
-        active.filter(check_in__gte=today)
+        active.filter(status=Reservation.Status.CONFIRMED, check_in__gte=today, pk__in=manageable_reservations(request.user))
         .prefetch_related(Prefetch("items", queryset=item_queryset, to_attr="dashboard_items"))
         .order_by("check_in", "name")[:20]
     )
@@ -279,13 +280,23 @@ def dashboard(request):
         today_items = today_items.filter(room__hut=selected_hut)
     today_occupied = today_items.aggregate(beds=Sum("beds"))["beds"] or 0
 
+    from .staff_decisions_v152 import decorate_requests, undo_context
+    scoped = manageable_reservations(request.user)
+    if selected_hut:
+        scoped = scoped.filter(items__room__hut=selected_hut)
+    scoped = scoped.distinct()
+    pending = list(scoped.filter(status='pending').prefetch_related('items__room__hut').order_by('created', 'pk')[:3])
+    decorate_requests(pending)
+    confirmed = scoped.filter(status='confirmed')
+    in_house_count = confirmed.filter(guest_stay__checked_in_at__isnull=False, guest_stay__checked_out_at__isnull=True).count()
     return render(request, "bookings/dashboard.html", {
         "today": today, "huts": huts, "manager_mode": not request.user.is_superuser, "selected_hut": selected_hut,
         "selected_slug": selected_slug,
         "rooms": rooms, "capacity": capacity, "occupied": today_occupied,
-        "arrival_count": active.filter(check_in=today).count(),
-        "departure_count": active.filter(check_out=today).count(),
-        "pending_count": active.filter(status=Reservation.Status.PENDING).count(),
+        "arrival_count": confirmed.filter(check_in=today).count(),
+        "departure_count": confirmed.filter(check_out=today).count(),
+        "pending_count": scoped.filter(status=Reservation.Status.PENDING).count(),
+        "pending_requests": pending, "in_house_count": in_house_count, "undo_decision": undo_context(request, scoped),
         "upcoming": upcoming, "daily": daily, "month": first,
         "previous_year": prev_month.year, "previous_month": prev_month.month,
         "next_year": next_month.year, "next_month": next_month.month,
@@ -358,7 +369,9 @@ def dashboard_export(request):
 
 @never_cache
 def reservation_detail(request, code):
-    reservation = get_object_or_404(Reservation.objects.prefetch_related("items__room"), code=code)
+    from django.db.models import Prefetch
+    reservation = get_object_or_404(Reservation.objects.prefetch_related(
+        Prefetch("items", queryset=ReservationItem.objects.select_related("room__hut"))), code=code)
     if not can_manage(request, reservation) and not has_guest_access(request, reservation):
         from .delivery_views_v145 import recover_guest_link
         return recover_guest_link(request, reservation)
@@ -368,6 +381,7 @@ def reservation_detail(request, code):
         "reservation": reservation, "can_manage_directly": staff,
         "guest_portal_url": portal_url(reservation) if not staff else '',
         "email_delivery_delayed": guest_delivery_delayed(reservation),
+        **receipt_context(reservation, staff=staff),
     })
 
 
@@ -396,7 +410,7 @@ def manager_reservation_action_v145(request, reservation):
 
 
 
-def send_confirmation(request, reservation):
+def send_confirmation(request, reservation, *, event=''):
     """Email the guest (and the hut keeper, if configured). A mail failure
     must never lose a booking that is already saved, so errors are logged."""
     from .notifications_v145 import supersede_request_notifications
@@ -433,7 +447,7 @@ def send_confirmation(request, reservation):
     for recipient in set(recipients):
         queue_notification(reservation, 'confirmation_guest' if recipient == reservation.email else 'confirmation_manager',
             custom_confirmation_subject or f"Your reservation at {settings.HUT_NAME}",
-            guest_body if recipient == reservation.email else body, recipient)
+            guest_body if recipient == reservation.email else body, recipient, event=event)
 
 
 @require_GET
@@ -625,7 +639,11 @@ def manager_reservations(request):
 
     from django.core.paginator import Paginator
     page = Paginator(qs, 25).get_page(request.GET.get("page"))
+    from .staff_decisions_v152 import undo_context
+    from .staff_decisions_v152 import decorate_requests
+    decorate_requests(page.object_list)
     return render(request, "bookings/manager_reservations.html", {
+        "undo_decision": undo_context(request, qs),
         "page": page, "huts": huts, "selected_hut": selected_hut,
         "selected_slug": selected_slug, "manager_mode": not request.user.is_superuser,
         "q": search, "status_filter": status,
@@ -641,37 +659,8 @@ def manager_reservation_action(request, code):
     if action not in {"confirm", "cancel"}:
         return JsonResponse({"error": "Unknown action"}, status=400)
 
-    with transaction.atomic():
-        reservation = get_locked_manageable_reservation(request.user, code=code)
-        # Never change bookings spanning multiple huts from this interface.
-        hut_ids = set(reservation.items.values_list("room__hut_id", flat=True))
-        if len(hut_ids) != 1 or None in hut_ids:
-            raise PermissionDenied("This reservation requires administrator review.")
-
-        if action == "confirm":
-            if reservation.status != Reservation.Status.PENDING:
-                messages.error(request, "Only pending reservations can be confirmed.")
-            else:
-                reservation.status = Reservation.Status.CONFIRMED
-                reservation.save(update_fields=["status"])
-                if reservation.guest_request:
-                    send_confirmation(request, reservation)
-                messages.success(request, "Reservation confirmed.")
-        else:
-            if reservation.status == Reservation.Status.CANCELLED:
-                messages.error(request, "Reservation is already cancelled.")
-            else:
-                reservation.status = Reservation.Status.CANCELLED
-                reservation.save(update_fields=["status"])
-                if reservation.guest_request:
-                    from .guest_requests_v126 import send_guest_request_declined
-                    send_guest_request_declined(request, reservation)
-                messages.success(request, "Reservation cancelled; beds are available again.")
-
-    # Only a fixed, known destination is allowed (never a user-supplied URL).
-    if request.POST.get("source") == "approvals":
-        return redirect("bookings:approval_dashboard")
-    return redirect("bookings:manager_reservations")
+    from .staff_decisions_v152 import decide
+    return decide(request, code)
 
 
 # --- Daily guest arrivals and departures ---

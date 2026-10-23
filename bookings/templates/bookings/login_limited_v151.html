@@ -1,0 +1,11 @@
+{% load i18n static %}{% get_current_language as current_language %}
+<!doctype html><html lang="{{ current_language }}"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow"><link rel="icon" href="{% static 'bookings/karlak-favicon-v153.png' %}" type="image/png">
+<title>{% if login_unavailable %}{% translate "Sign-in temporarily unavailable" %}{% else %}{% translate "Too many sign-in attempts" %}{% endif %}</title>
+<style>body{margin:0;background:#f7f8f4;color:#19372d;font:16px/1.7 system-ui,sans-serif}main{max-width:36rem;margin:10vh auto;padding:28px}h1{font-size:2rem;line-height:1.2}a{color:#285e40;display:inline-flex;align-items:center;min-height:44px}p{color:#4e6355}a:focus-visible{outline:3px solid #507b13;outline-offset:3px}</style>
+</head><body><main>
+{% if login_unavailable %}<h1>{% translate "Sign-in temporarily unavailable" %}</h1><p>{% translate "We couldn't check sign-in protection. Please try again shortly." %}</p>
+{% else %}<h1>{% translate "Too many sign-in attempts" %}</h1><p>{% blocktranslate count minutes=retry_minutes %}Please wait about {{ minutes }} minute before trying again.{% plural %}Please wait about {{ minutes }} minutes before trying again.{% endblocktranslate %}</p>{% endif %}
+<p>{% translate "A password reset does not clear this temporary limit." %}</p><a href="{{ login_path }}">{% translate "Return to sign-in" %}</a>
+</main></body></html>

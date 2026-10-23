@@ -7,11 +7,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#142b24">
+  {% include "bookings/public_head_v149.html" %}
+  {% if not sd116_staff %}<link rel="stylesheet" href="{% static 'bookings/public_shared_v149.css' %}">{% endif %}
   <title>{% block title %}{% translate "Mountain adventures" %}{% endblock %} · {{ HUT_NAME }}</title>
   <link rel="stylesheet" href="{% static 'bookings/site.css' %}">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'bookings/local_fonts_v152.css' %}">
+  {% if sd116_staff %}<script src="{% static 'bookings/staff_v152.js' %}" defer></script>{% endif %}
   <style>
     /* Shared shell only: deliberately avoids changing the individual page layouts. */
     .site-header.adventure-header{position:relative;z-index:50;background:#142b24;color:#f6f9f2;border-bottom:1px solid rgba(255,255,255,.12);box-shadow:0 6px 24px rgba(14,32,25,.10)}
@@ -49,9 +50,20 @@
     .sd115-nav a:hover,.sd115-nav a:focus-visible{background:#2c5343;color:#fff}
     .sd115-nav a[aria-current=page]{background:#c9ef71;color:#173025}
     @media(max-width:1050px){.sd115-nav{display:none}.adventure-header .mobile-menu{display:block}}
+    .adventure-header .brand-icon.karlak-legacy-logo{display:block;width:52px;height:52px;object-fit:contain;background:transparent;border-radius:0;box-shadow:none}
+    @media(max-width:540px){.adventure-header .brand-icon.karlak-legacy-logo{width:42px;height:42px}}
   </style>
   <link rel="stylesheet" href="{% static 'bookings/ui_v146.css' %}">
   <link rel="stylesheet" href="{% static 'bookings/ui_v147.css' %}">
+  <link rel="stylesheet" href="{% static 'bookings/karlak_nav_v154.css' %}">
+  <link rel="stylesheet" href="{% static 'bookings/karlak_links_v155.css' %}">
+  <link rel="stylesheet" href="{% static 'bookings/karlak_links_right_v156.css' %}">
+  <link rel="stylesheet" href="{% static 'bookings/karlak_language_nav_v157.css' %}">
+  <link rel="stylesheet" href="{% static 'bookings/karlak_language_last_v158.css' %}">
+{% if not sd116_staff %}
+  <link rel="stylesheet" href="{% static 'bookings/booking_flow_v150.css' %}">
+  <script src="{% static 'bookings/booking_feedback_v150.js' %}" defer></script>
+{% endif %}
   {{ UI147|json_script:"sd147-i18n" }}
   <script src="{% static 'bookings/ui_v147.js' %}"></script>
 </head>
@@ -60,12 +72,12 @@
   {% if sd116_staff %}{% summitdesk_nav %}{% else %}
   <header class="site-header adventure-header">
     <div class="shell header-inner">
-      <a class="brand" href="{% url 'bookings:hut_list' %}" aria-label="{% blocktranslate with v0=HUT_NAME %}{{ v0 }} — home{% endblocktranslate %}">
-        <span class="brand-icon" aria-hidden="true">▲</span>
-        <span>{{ HUT_NAME }}<small>{% translate "GO BEYOND THE ORDINARY" %}</small></span>
+      <a class="brand" href="{% url 'bookings:hut_list' %}" aria-label="Karlak — home">
+        <img class="brand-icon karlak-legacy-logo" src="{% static 'bookings/karlak-logo-light-v153.png' %}" width="52" height="52" alt="" decoding="async">
+        <span>Karlak<small>{% translate "GO BEYOND THE ORDINARY" %}</small></span>
       </a>
       {% if request.user.is_authenticated and request.user.is_staff %}
-      <nav class="sd115-nav" aria-label="{% translate "SummitDesk management navigation" %}">
+      <nav class="sd115-nav" aria-label="{% translate "Карлък management navigation" %}">
         <a href="{% url 'bookings:dashboard' %}" {% if request.resolver_match.url_name == 'dashboard' %}aria-current="page"{% endif %}>{% translate "Overview" %}</a>
         <a href="{% url 'bookings:calendar_timeline' %}" {% if request.resolver_match.url_name == 'calendar_timeline' %}aria-current="page"{% endif %}>{% translate "Calendar" %}</a>
         <a href="{% url 'bookings:manager_reservations' %}" {% if request.resolver_match.url_name == 'manager_reservations' %}aria-current="page"{% endif %}>{% translate "Reservations" %}</a>
@@ -76,16 +88,15 @@
       {% else %}
       <nav class="desktop-nav" aria-label="{% translate "Main navigation" %}">
         <a href="{% url 'bookings:hut_list' %}">{% translate "Explore huts" %}</a>
-        <a href="{% url 'bookings:hut_list' %}#how-it-works">{% translate "How it works" %}</a>
-        <a href="{% url 'bookings:staff_login' %}">{% translate "Staff sign in" %}</a>
+        <a href="{% url 'bookings:public_home' %}#how-it-works">{% translate "How it works" %}</a>
         {% if request.user.is_staff %}
         <a href="{% url 'bookings:dashboard' %}">{% translate "Dashboard" %}</a>
         <a href="{% url 'admin:index' %}">{% translate "Admin" %}</a>
         {% endif %}
-        <a class="nav-cta" href="{% url 'bookings:hut_list' %}#explore">{% translate "Find your stay" %} <span aria-hidden="true">↗</span></a>
+        <a class="nav-cta" href="{% url 'bookings:public_home' %}#explore">{% translate "Find your stay" %} <span aria-hidden="true">↗</span></a>
       </nav>
-      {% endif %}
       {% include "bookings/language_v147.html" %}
+      {% endif %}
       <details class="mobile-menu">
         <summary aria-label="{% translate "Toggle navigation" %}">☰ <span>{% translate "Menu" %}</span></summary>
         <nav class="mobile-nav" aria-label="{% translate "Mobile navigation" %}">
@@ -98,30 +109,24 @@
           <a href="{% url 'bookings:hut_list' %}">{% translate "Public site ↗" %}</a>
           {% else %}
           <a href="{% url 'bookings:hut_list' %}">{% translate "Explore huts" %}</a>
-          <a href="{% url 'bookings:hut_list' %}#how-it-works">{% translate "How it works" %}</a>
-        <a href="{% url 'bookings:staff_login' %}">{% translate "Staff sign in" %}</a>
+          <a href="{% url 'bookings:public_home' %}#how-it-works">{% translate "How it works" %}</a>
           {% if request.user.is_staff %}
           <a href="{% url 'bookings:dashboard' %}">{% translate "Dashboard" %}</a>
           <a href="{% url 'admin:index' %}">{% translate "Admin" %}</a>
           {% endif %}
-          <a class="mobile-cta" href="{% url 'bookings:hut_list' %}#explore">{% translate "Find your stay ↗" %}</a>
+          <a class="mobile-cta" href="{% url 'bookings:public_home' %}#explore">{% translate "Find your stay ↗" %}</a>
           {% endif %}
         </nav>
       </details>
     </div>
   </header>
   {% endif %}
-  <main id="main-content" class="shell">
+  <main id="main-content" class="shell" tabindex="-1">
     {% for message in messages %}
     <p class="notice" role="status">{{ message }}</p>
     {% endfor %}
     {% block content %}{% endblock %}
   </main>
-  {% if not sd116_staff %}<footer class="site-footer adventure-footer">
-    <div class="shell footer-inner">
-      <div><strong>{{ HUT_NAME }}</strong><small>{% translate "Wild places. Good nights. Great stories." %}</small></div>
-      <div class="footer-tagline">{% translate "Made for the mountains" %} <span aria-hidden="true">✳</span> {% translate "Built for adventure" %}</div>
-    </div>
-  </footer>{% endif %}
+  {% if not sd116_staff %}{% include "bookings/public_footer_v149.html" %}{% endif %}
 </body>
 </html>

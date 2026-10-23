@@ -1,4 +1,4 @@
-{% extends "bookings/base.html" %}
+{% extends "bookings/public_base_v124.html" %}
 {% load i18n ui_v147 %}
 {% block title %}{% translate "Manage your reservation" %}{% endblock %}
 {% block content %}
@@ -14,7 +14,7 @@
 .gss-page .v134-message-note{font-size:.86rem;color:#63756d}
 @media(max-width:500px){.gss-page .v134-bubble{width:100%}}
 </style>
-<div class="gss-page">
+<div class="pub-container gss-page" style="padding-top:28px">
   <header class="gss-hero">
     <div class="gss-eyebrow">{% translate "Your mountain stay · Reservation details" %}</div>
     <h1>{% blocktranslate with v0=hut.name %}Your reservation at {{ v0 }}{% endblocktranslate %}</h1>
@@ -22,13 +22,15 @@
     <div class="gss-hero-meta"><span class="gss-pill">{% if reservation.guest_request and reservation.status == 'pending' %}{% translate "Awaiting hut approval" %}{% else %}{% translate reservation.get_status_display %}{% endif %}</span><span class="gss-ref">{% translate "Reference:" %} <strong>{{ reservation.code }}</strong></span></div>
     {% if reservation.guest_request and reservation.status == 'pending' %}<p>{% translate "Your request is saved. Your stay is not confirmed until the hut manager approves it." %}</p>{% endif %}
   </header>
+  {% include "bookings/hut_contact_v150.html" %}
+  {% include "bookings/payment_note_v150.html" %}
   <div class="gss-grid">
     <section class="gss-card" aria-labelledby="gss-booking-title">
       <div class="gss-card-head"><h2 id="gss-booking-title">{% translate "Your stay" %}</h2><span class="gss-pill">{{ reservation.nights|night_count }}</span></div>
       <div class="gss-dates"><div><span class="gss-date-label">{% translate "Check-in" %}</span><span class="gss-date-value">{{ reservation.check_in|date:"j M Y" }}</span></div><span class="gss-arrow" aria-hidden="true">→</span><div><span class="gss-date-label">{% translate "Check-out" %}</span><span class="gss-date-value">{{ reservation.check_out|date:"j M Y" }}</span></div></div>
       <p class="gss-nights">{% translate "Your reservation includes the rooms and beds listed below." %}</p>
       <div class="gss-table-wrap"><table><thead><tr><th scope="col">{% translate "Room" %}</th><th scope="col">{% translate "Beds" %}</th><th scope="col" class="gss-price">{% translate "Price per night" %}</th></tr></thead><tbody>{% for item in items %}<tr><td><strong>{{ item.room.name }}</strong></td><td>{{ item.beds }}</td><td class="gss-price">{{ item.price_per_night }} {{ currency }}</td></tr>{% empty %}<tr><td colspan="3">{% translate "No rooms listed for this reservation." %}</td></tr>{% endfor %}</tbody></table></div>
-      <div class="gss-total"><span>{% translate "Reservation total" %}</span><strong>{{ reservation.total_price }} {{ currency }}</strong></div>
+      <div class="gss-total"><span>{% if reservation.status == 'pending' %}{% translate "Estimated total" %}{% else %}{% translate "Reservation total" %}{% endif %}</span><strong>{{ reservation.total_price }} {{ currency }}</strong></div>
     </section>
     <section class="gss-card" aria-labelledby="gss-payment-title">
       <div class="gss-card-head"><h2 id="gss-payment-title">{% translate "Deposit overview" %}</h2></div>

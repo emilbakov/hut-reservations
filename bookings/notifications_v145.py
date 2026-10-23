@@ -37,7 +37,9 @@ def deliver_notification(pk, *, manual=False):
         from .models import Reservation
         current_status = Reservation.objects.values_list('status', flat=True).get(pk=item.reservation_id)
         if ((item.kind.startswith('request_') and current_status != 'pending') or
-                (item.kind.startswith('confirmation_') and current_status != 'confirmed')):
+                (item.kind.startswith('confirmation_') and current_status != 'confirmed') or
+                (item.kind == 'declined_guest' and current_status != 'cancelled') or
+                (item.kind == 'decision_undo_guest' and current_status != 'pending')):
             item.status = 'skipped'
             item.last_error = ''
             item.save(update_fields=['status', 'last_error'])

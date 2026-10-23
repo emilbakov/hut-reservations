@@ -1,0 +1,1 @@
+v159 regression test compatibility fix for v158 navbar. Apply after v158. No templates, CSS, database or application logic changed. Run python manage.py test --settings=config.settings_test before collectstatic/restart.

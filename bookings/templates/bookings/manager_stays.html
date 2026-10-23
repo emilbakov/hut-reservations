@@ -1,4 +1,5 @@
 {% extends "bookings/base.html" %}
+{% load i18n %}
 {% block title %}Arrivals and departures{% endblock %}
 {% block content %}
 <style>
@@ -16,28 +17,26 @@
       <a href="{% url 'bookings:manager_reservations' %}">Reservations →</a>
     </nav>
   </header>
-  <section class="stays-filters" aria-label="Filter guest stays">
-    <form method="get" class="stays-filter-grid">
+  <details class="sd152-filters"><summary>{% translate "Filters" %} · {{ target_date|date:"j M Y" }} · {{ selected_hut.name|default:"All huts" }}</summary><form method="get" data-sd152-auto class="stays-filter-grid">
       <div><label for="hut">Hut</label><select id="hut" name="hut">{% if not manager_mode %}<option value="">All huts</option>{% endif %}{% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_slug == hut.slug %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}</select></div>
       <div><label for="date">View date</label><input type="date" id="date" name="date" value="{{ target_date|date:'Y-m-d' }}"></div>
       <button type="submit" class="stays-filter-btn">Show guests</button>
-    </form>
-  </section>
+    </form></details>
   <div class="stays-stats" aria-label="Guest overview">
-    <div class="stays-stat"><strong>{{ arriving|length }}</strong><span>Arriving</span></div>
-    <div class="stays-stat"><strong>{{ departing|length }}</strong><span>Departing</span></div>
-    <div class="stays-stat"><strong>{{ in_house|length }}</strong><span>In house</span></div>
+    <div class="stays-stat"><strong>{{ arriving|length }}</strong><span>{% translate "Confirmed arrivals" %}</span></div>
+    <div class="stays-stat"><strong>{{ departing|length }}</strong><span>{% translate "Confirmed departures" %}</span></div>
+    <div class="stays-stat"><strong>{{ in_house|length }}</strong><span>{% translate "Checked in now" %}</span></div>
   </div>
   <section class="stays-section stays-section--arrival" aria-labelledby="stays-arriving-title">
-    <div class="stays-section-header"><div><h2 id="stays-arriving-title">Arriving guests</h2><p>{{ target_date|date:"j M Y" }} · Expected arrivals</p></div><span class="stays-count">{{ arriving|length }} guests</span></div>
+    <div class="stays-section-header"><div><h2 id="stays-arriving-title">Arriving guests</h2><p>{{ target_date|date:"j M Y" }} · Expected arrivals</p></div><span class="stays-count">{{ arriving|length }} {% translate "bookings" %}</span></div>
     <div class="stays-section-body">{% include "bookings/_stay_rows.html" with reservations=arriving %}</div>
   </section>
   <section class="stays-section stays-section--departure" aria-labelledby="stays-departing-title">
-    <div class="stays-section-header"><div><h2 id="stays-departing-title">Departing guests</h2><p>{{ target_date|date:"j M Y" }} · Scheduled departures</p></div><span class="stays-count">{{ departing|length }} guests</span></div>
+    <div class="stays-section-header"><div><h2 id="stays-departing-title">Departing guests</h2><p>{{ target_date|date:"j M Y" }} · Scheduled departures</p></div><span class="stays-count">{{ departing|length }} {% translate "bookings" %}</span></div>
     <div class="stays-section-body">{% include "bookings/_stay_rows.html" with reservations=departing %}</div>
   </section>
   <section class="stays-section stays-section--house" aria-labelledby="stays-house-title">
-    <div class="stays-section-header"><div><h2 id="stays-house-title">Currently in house</h2><p>Guests with an active stay</p></div><span class="stays-count">{{ in_house|length }} guests</span></div>
+    <div class="stays-section-header"><div><h2 id="stays-house-title">Currently in house</h2><p>Actual check-in recorded; no check-out yet.</p></div><span class="stays-count">{{ in_house|length }} {% translate "bookings" %}</span></div>
     <div class="stays-section-body">{% include "bookings/_stay_rows.html" with reservations=in_house %}</div>
   </section>
 </div>

@@ -1,5 +1,6 @@
 {% extends "bookings/base.html" %}
-{% block title %}Room availability | Mountain Operations{% endblock %}
+{% load i18n %}
+{% block title %}Room ledger | Mountain Operations{% endblock %}
 {% block content %}
 <style>
   .adventure-calendar{--ac-ink:#17231d;--ac-forest:#163d31;--ac-lime:#c8f568;--ac-muted:#62716b;--ac-border:#dfe8e1;--ac-bg:#f4f7f2;color:var(--ac-ink);padding-bottom:3rem}
@@ -57,7 +58,7 @@
 <div class="adventure-calendar">
   <header class="ac-hero">
     <p class="ac-eyebrow">Mountain operations / Room planning</p>
-    <h1>Room availability<span style="color:#c8f568">.</span></h1>
+    <h1>{% translate "Room ledger" %}<span style="color:#c8f568">.</span></h1>
     <p>Plan stays at a glance. Explore available beds by room and date, inspect reservations, and start new bookings.</p>
     <nav class="ac-links" aria-label="Staff navigation">
       <a href="{% url 'bookings:dashboard' %}">← Operations dashboard</a>
@@ -66,9 +67,10 @@
   </header>
 
   <section class="ac-panel" aria-label="Calendar filters">
-    <form method="get" class="ac-toolbar">
+    {% include "bookings/calendar_views_v152.html" %}
+<details class="sd152-filters"><summary>{% translate "Filters" %} · {{ selected_hut.name|default:"All huts" }}</summary><form method="get" data-sd152-auto class="ac-toolbar">
       <div class="ac-field">
-        <label for="hut">Mountain hut</label>
+        <label for="hut">Hut</label>
         <select id="hut" name="hut">
           {% for hut in huts %}
             <option value="{{ hut.slug }}" {% if selected_hut.pk == hut.pk %}selected{% endif %}>{{ hut.name }}</option>
@@ -82,7 +84,7 @@
       <input type="hidden" name="year" id="calendar-year" value="{{ month.year }}">
       <input type="hidden" name="month" id="calendar-month" value="{{ month.month }}">
       <button class="ac-button" type="submit">Show availability →</button>
-    </form>
+    </form></details>
     <div class="ac-month-nav">
       <a href="?hut={{ selected_hut.slug|urlencode }}&amp;year={{ prev.year }}&amp;month={{ prev.month }}" aria-label="Previous month">← Previous</a>
       <strong>{{ month|date:'F Y' }}</strong>
@@ -91,7 +93,7 @@
   </section>
 
   {% if selected_hut %}
-    <section class="ac-panel" aria-label="Room availability grid">
+    <section class="ac-panel" aria-label="Room ledger grid">
       <div class="ac-panel-heading">
         <div>
           <p class="ac-eyebrow" style="color:#367355">Live room overview</p>

@@ -1,0 +1,29 @@
+<style>
+.stays-page .stay-table-wrap{overflow-x:auto;width:100%}.stays-page .stay-table{border-collapse:collapse;width:100%;min-width:780px;font-size:.9rem}.stays-page .stay-table th{text-align:left;color:#61786c;background:#f6f9f6;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;padding:14px 13px;white-space:nowrap}.stays-page .stay-table td{padding:16px 13px;border-top:1px solid #e8eee9;vertical-align:middle}.stays-page .stay-table tbody tr:hover{background:#fafcf9}.stays-page .stay-guest{font-weight:800;color:#173e30}.stays-page .stay-code{display:block;color:#718579;font-size:.77rem;margin-top:3px}.stays-page .stay-contact{overflow-wrap:anywhere}.stays-page .stay-contact div+div{margin-top:3px}.stays-page .stay-muted{color:#728379}.stays-page .stay-pill{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;font-size:.77rem;font-weight:750;white-space:nowrap}.stays-page .stay-pill--expected{background:#edf1f0;color:#566b61}.stays-page .stay-pill--in{background:#e8f4df;color:#326339}.stays-page .stay-pill--out{background:#e9f0f5;color:#365d73}.stays-page .stay-time{display:block;margin-top:5px;font-size:.76rem;color:#61786c}.stays-page .stay-action{background:#c7ed65;color:#173d2e;white-space:nowrap}.stays-page .stay-action--out{background:#1a4939;color:white}.stays-page .stay-action:hover{filter:brightness(.95)}.stays-page .stay-done{font-weight:700;color:#3f7650}.stays-page .stay-empty{text-align:center;padding:30px 14px!important;color:#6a7e72}
+@media(max-width:700px){.stays-page .stay-table{min-width:0}.stays-page .stay-table thead{display:none}.stays-page .stay-table,.stays-page .stay-table tbody,.stays-page .stay-table tr,.stays-page .stay-table td{display:block;width:100%}.stays-page .stay-table tbody tr{padding:14px 10px;border-bottom:1px solid #e8eee9}.stays-page .stay-table td{border:0;padding:5px 6px}.stays-page .stay-table td[data-label]:before{content:attr(data-label) ': ';color:#708378;font-size:.76rem;font-weight:700}.stays-page .stay-table td:first-child:before,.stays-page .stay-table td:last-child:before{content:none}.stays-page .stay-table td:last-child{padding-top:12px}.stays-page .stay-table .stay-action{width:100%}.stays-page .stay-empty{padding:22px 8px!important}}
+</style>
+<div class="stay-table-wrap"><table class="stay-table">
+  <thead><tr><th scope="col">Guest</th><th scope="col">Contact</th><th scope="col">Dates</th><th scope="col">Rooms / beds</th><th scope="col">Actual stay</th><th scope="col">Action</th></tr></thead>
+  <tbody>
+    {% for reservation in reservations %}
+    <tr>
+      <td><span class="stay-guest">{{ reservation.name }}</span><span class="stay-code">Ref. {{ reservation.code }}</span></td>
+      <td class="stay-contact" data-label="Contact">{% if reservation.email %}<div>{{ reservation.email }}</div>{% endif %}{% if reservation.phone %}<div>{{ reservation.phone }}</div>{% endif %}{% if not reservation.email and not reservation.phone %}<span class="stay-muted">—</span>{% endif %}</td>
+      <td data-label="Dates">{{ reservation.check_in|date:"j M" }} – {{ reservation.check_out|date:"j M Y" }}</td>
+      <td data-label="Rooms / beds">{% for item in reservation.items.all %}{{ item.room.name }} ({{ item.beds }}){% if not forloop.last %}, {% endif %}{% empty %}<span class="stay-muted">—</span>{% endfor %}</td>
+      <td data-label="Actual stay">
+        {% if reservation.guest_stay.checked_out_at %}<span class="stay-pill stay-pill--out">Checked out</span><span class="stay-time">{{ reservation.guest_stay.checked_out_at|date:"j M H:i" }}</span>
+        {% elif reservation.guest_stay.checked_in_at %}<span class="stay-pill stay-pill--in">Checked in</span><span class="stay-time">{{ reservation.guest_stay.checked_in_at|date:"j M H:i" }}</span>
+        {% else %}<span class="stay-pill stay-pill--expected">Expected</span>{% endif %}
+      </td>
+      <td>
+        {% if not reservation.guest_stay.checked_in_at %}
+          <form method="post" action="{% url 'bookings:manager_stay_action' reservation.code %}" onsubmit="return confirm('Confirm check-in for this guest?');">{% csrf_token %}<input type="hidden" name="action" value="check_in"><button type="submit" class="stay-action">Check in</button></form>
+        {% elif not reservation.guest_stay.checked_out_at %}
+          <form method="post" action="{% url 'bookings:manager_stay_action' reservation.code %}" onsubmit="return confirm('Confirm check-out for this guest?');">{% csrf_token %}<input type="hidden" name="action" value="check_out"><button type="submit" class="stay-action stay-action--out">Check out</button></form>
+        {% else %}<span class="stay-done">✓ Completed</span>{% endif %}
+      </td>
+    </tr>
+    {% empty %}<tr><td colspan="6" class="stay-empty">No guests in this group.</td></tr>{% endfor %}
+  </tbody>
+</table></div>

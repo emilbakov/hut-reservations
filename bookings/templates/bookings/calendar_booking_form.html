@@ -18,7 +18,7 @@
 <div class="sd137" id="sd137-reservation">
   <nav class="crumb" aria-label="Breadcrumb"><a href="{% url 'bookings:dashboard' %}">Staff dashboard</a><span class="sep">/</span><a href="{% url 'bookings:availability_calendar' %}">Availability calendar</a><span class="sep">/</span><span>{% if mode == 'edit' %}Edit booking{% else %}New booking{% endif %}</span></nav>
   <header class="hero">
-    <div class="eyebrow">✦ &nbsp; SUMMITDESK / RESERVATIONS</div>
+    <div class="eyebrow">✦ &nbsp; КАРЛЪК / RESERVATIONS</div>
     <h1>{% if mode == 'edit' %}Edit reservation{% else %}Create a reservation{% endif %}</h1>
     <p>{% if mode == 'edit' %}Adjust dates, room, or number of beds for this reservation. Guest details are protected here.{% else %}Turn a calendar selection into a reservation. Review the stay and guest details before saving.{% endif %}</p>
     <div class="hero-meta"><span class="hero-chip">▦ &nbsp; From availability calendar</span>{% if selected_hut %}<span class="hero-chip">⌂ &nbsp; <strong>{{ selected_hut.name }}</strong></span>{% endif %}{% if mode == 'edit' %}<span class="hero-chip"># {{ reservation.code }}</span>{% endif %}</div>

@@ -29,6 +29,7 @@
  function validate(){
   const row=rows.find(r=>r.dataset.room===room.value),q=Number(beds.value),a=arrival.value,b=departure.value,n=daysBetween(a,b);let error='',message='';
   if(!row)message=t('Choose a room or click an available arrival.');
+  else if(row.dataset.active!=='1')error=t('This room is inactive. Choose another room.');
   else if(!a)message=t('Choose your arrival date.');
   else if(a<today||a>root.dataset.latestArrival)error=t('Choose an arrival within the permitted booking period.');
   else if(!b)message=t('Arrival: %(date)s. Choose a later departure in this room.',{date:fmt(a)});
@@ -49,7 +50,7 @@
   syncTabstop();alternatives(a,b,q,Boolean(error));return valid;
  }
  function preview(entry,row,trigger){
-  previewTrigger=trigger;$('sd146-preview-status').textContent=entry.status==='pending'?t('Pending request'):t('Confirmed reservation');$('sd146-preview-guest').textContent=entry.guest;$('sd146-preview-room').textContent=row.dataset.name;$('sd146-preview-arrival').textContent=fmt(entry.arrival);$('sd146-preview-departure').textContent=fmt(entry.departure);$('sd146-preview-beds').textContent=entry.beds;$('sd146-preview-link').href=entry.href;
+  previewTrigger=trigger;$('sd146-preview-status').textContent=entry.status==='pending'?t('Pending request'):t('Confirmed reservation');$('sd146-preview-code').textContent=entry.code;$('sd146-preview-guest').textContent=entry.guest;$('sd146-preview-room').textContent=row.dataset.name;$('sd146-preview-arrival').textContent=fmt(entry.arrival);$('sd146-preview-departure').textContent=fmt(entry.departure);$('sd146-preview-beds').textContent=entry.beds;$('sd146-preview-link').href=entry.href;
   if(typeof $('sd146-preview').showModal==='function')$('sd146-preview').showModal();else window.location.assign(entry.href);
  }
  function renderBars(){

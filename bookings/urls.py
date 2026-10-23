@@ -3,11 +3,13 @@ from django.urls import path
 
 from . import views
 from . import public_site_v124
+from .public_profile_v149 import public_policy
 from . import approval_dashboard_v127
 from . import manager_digest_preferences_v130
 from . import manager_digest_preview_v131
 from . import manager_digest_history_v132
 from .request_operations_v128 import request_export
+from .staff_decisions_v152 import undo_decision
 from .staff_auth_v117 import StaffLoginView, StaffLogoutView
 
 app_name = "bookings"
@@ -17,6 +19,7 @@ urlpatterns = [
     path("staff/logout/", StaffLogoutView.as_view(), name="staff_logout"),
     # Public role selection and preserved hut directory
     path("", public_site_v124.public_home, name="public_home"),
+    path("policies/<slug:kind>/", public_policy, name="public_policy"),
     path("welcome/", views.role_landing, name="role_landing"),
     path("huts/", public_site_v124.public_huts, name="hut_list"),
 
@@ -62,6 +65,7 @@ urlpatterns = [
     # Hut manager reservation management
     path("staff/reservations/", views.manager_reservations, name="manager_reservations"),
     path("staff/reservations/<str:code>/action/", views.manager_reservation_action, name="manager_reservation_action"),
+    path("staff/reservations/<str:code>/decisions/<int:decision_id>/undo/", undo_decision, name="undo_decision"),
 
     # Manager arrivals, departures, and actual stay events
     path("staff/stays/", views.manager_stays, name="manager_stays"),

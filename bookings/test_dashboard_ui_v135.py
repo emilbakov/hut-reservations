@@ -44,7 +44,7 @@ class DashboardPageV135Tests(TestCase):
     def test_manager_dashboard_renders_new_layout_and_real_data(self):
         response = self.client.get(reverse("bookings:dashboard"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Your hut, at a glance.")
+        self.assertContains(response, "Needs your decision")
         self.assertContains(response, "Visible Guest V135")
         self.assertContains(response, "New reservation")
         self.assertContains(response, "Monthly occupancy")
@@ -65,5 +65,5 @@ class DashboardPageV135Tests(TestCase):
 
     def test_mobile_layout_css_present(self):
         response = self.client.get(reverse("bookings:dashboard"))
-        self.assertContains(response, "@media(max-width:600px)")
+        self.assertContains(response, "bookings/staff_v152.css")
         self.assertContains(response, "sd135-table")

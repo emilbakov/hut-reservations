@@ -1,6 +1,8 @@
 {% extends "bookings/base.html" %}
+{% load i18n %}
 {% block title %}Manage hut reservations{% endblock %}
 {% block content %}
+{% include "bookings/undo_decision_v152.html" with source="reservations" %}
 <style>
   .mr-page{--pine:#173e34;--deep:#112b26;--lime:#d9f279;--ink:#20352f;--muted:#63766e;--line:#dce7df;--paper:#f6f8f4;color:var(--ink);max-width:1440px;margin:0 auto;padding:clamp(16px,3vw,36px) 0 56px}
   .mr-page *{box-sizing:border-box}
@@ -45,6 +47,17 @@
   .mr-actions a,.mr-actions button{font:inherit;font-size:.78rem;font-weight:800;padding:8px 10px;border-radius:8px;text-decoration:none;border:1px solid #cbded0;background:#fff;color:var(--pine);cursor:pointer;white-space:nowrap}
   .mr-actions button.mr-confirm{background:#e3f4e8;border-color:#b5dcc1;color:#1f6a3e}
   .mr-actions button.mr-cancel{border-color:#f0cece;color:#a34242}
+  /* v162: staff_v152.css sets white text on danger buttons, but the generic
+     .mr-actions button rule overrides their background to white. Preserve
+     visible labels and action-specific contrast in the reservation list. */
+  .mr-page .mr-actions button.sd152-danger{background:#a43432!important;border-color:#a43432!important;color:#fff!important}
+  .mr-page .mr-actions button.sd152-danger:hover{background:#852725!important;border-color:#852725!important}
+  .mr-page .mr-actions button.sd152-button{background:#195b42!important;border-color:#195b42!important;color:#fff!important}
+  .mr-page .mr-actions button.sd152-button:hover{background:#10472f!important}
+  .mr-page .mr-actions details>form{display:grid;gap:9px;margin-top:9px}
+  .mr-page .mr-actions details>form label{font-size:.8rem;font-weight:700;color:var(--deep)}
+  .mr-page .mr-actions details>form textarea{width:100%;min-height:78px;padding:10px;border:1px solid #cbded0;border-radius:9px;background:#fff;color:var(--deep);font:inherit;resize:vertical}
+  .mr-page .mr-actions details>form button{min-height:44px;white-space:normal}
   .mr-empty{text-align:center;color:var(--muted);padding:42px 18px!important}
   .mr-pagination{display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap;padding:20px;border-top:1px solid var(--line);color:var(--muted);font-size:.85rem}
   .mr-pagination a{color:var(--pine);text-decoration:none;font-weight:800;padding:9px 13px;border:1px solid var(--line);border-radius:9px}
@@ -142,16 +155,8 @@
             <td data-label="Actions"><div class="mr-actions">
               <a href="{% url 'bookings:reservation_payments' reservation.code %}">Payments</a>
               <a href="{% url 'bookings:conversation_thread' reservation.code %}">Messages</a>
-              {% if reservation.status == 'pending' %}
-                <form method="post" action="{% url 'bookings:manager_reservation_action' reservation.code %}">
-                  {% csrf_token %}<input type="hidden" name="action" value="confirm"><button class="mr-confirm" type="submit">{% if reservation.guest_request %}Approve{% else %}Confirm{% endif %}</button>
-                </form>
-              {% endif %}
-              {% if reservation.status != 'cancelled' %}
-                <form method="post" action="{% url 'bookings:manager_reservation_action' reservation.code %}" onsubmit="return confirm('Cancel this reservation?');">
-                  {% csrf_token %}<input type="hidden" name="action" value="cancel"><button class="mr-cancel" type="submit">{% if reservation.guest_request and reservation.status == "pending" %}Decline{% else %}Cancel{% endif %}</button>
-                </form>
-              {% endif %}
+              {% if reservation.status == 'pending' %}{% include "bookings/decision_actions_v152.html" with source="reservations" %}
+              {% elif reservation.status != 'cancelled' %}<details><summary class="sd152-quiet">{% translate "Cancel reservation" %}</summary><form method="post" action="{% url 'bookings:manager_reservation_action' reservation.code %}">{% csrf_token %}<input type="hidden" name="action" value="cancel"><input type="hidden" name="return_hut" value="{{ selected_slug }}"><label for="cancel-reason-{{ reservation.pk }}">{% translate "Reason / message to guest (optional)" %}</label><textarea id="cancel-reason-{{ reservation.pk }}" name="reason" maxlength="1000" rows="2"></textarea><button type="submit" class="sd152-danger">{% translate "Cancel reservation" %}</button></form></details>{% endif %}
             </div></td>
           </tr>
         {% empty %}

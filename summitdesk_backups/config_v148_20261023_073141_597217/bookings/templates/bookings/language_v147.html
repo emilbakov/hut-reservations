@@ -1,0 +1,7 @@
+{% load i18n %}
+{% get_current_language as current_language %}
+<form class="sd147-language" action="{% url 'set_language' %}" method="post" aria-label="{% translate 'Website language' %}">
+ {% csrf_token %}<input name="next" type="hidden" value="{{ request.get_full_path }}">
+ <button type="submit" name="language" value="en" lang="en" aria-label="English" aria-pressed="{% if current_language == 'en' %}true{% else %}false{% endif %}">EN</button>
+ <button type="submit" name="language" value="bg" lang="bg" aria-label="Български" aria-pressed="{% if current_language == 'bg' %}true{% else %}false{% endif %}">БГ</button>
+</form>
