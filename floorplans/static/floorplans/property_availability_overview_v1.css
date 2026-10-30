@@ -1,0 +1,13 @@
+/* SummitDesk property planner: read-only availability overview. */
+.sd-av-overview{margin:0 0 16px;padding:14px 16px;background:#fff;border:1px solid #dce7df;border-radius:14px;box-shadow:0 5px 20px rgba(17,57,35,.04)}
+.sd-av-heading{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:11px}
+.sd-av-heading strong{font-size:14px;color:#173b30;font-weight:800}
+.sd-av-heading span{font-size:11px;color:#61776c}
+.sd-av-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.sd-av-stat{padding:11px 12px;border-radius:9px;background:#f7faf6;border:1px solid #e6eee6;display:flex;flex-direction:column;gap:3px;min-width:0}
+.sd-av-stat>span{font-size:11px;color:#61776c;font-weight:650}
+.sd-av-stat>strong{font-size:clamp(21px,2.4vw,28px);font-weight:800;line-height:1.15;color:#173b30;font-variant-numeric:tabular-nums}
+.sd-av-stat>small{font-size:10px;color:#61776c}
+.sd-av-warning{margin:12px 0 0;padding:9px 11px;border:1px solid #e8b08a;background:#fff4e9;color:#8b411e;border-radius:8px;font-size:12px}
+.sd142-dayhead .sd-av-day-free{display:block;font-size:9px;font-weight:750;color:#17643f;white-space:nowrap}
+@media(max-width:650px){.sd-av-overview{padding:12px}.sd-av-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.sd-av-stat{padding:9px 10px}.sd-av-heading{margin-bottom:9px}}

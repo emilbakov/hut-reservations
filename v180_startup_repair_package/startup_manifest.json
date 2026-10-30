@@ -1,0 +1,39 @@
+{
+  "release": "v180-socket-startup-order",
+  "guards": [
+    {
+      "path": "v180_deposit_flow_package/install_v180.py",
+      "sha256": "20440e572d65971b9736e8e86a04d634c6cd24ef53de53c67bb95d1aa052cfe7"
+    }
+  ],
+  "files": [
+    {
+      "path": "v180_deposit_flow_package/deploy_v180.sh",
+      "accepted_sha256": [
+        "396685e43caf0489fd15309c47a7db9d0f62e28670382033aed2f29fb10a57ba",
+        "79bf7a1e9822097c879b81bfe21b062bf3cbec6aa502a0812cba8c339013624f",
+        "a66493df2f542d19bc93cebcea5ea5e2f8e76ad8790c098c4987a10714549c66",
+        "eaa0af685f361f8e425b8d383bf34e55abc14aa6c8ed52facf211b5d6fbbe9cd"
+      ],
+      "transform_sha256": {
+        "79bf7a1e9822097c879b81bfe21b062bf3cbec6aa502a0812cba8c339013624f": "a66493df2f542d19bc93cebcea5ea5e2f8e76ad8790c098c4987a10714549c66",
+        "396685e43caf0489fd15309c47a7db9d0f62e28670382033aed2f29fb10a57ba": "eaa0af685f361f8e425b8d383bf34e55abc14aa6c8ed52facf211b5d6fbbe9cd",
+        "a66493df2f542d19bc93cebcea5ea5e2f8e76ad8790c098c4987a10714549c66": "a66493df2f542d19bc93cebcea5ea5e2f8e76ad8790c098c4987a10714549c66",
+        "eaa0af685f361f8e425b8d383bf34e55abc14aa6c8ed52facf211b5d6fbbe9cd": "eaa0af685f361f8e425b8d383bf34e55abc14aa6c8ed52facf211b5d6fbbe9cd"
+      }
+    },
+    {
+      "path": "v180_deposit_flow_package/rollback_v180.sh",
+      "accepted_sha256": [
+        "09d2084436d328a3a818c4b2e41e6b9a0aa7442c39fc112aa253e1181ffa520b",
+        "fafaebd205ac26fae2b3591d33947acb0aa5ec745f8f7a0290f586194490e0a0"
+      ],
+      "transform_sha256": {
+        "fafaebd205ac26fae2b3591d33947acb0aa5ec745f8f7a0290f586194490e0a0": "09d2084436d328a3a818c4b2e41e6b9a0aa7442c39fc112aa253e1181ffa520b",
+        "09d2084436d328a3a818c4b2e41e6b9a0aa7442c39fc112aa253e1181ffa520b": "09d2084436d328a3a818c4b2e41e6b9a0aa7442c39fc112aa253e1181ffa520b"
+      }
+    }
+  ],
+  "old_start_block": "sudo systemctl start gunicorn.service\nif systemctl cat gunicorn.socket >/dev/null 2>&1; then sudo systemctl start gunicorn.socket; fi\n",
+  "new_start_block": "if systemctl cat gunicorn.socket >/dev/null 2>&1; then sudo systemctl start gunicorn.socket; fi\nsudo systemctl start gunicorn.service\n"
+}

@@ -7,3 +7,5 @@ class BookingsConfig(AppConfig):
     def ready(self):
         from .login_guard_v151 import register_signals
         register_signals()
+        from .deposit_signals_v180 import register
+        register()

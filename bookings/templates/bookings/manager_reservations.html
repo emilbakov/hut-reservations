@@ -151,7 +151,7 @@
             <td data-label="Hut">{% for item in reservation.items.all %}{{ item.room.hut.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
             <td class="mr-dates" data-label="Stay dates">{{ reservation.check_in|date:"j M Y" }} – {{ reservation.check_out|date:"j M Y" }}</td>
             <td data-label="Beds"><span class="mr-beds">{{ reservation.total_beds }}</span></td>
-            <td data-label="Status"><span class="mr-status {% if reservation.status == 'pending' %}mr-status-pending{% elif reservation.status == 'confirmed' %}mr-status-confirmed{% elif reservation.status == 'cancelled' %}mr-status-cancelled{% endif %}">{% if reservation.guest_request and reservation.status == "pending" %}Awaiting approval{% else %}{{ reservation.get_status_display }}{% endif %}</span></td>
+            <td data-label="Status"><span class="mr-status {% if reservation.status == 'pending' %}mr-status-pending{% elif reservation.status == 'confirmed' %}mr-status-confirmed{% elif reservation.status == 'cancelled' %}mr-status-cancelled{% endif %}">{% if reservation.deposit_request_id %}{{ reservation.get_status_display }}{% elif reservation.guest_request and reservation.status == "pending" %}Awaiting approval{% else %}{{ reservation.get_status_display }}{% endif %}</span></td>
             <td data-label="Actions"><div class="mr-actions">
               <a href="{% url 'bookings:reservation_payments' reservation.code %}">Payments</a>
               <a href="{% url 'bookings:conversation_thread' reservation.code %}">Messages</a>

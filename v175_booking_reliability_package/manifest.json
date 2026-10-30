@@ -1,0 +1,26 @@
+{
+  "release": "v175-booking-journey-reliability",
+  "compatible_baselines": [
+    "known v169\u2013v174 booking backend"
+  ],
+  "prerequisites": [
+    {
+      "path": "bookings/notifications_v145.py",
+      "sha256": "9db4e797512d744d77fd793764ca2cf88ae78580041af13dfa9f0fddc9324c57"
+    }
+  ],
+  "files": [
+    {
+      "path": "bookings/self_service.py",
+      "before_sha256": "569e92740c173cd330868d916d5870327f067e412cd047dc21ee7994304181bf",
+      "compatible_sha256": [],
+      "after_sha256": "a3ab8912fe993fd5f178ed437addebdce075750b4316035472f42307d1fb012f"
+    },
+    {
+      "path": "bookings/test_booking_journey_v175.py",
+      "before_sha256": null,
+      "compatible_sha256": [],
+      "after_sha256": "bd50edfd02c1ae104ad50fe6564faeb059107df8b89b91693e7a74daec5edca0"
+    }
+  ]
+}

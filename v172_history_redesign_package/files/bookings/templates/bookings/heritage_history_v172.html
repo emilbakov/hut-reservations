@@ -1,0 +1,42 @@
+{% load static i18n %}
+<div class="h172-history" id="history">
+  <div class="h172-heading">
+    <h2 id="h168-story-title">{% translate "Before the resort." %}<br><em>{% translate "Still at its heart." %}</em></h2>
+    <p>{% translate "Before the pistes and lifts, there was a hut. Pamporovo grew around it. Studenets remained a place to meet, rest and return to." %}</p>
+  </div>
+
+  <div class="h172-photo-pair" id="then-now" role="group" aria-label="{% translate 'One place, across the years' %}">
+    <figure>
+      <a href="{% static 'bookings/heritage-v168/first-hut-1280.webp' %}" data-photo data-photo-title="{% translate 'The original Studenets hut' %}" aria-label="{% translate 'Open photograph of the original hut' %}">
+        <img src="{% static 'bookings/heritage-v168/first-hut-1280.webp' %}" width="1280" height="911" alt="{% translate 'Archival photograph of the original Studenets hut, with its timber balcony and name above the entrance.' %}" loading="lazy" decoding="async">
+        <span class="h168-photo-expand" aria-hidden="true">↗</span>
+      </a>
+      <figcaption><strong>{% translate "The beginning" %}</strong><span>{% translate "The original hut · Archive photograph" %}</span></figcaption>
+    </figure>
+    <figure>
+      <a href="{% static 'bookings/heritage-v168/studenets-today-1280.webp' %}" data-photo data-photo-title="{% translate 'Studenets today' %}" aria-label="{% translate 'Open the present-day photograph' %}">
+        <img src="{% static 'bookings/heritage-v168/studenets-today-1280.webp' %}" width="1280" height="714" alt="{% translate 'The present-day hut with its expanded buildings surrounded by snowy forest.' %}" loading="lazy" decoding="async">
+        <span class="h168-photo-expand" aria-hidden="true">↗</span>
+      </a>
+      <figcaption><strong>{% translate "The story continues" %}</strong><span>{% translate "Studenets today · A new chapter" %}</span></figcaption>
+    </figure>
+  </div>
+
+  <ol class="h172-moments" aria-label="{% translate 'Three moments in our story' %}">
+    <li>
+      <span class="h172-date">1936–1937</span>
+      <h3>{% translate "A home in the mountain" %}</h3>
+      <p>{% translate "Hikers from Chepelare turn a former border post into the first Studenets hut." %}</p>
+    </li>
+    <li>
+      <span class="h172-date">1964</span>
+      <h3>{% translate "Room for new memories" %}</h3>
+      <p>{% translate "On 28 October, the larger hut opens its doors to a growing mountain community." %}</p>
+    </li>
+    <li>
+      <span class="h172-date">{% translate "Since 2021" %}</span>
+      <h3>{% translate "A new chapter" %}</h3>
+      <p>{% translate "The hut’s modernisation begins. The place moves forward, with its history at its heart." %}</p>
+    </li>
+  </ol>
+</div>

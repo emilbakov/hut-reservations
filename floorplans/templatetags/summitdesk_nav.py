@@ -22,7 +22,7 @@ BOOKINGS_STAFF = frozenset({
     'deposit_dashboard', 'lifecycle_dashboard', 'communications_dashboard',
     'conversation_inbox', 'conversation_thread', 'quick_replies',
     'guest_requests_dashboard', 'guest_link_controls',
-    'approval_dashboard', 'manager_digest_preferences',
+    'arrival_settings', 'approval_dashboard', 'manager_digest_preferences',
     'manager_digest_preview', 'manager_digest_history',
     'availability_calendar', 'calendar_create', 'calendar_edit',
     'calendar_timeline', 'calendar_move', 'notification_deliveries',
@@ -45,6 +45,7 @@ HUT_WORKSPACE = {
     'availability': 'beds',
 }
 GLOBAL_WORKSPACE = {
+    'arrival_settings': 'arrival_info',
     'dashboard': 'dashboard', 'calendar_timeline': 'calendar',
     'calendar_create': 'new', 'calendar_edit': 'reservations',
     'calendar_move': 'calendar', 'manager_reservations': 'reservations',
@@ -200,6 +201,7 @@ def summitdesk_nav(context):
             b('guest_requests_dashboard', 'Stay changes & cancellations', 'clipboard-list', 'stay_changes'),
         ])
         group('Settings', [
+            b('arrival_settings', 'Arrival information', 'map-pin', 'arrival_info'),
             b('communications_dashboard', 'Email templates', 'messages-square', 'email_templates'),
             b('notification_deliveries', 'Email delivery', 'mail', 'email_delivery'),
             b('manager_digest_preferences', 'Email reminders', 'mail', 'reminders'),
@@ -224,6 +226,7 @@ def summitdesk_nav(context):
     if hut and cleaner and not manager:
         property_options = [{'name': hut.name, 'url': _url('floorplans', 'staff_hub', hut_id=hut.pk), 'selected': True}]
     return {
+        'request': request,
         'visible': True, 'groups': groups, 'title': title, 'hut': hut,
         'role': 'Manager' if manager else 'Cleaner', 'search_url': search_url,
         'property_options': property_options, 'user': user,

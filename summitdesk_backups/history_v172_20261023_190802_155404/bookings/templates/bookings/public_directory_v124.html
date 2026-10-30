@@ -1,0 +1,12 @@
+{% extends "bookings/public_base_v124.html" %}
+{% load i18n ui_v147 %}
+{% block title %}{% translate "Explore mountain huts" %}{% endblock %}
+{% block content %}
+<section class="pub-directory-heading"><div class="pub-container"><span class="pub-eyebrow">{% translate "EXPLORE THE MOUNTAINS" %}</span><h1>{% translate "Find your" %} <em>{% translate "next basecamp." %}</em></h1><p>{% translate "Explore our huts. Online reservation requests are currently available only for the main hut." %}</p></div></section>
+<div class="pub-container pub-directory-search"><form method="get" class="sd153-directory-search"><label for="sd153-query">{% translate "Hut or location" %}</label><input id="sd153-query" type="search" name="q" value="{{ query }}" maxlength="100"><button type="submit">{% translate "Search huts" %}</button></form></div>
+<section class="pub-container pub-section pub-directory-results">
+  <div class="pub-section-heading"><div><span class="pub-eyebrow">{% translate "YOUR MOUNTAIN STAYS" %}</span><h2>{% if dates_valid %}{% translate "Huts with space for you" %}{% elif query %}{% translate "Search results" %}{% else %}{% translate "Explore all huts" %}{% endif %}</h2></div><span class="pub-result-count">{{ cards|length|hut_count }}{% if dates_valid %} {% blocktranslate with v0=beds|bed_count %}· {{ v0 }} needed{% endblocktranslate %}{% endif %}</span></div>
+  <p class="pub-section-lead">{% if MAIN_PUBLIC_HUT %}<a href="{% url 'bookings:public_home' %}">{% blocktranslate with name=MAIN_PUBLIC_HUT.name %}Visit {{ name }} for dates, rooms and reservation requests.{% endblocktranslate %}</a>{% else %}{% translate "Browse our huts. Online booking will be available soon." %}{% if request.user.is_superuser %} <a href="{% url 'admin:bookings_publicwebsitesettings_changelist' %}">{% translate "Set the main hut in Public website settings." %}</a>{% endif %}{% endif %}</p>
+  {% include "bookings/public_cards_v124.html" %}
+</section>
+{% endblock %}

@@ -21,6 +21,7 @@ def _guest_context(request, reservation):
         link = request.build_absolute_uri(reservation.get_absolute_url())
     return {
         'reservation': reservation,
+        'WHOLE_UNITS': any(item.pricing_unit == 'room' for item in reservation.items.all()),
         'hut_name': hut.name if hut else settings.HUT_NAME,
         'link': link,
         'currency': settings.BOOKING_CURRENCY,

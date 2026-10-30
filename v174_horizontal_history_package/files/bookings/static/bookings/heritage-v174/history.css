@@ -1,0 +1,24 @@
+/* This component stylesheet changes only the historical timeline. */
+.h168 .h174-history{margin-top:64px;padding-top:44px;min-width:0}
+.h174-heading{display:grid;grid-template-columns:1.2fr 1fr;align-items:end;gap:50px;margin-bottom:38px}
+.h174-heading .h168-eyebrow{font-size:11px;letter-spacing:.12em;margin-bottom:14px}
+.h168 .h174-heading h2{font-size:clamp(29px,2.7vw,40px);line-height:1.25;letter-spacing:-.045em;text-wrap:balance}
+.h168 .h174-heading h2 em{color:#52665b}
+.h174-heading>p{max-width:440px;color:var(--h168-muted);font-size:14px;line-height:1.85;text-wrap:pretty}
+.h174-track{min-width:0;max-width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scroll-snap-type:x proximity;scrollbar-width:thin;scrollbar-color:#819078 #e4e7dc;padding:4px 1px 14px;scroll-padding-inline:1px}
+.h174-timeline{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));list-style:none;margin:0;padding:0}
+.h174-timeline>li{min-width:0;position:relative;padding:16px 22px 20px;scroll-snap-align:start}
+.h174-timeline>li::before{content:'';position:absolute;left:0;right:0;top:70px;height:1px;background:#a8b49d}
+.h174-timeline>li:first-child::before{left:22px}
+.h174-timeline>li:last-child::before{right:22px}
+.h174-date{min-height:35px;white-space:nowrap;font-family:var(--h168-serif);font-size:clamp(20px,1.7vw,25px);letter-spacing:-.04em;line-height:1.4;color:var(--h168-ink)}
+.h174-marker{display:block;position:relative;z-index:1;width:11px;height:11px;margin-block:14px 20px;border-radius:50%;border:2px solid var(--h168-green);background:var(--h168-paper)}
+.h168 .h174-timeline h3{font-family:var(--h168-sans);font-size:14px;line-height:1.6;font-weight:700;letter-spacing:-.015em;margin:0 0 9px;min-height:45px}
+.h174-timeline p{font-size:13px;line-height:1.85;color:var(--h168-muted);text-wrap:pretty}
+.h174-timeline .h174-present{background:#e5e9d9;border-radius:4px}
+.h174-present .h174-marker{background:var(--h168-green);box-shadow:0 0 0 5px #cfd9c3}
+.h174-scroll-hint{display:none;align-items:center;justify-content:space-between;gap:20px;font-size:12px;line-height:1.8;color:var(--h168-muted);margin-bottom:12px!important}
+.h174-scroll-hint span{font-size:18px;color:var(--h168-ink)}
+@media(max-width:1199px){.h174-heading{gap:32px;margin-bottom:26px}.h174-timeline{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:clamp(245px,31vw,300px)}.h174-date{font-size:25px}.h174-scroll-hint{display:flex}}
+@media(max-width:650px){.h168 .h174-history{margin-top:40px;padding-top:32px}.h174-heading{grid-template-columns:1fr;gap:16px;margin-bottom:22px}.h174-heading .h168-eyebrow{margin-bottom:12px}.h168 .h174-heading h2{font-size:29px}.h174-heading>p{font-size:13px}.h174-timeline{grid-auto-columns:86%}.h174-timeline>li{padding-inline:20px}.h174-timeline>li:first-child::before{left:20px}.h174-timeline>li:last-child::before{right:20px}.h168 .h174-timeline h3{min-height:0;font-size:15px}.h174-timeline p{font-size:14px;line-height:1.85}}
+@media print{.h174-track{overflow:visible}.h174-timeline{grid-template-columns:repeat(5,minmax(0,1fr));grid-auto-flow:row}.h174-timeline>li{padding-inline:10px;break-inside:avoid}.h174-scroll-hint{display:none}.h174-date{font-size:16px}}

@@ -17,7 +17,7 @@ from .views import manageable_reservations, permitted_hut_selection
 
 
 PRIORITIES = {'all', 'waiting24', 'arrival48'}
-STATUSES = {'all', 'pending', 'confirmed', 'cancelled'}
+STATUSES = {'all', 'pending', 'confirmed', 'cancelled', 'awaiting_deposit'}
 
 
 def scoped_public_requests(request):
@@ -46,7 +46,12 @@ def filter_requests(scoped, filters, *, now=None, today=None):
     today = today or timezone.localdate()
     results = scoped
     status = filters['status']
-    if status != 'all':
+    from .deposit_flow_v180 import unreviewed
+    if status == 'awaiting_deposit':
+        results = results.filter(status='pending', deposit_request__state__in=['awaiting', 'review'])
+    elif status == 'pending':
+        results = unreviewed(results)
+    elif status != 'all':
         results = results.filter(status=status)
     if filters['q']:
         query = filters['q']
@@ -54,6 +59,8 @@ def filter_requests(scoped, filters, *, now=None, today=None):
             Q(name__icontains=query) | Q(email__icontains=query)
             | Q(code__icontains=query) | Q(phone__icontains=query)
         )
+    if filters['priority'] != 'all':
+        results = unreviewed(results)
     if filters['priority'] == 'waiting24':
         results = results.filter(
             status=Reservation.Status.PENDING,
@@ -73,7 +80,8 @@ def filter_requests(scoped, filters, *, now=None, today=None):
 def pending_priorities(scoped, *, now=None, today=None):
     now = now or timezone.now()
     today = today or timezone.localdate()
-    pending = scoped.filter(status=Reservation.Status.PENDING)
+    from .deposit_flow_v180 import unreviewed
+    pending = unreviewed(scoped)
     return {
         'waiting24': pending.filter(created__lte=now - timedelta(hours=24)).count(),
         'arrival48': pending.filter(check_in__lte=today + timedelta(days=2)).count(),
@@ -119,7 +127,7 @@ def _export_rows(queryset, now):
             if reservation.status == Reservation.Status.PENDING else ''
         )
         row = [
-            reservation.code, reservation.status,
+            reservation.code, reservation.get_status_display() if reservation.deposit_request_id else reservation.status,
             timezone.localtime(reservation.created).isoformat(timespec='seconds'),
             waiting_hours, reservation.name, reservation.email, reservation.phone,
             '; '.join(hut_names), rooms,

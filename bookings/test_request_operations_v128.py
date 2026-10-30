@@ -37,8 +37,11 @@ class RequestOperationsTests(TestCase):
             name=name, email='guest@example.com', phone='555', notes=notes,
             check_in=self.today + timedelta(days=days),
             check_out=self.today + timedelta(days=days + 2),
-            status=status, guest_request=guest_request,
+            status=status, guest_request=guest_request and status != 'confirmed',
         )
+        if status == 'confirmed':
+            Reservation.objects.filter(pk=r.pk).update(guest_request=True)
+            r.refresh_from_db()
         ReservationItem.objects.create(
             reservation=r, room=room, beds=2, price_per_night=room.price_per_night
         )

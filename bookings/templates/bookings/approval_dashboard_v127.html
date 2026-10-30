@@ -58,8 +58,9 @@
 
   <nav class="aq-stats" aria-label="Request status filters">
     <a class="aq-stat" href="?status=pending{% if selected_slug %}&amp;hut={{ selected_slug|urlencode }}{% endif %}" {% if status_filter == 'pending' %}aria-current="page"{% endif %}><span>Needs review</span><strong>{{ counts.pending }}</strong><small>Oldest first</small></a>
-    <a class="aq-stat" href="?status=confirmed{% if selected_slug %}&amp;hut={{ selected_slug|urlencode }}{% endif %}" {% if status_filter == 'confirmed' %}aria-current="page"{% endif %}><span>Approved</span><strong>{{ counts.confirmed }}</strong><small>Confirmed stays</small></a>
-    <a class="aq-stat" href="?status=cancelled{% if selected_slug %}&amp;hut={{ selected_slug|urlencode }}{% endif %}" {% if status_filter == 'cancelled' %}aria-current="page"{% endif %}><span>Declined</span><strong>{{ counts.cancelled }}</strong><small>Cancelled requests</small></a>
+    <a class="aq-stat" href="?status=awaiting_deposit{% if selected_slug %}&amp;hut={{ selected_slug|urlencode }}{% endif %}"><span>{% translate "Awaiting deposit" %}</span><strong>{{ counts.awaiting_deposit }}</strong><small>{% translate "Approved holds" %}</small></a>
+    <a class="aq-stat" href="?status=confirmed{% if selected_slug %}&amp;hut={{ selected_slug|urlencode }}{% endif %}" {% if status_filter == 'confirmed' %}aria-current="page"{% endif %}><span>{% translate "Confirmed" %}</span><strong>{{ counts.confirmed }}</strong><small>Confirmed stays</small></a>
+    <a class="aq-stat" href="?status=cancelled{% if selected_slug %}&amp;hut={{ selected_slug|urlencode }}{% endif %}" {% if status_filter == 'cancelled' %}aria-current="page"{% endif %}><span>{% translate "Cancelled" %}</span><strong>{{ counts.cancelled }}</strong><small>Cancelled requests</small></a>
   </nav>
 
   <section class="aq-priority-summary" aria-label="Pending request priorities">
@@ -82,12 +83,12 @@
       <button type="submit" class="aq-btn aq-btn-dark">Apply filters →</button>
     </form></details>
 
-  <div class="aq-results-heading"><h2>{% if status_filter == 'pending' %}Awaiting your decision{% elif status_filter == 'confirmed' %}Approved requests{% elif status_filter == 'cancelled' %}Declined requests{% else %}All public requests{% endif %}</h2><div class="aq-heading-actions"><p>{{ page.paginator.count }} matching request{{ page.paginator.count|pluralize }}</p><a class="aq-download" href="{% url 'bookings:request_export' %}?status={{ status_filter|urlencode }}&amp;hut={{ selected_slug|urlencode }}&amp;q={{ q|urlencode }}&amp;priority={{ priority_filter|urlencode }}">↓ Download CSV (all matches)</a></div></div>
+  <div class="aq-results-heading"><h2>{% if status_filter == 'awaiting_deposit' %}{% translate 'Awaiting deposit' %}{% elif status_filter == 'pending' %}Awaiting your decision{% elif status_filter == 'confirmed' %}Approved requests{% elif status_filter == 'cancelled' %}Declined requests{% else %}All public requests{% endif %}</h2><div class="aq-heading-actions"><p>{{ page.paginator.count }} matching request{{ page.paginator.count|pluralize }}</p><a class="aq-download" href="{% url 'bookings:request_export' %}?status={{ status_filter|urlencode }}&amp;hut={{ selected_slug|urlencode }}&amp;q={{ q|urlencode }}&amp;priority={{ priority_filter|urlencode }}">↓ Download CSV (all matches)</a></div></div>
   {% if page.object_list %}
   <div class="aq-list">
     {% for reservation in page %}
     <article class="aq-card">
-      <div class="aq-card-top"><div><h3>{{ reservation.name }}</h3><small>Requested {{ reservation.created|date:"j M Y, H:i" }}</small>{% if reservation.waiting_over_24h or reservation.arrival_due %}<div class="aq-alerts">{% if reservation.waiting_over_24h %}<span class="aq-alert">Waiting over 24 hours</span>{% endif %}{% if reservation.arrival_due %}<span class="aq-alert aq-alert-due">Arrival due</span>{% endif %}</div>{% endif %}</div><span class="aq-pill {% if reservation.status == 'confirmed' %}aq-pill-confirmed{% elif reservation.status == 'cancelled' %}aq-pill-cancelled{% endif %}">{% if reservation.status == 'pending' %}Awaiting approval{% elif reservation.status == 'confirmed' %}Approved{% else %}Declined / cancelled{% endif %}</span></div>
+      <div class="aq-card-top"><div><h3>{{ reservation.name }}</h3><small>Requested {{ reservation.created|date:"j M Y, H:i" }}</small>{% if reservation.waiting_over_24h or reservation.arrival_due %}<div class="aq-alerts">{% if reservation.waiting_over_24h %}<span class="aq-alert">Waiting over 24 hours</span>{% endif %}{% if reservation.arrival_due %}<span class="aq-alert aq-alert-due">Arrival due</span>{% endif %}</div>{% endif %}</div><span class="aq-pill {% if reservation.status == 'confirmed' %}aq-pill-confirmed{% elif reservation.status == 'cancelled' %}aq-pill-cancelled{% endif %}">{% if reservation.deposit_request_id %}{{ reservation.get_status_display }}{% elif reservation.status == 'pending' %}Awaiting approval{% elif reservation.status == 'confirmed' %}Approved{% else %}Declined / cancelled{% endif %}</span></div>
       <div class="aq-card-body">
         <div class="aq-grid">
           <div><span class="aq-label">Stay dates</span><span class="aq-value">{{ reservation.check_in|date:"j M" }} – {{ reservation.check_out|date:"j M Y" }} ({{ reservation.nights }} night{{ reservation.nights|pluralize }})</span></div>
@@ -107,7 +108,7 @@
         <span class="aq-ref">Reference: {{ reservation.code }}</span>
         {% if reservation.reviewable_here %}
         {% include "bookings/decision_actions_v152.html" with source="approvals" %}
-        {% elif reservation.status == 'pending' %}<span class="aq-ref">Requires administrator review</span>{% endif %}
+        {% elif reservation.deposit_request_id %}{% include 'bookings/decision_actions_v152.html' with source='approvals' %}{% elif reservation.status == 'pending' %}<span class="aq-ref">Requires administrator review</span>{% endif %}
       </div>
     </article>
     {% endfor %}

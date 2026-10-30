@@ -14,14 +14,14 @@ logger = logging.getLogger(__name__)
 MAX_ATTEMPTS = 5
 
 
-def queue_notification(reservation, kind, subject, body, recipient, *, event=''):
+def queue_notification(reservation, kind, subject, body, recipient, *, event='', defer_delivery=False):
     if not recipient:
         return None
     key = hashlib.sha256(f'{reservation.pk}:{kind}:{recipient}:{event}'.encode()).hexdigest()
     item, created = ReservationNotification.objects.get_or_create(dedupe_key=key, defaults={
         'reservation': reservation, 'kind': kind, 'recipient': recipient,
         'subject': subject[:255], 'body': body})
-    if created:
+    if created and not defer_delivery:
         transaction.on_commit(lambda pk=item.pk: deliver_notification(pk), robust=True)
     return item
 
@@ -36,6 +36,27 @@ def deliver_notification(pk, *, manual=False):
             return item.status
         from .models import Reservation
         current_status = Reservation.objects.values_list('status', flat=True).get(pk=item.reservation_id)
+        current = Reservation.objects.get(pk=item.reservation_id)
+        hold = current.deposit_request if current.deposit_request_id else None
+        stale_deposit = False
+        if item.kind in ('deposit_request_guest', 'deposit_reminder_guest'):
+            stale_deposit = not hold or hold.state != 'awaiting' or current.status != 'pending' or hold.due_at <= now
+        elif item.kind == 'deposit_expired_guest':
+            stale_deposit = not hold or hold.state != 'expired' or current.status != 'cancelled'
+        elif item.kind == 'deposit_withdrawn_guest':
+            stale_deposit = not hold or hold.state != 'withdrawn' or current.status != 'pending'
+        if item.kind in ('deposit_review_guest', 'deposit_review_manager'):
+            stale_deposit = not hold or hold.state != 'review' or current.status != 'pending'
+        if item.kind.startswith('deposit_') and hold:
+            # Event keys include the immutable request id; an older approval
+            # must not send its bank terms after withdrawal/reapproval.
+            expected = hashlib.sha256(f'{current.pk}:{item.kind}:{item.recipient}:{hold.pk}'.encode()).hexdigest()
+            stale_deposit = stale_deposit or item.dedupe_key != expected
+        if stale_deposit or (item.kind.startswith('request_') and hold and hold.state != 'withdrawn'):
+            item.status = 'skipped'
+            item.last_error = ''
+            item.save(update_fields=['status', 'last_error'])
+            return item.status
         if ((item.kind.startswith('request_') and current_status != 'pending') or
                 (item.kind.startswith('confirmation_') and current_status != 'confirmed') or
                 (item.kind == 'declined_guest' and current_status != 'cancelled') or
@@ -44,6 +65,22 @@ def deliver_notification(pk, *, manual=False):
             item.last_error = ''
             item.save(update_fields=['status', 'last_error'])
             return item.status
+        if item.kind in ('deposit_request_guest', 'deposit_reminder_guest'):
+            # A partial payment between queueing and delivery must reduce the
+            # requested remainder rather than ask the guest to pay it twice.
+            from .payments import balance
+            from django.conf import settings
+            from decimal import Decimal
+            net = balance(current)['net']
+            remaining = max(hold.amount-net, Decimal('0.00'))
+            if remaining <= 0:
+                item.status = 'skipped'
+                item.save(update_fields=['status'])
+                return item.status
+            item.body = re.sub(r'(?m)^Already recorded / Вече отчетени: .*$',
+                f'Already recorded / Вече отчетени: {net:.2f} {settings.BOOKING_CURRENCY}', item.body)
+            item.body = re.sub(r'(?m)^Remaining deposit / Остатък по депозита: .*$',
+                f'Remaining deposit / Остатък по депозита: {remaining:.2f} {settings.BOOKING_CURRENCY}', item.body)
         item.attempts += 1
         item.last_attempt_at = now
         try:

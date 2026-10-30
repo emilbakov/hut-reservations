@@ -1,0 +1,47 @@
+{% load i18n %}
+<section class="h169-history" id="history" aria-labelledby="h169-history-title">
+  <div class="h169-history-heading">
+    <div><p class="h168-eyebrow">{% translate "SINCE THE 1930s" %}</p><h2 id="h169-history-title">{% translate "One place." %}<br><em>{% translate "Many chapters." %}</em></h2></div>
+    <p>{% translate "Studenets connects the early days of organised hiking with the growth of skiing in Pamporovo. Its story belongs to two distinct buildings: the original refuge and the larger hut opened in 1964." %}</p>
+  </div>
+  <ol class="h169-timeline">
+    <li>
+      <div class="h169-year">1936–1937</div>
+      <div class="h169-chapter"><h3>{% translate "A border post becomes a refuge" %}</h3><p>{% translate "Hikers from Chepelare established the first hut in a former border-post building. Eho, the Bulgarian Tourist Union newspaper, dates its conversion to 1936 and counts it among the Smolyan region’s earliest huts. The hut’s own history gives the founding period as 1936–1937." %}</p><p>{% translate "The building had served the old Bulgarian–Ottoman border, which remained here until 1912. The place’s story began before its life as a mountain refuge." %}</p></div>
+    </li>
+    <li>
+      <div class="h169-year">1946–1947</div>
+      <div class="h169-chapter"><h3>{% translate "Lost to fire. Brought back together." %}</h3><p>{% translate "A fire destroyed the hut in 1946. The hikers of Chepelare rebuilt it the following year, keeping this mountain meeting place alive." %}</p></div>
+    </li>
+    <li>
+      <div class="h169-year">{% translate "1950s–1960" %}</div>
+      <div class="h169-chapter"><h3>{% translate "At the centre of a growing ski resort" %}</h3><p>{% translate "During the 1950s, work began on Stenata, the first ski piste running from Snezhanka peak to Studenets. The hut became an important point in the resort’s emerging mountain infrastructure." %}</p><p>{% translate "The 1960 regional scheme already envisaged lifts from the resort to the hut, onwards to Snezhanka, and from the peak towards the Smolyan Lakes area. These were planning proposals at that date." %}</p></div>
+    </li>
+    <li>
+      <div class="h169-year"><time datetime="1964-10-28">{% translate "28 October" %}<strong>1964</strong></time></div>
+      <div class="h169-chapter"><h3>{% translate "A new hut, a larger welcome" %}</h3><p>{% translate "The larger Studenets hut opened on 28 October 1964 with a tourist celebration bringing together societies from across the region. This is the later building, distinct from the original 1930s refuge." %}</p><p class="h169-date-note">{% translate "The hut’s historical account dates construction to 1962–1964; the 1977 guidebook gives 1960–1964. Both agree on the year it was completed." %}</p></div>
+    </li>
+    <li>
+      <div class="h169-year">1977</div>
+      <div class="h169-chapter"><h3>{% translate "A mountain base for hikers and skiers" %}</h3><p>{% translate "The guidebook Huts in Bulgaria records the scale of the newer hut in 1977: rooms of different sizes, shared spaces and facilities for a growing mountain community." %}</p>
+        <div class="h169-historic-base" aria-labelledby="h169-base-title">
+          <p class="h168-eyebrow" id="h169-base-title">{% translate "AS RECORDED IN 1977" %}</p>
+          <dl class="h169-historic-numbers"><div><dt>{% translate "Accommodation places" %}</dt><dd>170</dd></div><div><dt>{% translate "Restaurant seats" %}</dt><dd>90</dd></div></dl>
+          <p>{% translate "Guests could use a self-catering kitchen and dining room, a lounge with a television, indoor toilets and bathrooms on each floor. Central heating, a year-round refreshment counter and a telephone connection to Smolyan completed the picture." %}</p>
+          <p class="h169-historic-note">{% translate "A snapshot from 1977. For today’s rooms, facilities, prices and availability, see the booking page." %} <a href="{{ heritage_booking_url }}">{% translate "Rooms & reservations" %}<span aria-hidden="true"> ↗</span></a></p>
+        </div>
+      </div>
+    </li>
+  </ol>
+  <details class="h169-sources">
+    <summary>{% translate "Sources & historical notes" %}<span aria-hidden="true">+</span></summary>
+    <div class="h169-source-content"><p>{% translate "The dates above follow the published accounts below. Where the accounts differ, both dates are retained." %}</p>
+      <ul>
+        <li><a href="https://www.btsbg.org/file/3636/download?token=jc6RJGIm#page=12" rel="external">{% translate "Eho · Bulgarian Tourist Union, February 2025, p. 12" %}<span aria-hidden="true">↗</span></a><p>{% translate "The former border post, the 1912 border and the hut’s conversion in 1936." %}</p></li>
+        <li><a href="https://www.studenets.eu/studenets.html" rel="external">{% translate "Studenets · The hut’s historical account" %}<span aria-hidden="true">↗</span></a><p>{% translate "The 1936–1937 beginning, the fire and rebuilding, and the opening on 28 October 1964." %}</p></li>
+        <li><a href="https://www.moew.government.bg/static/media/ups/articles/attachments/Zapiska_Pamporvo_IOUP_PPfb3839c2ea30b67a77923dfc3b3ccb17.pdf" rel="external">{% translate "MOEW · Pamporovo planning document, 2020, §2.4.1, p. 84" %}<span aria-hidden="true">↗</span></a><p>{% translate "The Stenata piste and the lift connections envisaged in the 1960 regional scheme." %}</p></li>
+        <li><a href="https://chitanka.info/text/40755-hizhite-v-bylgarija/12" rel="external">{% translate "Huts in Bulgaria · H. Peychev, P. Bozhkov & D. Dushkov, 1977" %}<span aria-hidden="true">↗</span></a><p>{% translate "Separate entries for the old and new huts; the 1960–1964 construction dates and the facilities recorded in 1977." %}</p></li>
+      </ul>
+    </div>
+  </details>
+</section>

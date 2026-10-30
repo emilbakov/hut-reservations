@@ -21,7 +21,7 @@ class PublicHutDetailTests(TestCase):
         cls.end = cls.start + timedelta(days=2)
 
     def url(self):
-        return reverse("bookings:hut_detail", kwargs={"slug": self.hut.slug})
+        return reverse("bookings:book")
 
     def dates(self):
         return {"check_in": self.start.isoformat(), "check_out": self.end.isoformat()}
@@ -84,7 +84,7 @@ class PublicHutDetailTests(TestCase):
         self.assertContains(response, "Only 4 left")
         self.assertFalse(Reservation.objects.filter(name="Guest Test").exists())
 
-    def test_legacy_book_page_keeps_existing_template(self):
+    def test_book_page_uses_the_dedicated_public_booking_template(self):
         response = self.client.get(reverse("bookings:book"))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "bookings/book.html")
+        self.assertTemplateUsed(response, "bookings/public_hut_v125.html")

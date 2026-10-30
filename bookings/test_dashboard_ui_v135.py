@@ -10,14 +10,14 @@ from bookings.models import Hut, Reservation, ReservationItem, Room
 
 
 class DashboardTemplateV135Tests(SimpleTestCase):
-    def test_dashboard_template_preserves_existing_mobile_regression_marker(self):
+    def test_dashboard_template_preserves_accessible_operations_and_decision_actions(self):
         from django.conf import settings
         from pathlib import Path
         source = (Path(settings.BASE_DIR) / "bookings/templates/bookings/dashboard.html").read_text()
-        self.assertIn("SummitDesk v135", source)
-        self.assertIn("/* v133:", source)
-        self.assertIn('data-label="Check-in"', source)
-        self.assertIn('aria-label="Today\'s operations"', source)
+        self.assertIn('id="needs-decision"', source)
+        self.assertIn('scope="col"', source)
+        self.assertIn('bookings/decision_actions_v152.html', source)
+        self.assertIn('translate "Today\'s operations"', source)
 
 
 class DashboardPageV135Tests(TestCase):
@@ -48,7 +48,7 @@ class DashboardPageV135Tests(TestCase):
         self.assertContains(response, "Visible Guest V135")
         self.assertContains(response, "New reservation")
         self.assertContains(response, "Monthly occupancy")
-        self.assertContains(response, 'data-label="Check-in"')
+        self.assertContains(response, '<th scope="col">Check-in</th>', html=True)
         self.assertContains(response, reverse("bookings:conversation_inbox"))
         self.assertEqual(response.context["capacity"], 8)
         self.assertNotContains(response, "Hidden Guest V135")
@@ -66,4 +66,4 @@ class DashboardPageV135Tests(TestCase):
     def test_mobile_layout_css_present(self):
         response = self.client.get(reverse("bookings:dashboard"))
         self.assertContains(response, "bookings/staff_v152.css")
-        self.assertContains(response, "sd135-table")
+        self.assertContains(response, "bookings/staff-v176/dashboard.css")

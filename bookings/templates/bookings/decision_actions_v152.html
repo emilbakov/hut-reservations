@@ -1,4 +1,5 @@
-{% load i18n ui_v147 %}
+{% load i18n ui_v147 static %}
+<link rel="stylesheet" href="{% static 'bookings/deposit-v180/flow.css' %}">
 {% if reservation.reviewable_here %}
 <div class="sd152-capacity" role="group" aria-label="{% translate 'Capacity check' %}">
   {% for row in reservation.capacity_rows %}<p class="{% if row.conflict %}sd152-conflict{% endif %}"><strong>{{ row.room.name }}</strong> · {% blocktranslate with requested=row.requested available=row.available remaining=row.remaining %}{{ requested }} requested · {{ available }} available before this request · {{ remaining }} left after approval{% endblocktranslate %}{% if not row.room.is_active %} · {% translate 'Inactive room' %}{% endif %}</p>{% endfor %}
@@ -7,11 +8,11 @@
 <div class="sd152-decision-actions">
   {% if reservation.capacity_ok %}<details class="sd152-approve" name="decision-{{ reservation.pk }}"><summary class="sd152-button">{% translate 'Approve' %}</summary>
     <form method="post" action="{% url 'bookings:manager_reservation_action' reservation.code %}">{% csrf_token %}<input type="hidden" name="action" value="confirm"><input type="hidden" name="source" value="{{ source }}"><input type="hidden" name="return_hut" value="{{ selected_slug }}">
-      <p>{% blocktranslate with name=reservation.name %}Confirm this stay for {{ name }}?{% endblocktranslate %} {% if reservation.guest_request and reservation.email %}{% translate 'The guest will receive a confirmation.' %}{% endif %}</p><button type="submit" class="sd152-button">{% translate 'Approve request' %}</button>
+      {% if reservation.guest_request %}{% include 'bookings/deposit_fields_v180.html' with deposit_form=reservation.deposit_form %}{% else %}<p>{% blocktranslate with name=reservation.name %}Confirm this stay for {{ name }}?{% endblocktranslate %}</p>{% endif %}<button type="submit" class="sd152-button">{% translate 'Approve request' %}</button>
     </form></details>{% else %}<p class="sd152-conflict" role="status">{% translate 'Capacity conflict. Review the room or maintenance closure before approving.' %}</p>{% endif %}
   <details class="sd152-decline" name="decision-{{ reservation.pk }}"><summary class="sd152-quiet">{% translate 'Decline' %}</summary>
     <form method="post" action="{% url 'bookings:manager_reservation_action' reservation.code %}">{% csrf_token %}<input type="hidden" name="action" value="cancel"><input type="hidden" name="source" value="{{ source }}"><input type="hidden" name="return_hut" value="{{ selected_slug }}">
       <label for="reason-{{ reservation.pk }}">{% translate 'Reason / message to the guest (optional)' %}</label><textarea id="reason-{{ reservation.pk }}" name="reason" maxlength="1000" rows="3"></textarea><p>{% if reservation.guest_request and reservation.email %}{% translate 'This releases the held beds. Your message will be included in the guest email.' %}{% else %}{% translate 'This releases the held beds. The reason is saved with the decision.' %}{% endif %}</p><button type="submit" class="sd152-danger">{% translate 'Decline request' %}</button>
     </form></details>
 </div>
-{% elif reservation.status == 'pending' %}<p>{% translate 'Requires administrator review' %}</p>{% endif %}
+{% elif reservation.deposit180 %}<p>{{ reservation.get_status_display }} · {{ reservation.deposit180.hold.amount }} {{ currency|default:'EUR' }} · {{ reservation.deposit180.hold.due_at|date:'j M Y H:i T' }}</p><a class="sd152-button" href="{% url 'bookings:reservation_payments' reservation.code %}">{% if reservation.deposit180.awaiting %}{% translate 'Record deposit received' %}{% else %}{% translate 'View payment record' %}{% endif %} ↗</a>{% elif reservation.status == 'pending' %}<p>{% translate 'Requires administrator review' %}</p>{% endif %}

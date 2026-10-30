@@ -106,7 +106,9 @@ def staff_reservation(request, hut_id, code):
         else:
             with transaction.atomic():
                 locked = Reservation.objects.select_for_update().get(pk=reservation.pk)
-                if locked.status == "cancelled" and target != "cancelled":
+                if locked.guest_request and target == "confirmed" and locked.status == "pending":
+                    error_message = "Use the approval and deposit workflow before confirming this guest request."
+                elif locked.status == "cancelled" and target != "cancelled":
                     error_message = "Cancelled bookings cannot be reopened here; create a new reservation with availability validation."
                 elif target == "cancelled" and has_physical_assignments(locked):
                     error_message = "Remove numbered-bed assignments before cancelling this reservation."

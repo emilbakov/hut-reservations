@@ -1,0 +1,5 @@
+.sd140 .sd148-filter{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:750;white-space:nowrap;cursor:pointer}
+.sd140 .sd148-filter input{accent-color:#195b42;width:18px;height:18px;min-height:18px;margin:0}
+.sd140 .sd148-filter:has(input:disabled){opacity:.6;cursor:not-allowed}
+.sd140 .sd148-count{font-size:12px;color:#526d60;white-space:nowrap}
+@media(max-width:850px){.sd140 .sd148-filter{min-height:40px}.sd140 .sd148-count{flex-basis:100%}}

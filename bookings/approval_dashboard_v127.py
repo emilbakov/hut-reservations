@@ -26,8 +26,10 @@ def approval_dashboard(request):
     filters = get_request_filters(request)
     status, query, priority = filters['status'], filters['q'], filters['priority']
 
+    from .deposit_flow_v180 import unreviewed
     counts = {
-        'pending': scoped.filter(status=Reservation.Status.PENDING).count(),
+        'pending': unreviewed(scoped).count(),
+        'awaiting_deposit': scoped.filter(status='pending', deposit_request__state__in=['awaiting', 'review']).count(),
         'confirmed': scoped.filter(status=Reservation.Status.CONFIRMED).count(),
         'cancelled': scoped.filter(status=Reservation.Status.CANCELLED).count(),
     }

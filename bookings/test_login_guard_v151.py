@@ -58,6 +58,16 @@ class ClientIdentityV151Tests(TestCase):
 
 @override_settings(TRUST_UNIX_PROXY=False, TRUSTED_PROXY_CIDRS=())
 class LoginGuardV151Tests(TestCase):
+    def test_unavailable_response_needs_no_branding_database_query(self):
+        from django.contrib.auth.models import AnonymousUser
+        from .login_guard_v151 import _response
+        request=RequestFactory().post('/staff/login/')
+        request.user=AnonymousUser()
+        with self.assertNumQueries(0):
+            response=_response(request,503,60)
+        self.assertEqual(response.status_code,503)
+        self.assertContains(response,'Sign-in temporarily unavailable',status_code=503)
+
     def setUp(self):
         self.user = get_user_model().objects.create_superuser("boss", "boss@example.com", "right-password")
         self.url = reverse("bookings:staff_login")

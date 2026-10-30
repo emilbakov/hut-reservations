@@ -1,0 +1,5 @@
+/* Local DejaVu Sans, licensed in fonts/LICENSE-DejaVu.txt. Existing CSS family aliases retain layout hooks. */
+@font-face{font-family:'DM Sans';font-style:normal;font-weight:100 500;font-display:swap;src:url('fonts/DejaVuSans.woff') format('woff')}
+@font-face{font-family:'DM Sans';font-style:normal;font-weight:600 900;font-display:swap;src:url('fonts/DejaVuSans-Bold.woff') format('woff')}
+@font-face{font-family:'Outfit';font-style:normal;font-weight:100 500;font-display:swap;src:url('fonts/DejaVuSans.woff') format('woff')}
+@font-face{font-family:'Outfit';font-style:normal;font-weight:600 900;font-display:swap;src:url('fonts/DejaVuSans-Bold.woff') format('woff')}

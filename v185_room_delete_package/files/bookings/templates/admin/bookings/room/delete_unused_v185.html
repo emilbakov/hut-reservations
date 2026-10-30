@@ -1,0 +1,16 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<p>Permanently delete these {{ rooms|length }} room(s) and {{ bed_count }} attached bed record(s)? This cannot be undone.</p>
+<ul>{% for room in rooms %}<li>{{ room }}</li>{% endfor %}</ul>
+<p>Their floor-plan room positions and bed markers will also be removed. Huts and other rooms will remain.</p>
+<p>Rooms with any booking history, bed assignments, closures or linked operational history cannot be deleted. All selected rooms must pass the checks; otherwise nothing is deleted.</p>
+<form method="post">{% csrf_token %}
+{% for room in rooms %}<input type="hidden" name="{{ action_checkbox_name }}" value="{{ room.pk }}">{% endfor %}
+<input type="hidden" name="action" value="delete_unused_rooms">
+<input type="hidden" name="confirm_unused_room_delete" value="yes">
+<div class="submit-row">
+<input type="submit" value="Yes, delete these unused rooms and beds">
+<a href="{{ cancel_url }}" class="button cancel-link">Cancel</a>
+</div>
+</form>
+{% endblock %}

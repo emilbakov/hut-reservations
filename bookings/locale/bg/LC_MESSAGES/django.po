@@ -1862,3 +1862,2416 @@ msgstr "Настройки"
 
 msgid "This room is inactive. Choose another room."
 msgstr "Тази стая не е активна. Изберете друга стая."
+
+#: main hut v153
+msgid "Hut information"
+msgstr "Информация за хижата"
+
+#: main hut v153
+msgid "About the hut"
+msgstr "За хижата"
+
+#: main hut v153
+msgid "Online booking unavailable"
+msgstr "Онлайн резервации не се приемат"
+
+#: main hut v153
+msgid "This hut is listed for information only. Reservations through the website are not available here yet."
+msgstr "Хижата е представена само с информация. Засега не се приемат резервации за нея през сайта."
+
+#: main hut v153
+msgid "Visit %(name)s for online reservation requests"
+msgstr "Посетете %(name)s за онлайн заявки за резервация"
+
+#: main hut v153
+msgid "Online reservation requests are not available for this hut."
+msgstr "За тази хижа не се приемат онлайн заявки за резервация."
+
+#: main hut v153
+msgid "These rooms are not available for online booking."
+msgstr "Тези стаи не са достъпни за онлайн резервации."
+
+#: main hut v153
+msgid "Main hut · online requests available"
+msgstr "Основна хижа · приема онлайн заявки"
+
+#: main hut v153
+msgid "Information only · online booking unavailable"
+msgstr "Само информация · без онлайн резервации"
+
+#: main hut v153
+msgid "View main hut & booking"
+msgstr "Основна хижа и резервации"
+
+#: main hut v153
+msgid "View hut"
+msgstr "Виж хижата"
+
+#: main hut v153
+msgid "Explore our huts. Online reservation requests are currently available only for the main hut."
+msgstr "Разгледайте нашите хижи. Онлайн заявки за резервация се приемат само за основната хижа."
+
+#: main hut v153
+msgid "Hut or location"
+msgstr "Хижа или местоположение"
+
+#: main hut v153
+msgid "Search huts"
+msgstr "Търси хижи"
+
+#: main hut v153
+msgid "Visit %(name)s for dates, rooms and reservation requests."
+msgstr "Посетете %(name)s за дати, стаи и заявки за резервация."
+
+#: main hut v153
+msgid "Browse our huts. Online booking will be available soon."
+msgstr "Разгледайте нашите хижи. Онлайн резервациите ще бъдат достъпни скоро."
+
+#: main hut v153
+msgid "Set the main hut in Public website settings."
+msgstr "Изберете основна хижа в настройките на публичния сайт."
+
+#: heritage v168
+msgid "At the heart of the mountain"
+msgstr "В сърцето на планината"
+
+#: heritage v168
+msgid "Our story"
+msgstr "Нашата история"
+
+#: heritage v168
+msgid "Then & now"
+msgstr "Тогава и сега"
+
+#: heritage v168
+msgid "Book a stay"
+msgstr "Резервирай"
+
+#: heritage v168
+msgid "Rhodope Mountains"
+msgstr "Родопите"
+
+#: heritage v168
+msgid "A mountain hut."
+msgstr "Хижа с история."
+
+#: heritage v168
+msgid "A resort’s heart."
+msgstr "Сърцето на курорта."
+
+#: heritage v168
+msgid "Before the resort grew around it, the hut was already part of the mountain’s story."
+msgstr "Преди курортът да израсне около нея, хижата вече е част от историята на планината."
+
+#: heritage v168
+msgid "Discover our story"
+msgstr "Открий историята"
+
+#: heritage v168
+msgid "Plan your stay"
+msgstr "Планирай престоя си"
+
+#: heritage v168
+msgid "Rooted in the past. Open to what’s next."
+msgstr "С корени в миналото. С поглед напред."
+
+#: heritage v168
+msgid "Scroll to our story"
+msgstr "Към нашата история"
+
+#: heritage v168
+msgid "Explore"
+msgstr "Разгледай"
+
+#: heritage v168
+msgid "A PLACE WITH ROOTS"
+msgstr "МЯСТО С КОРЕНИ"
+
+#: heritage v168
+msgid "The resort grew."
+msgstr "Курортът расте."
+
+#: heritage v168
+msgid "The heart remained."
+msgstr "Сърцето остава."
+
+#: heritage v168
+msgid "Some places are more than a point on the map. They are where a story begins."
+msgstr "Някои места са повече от точка на картата. От тях започва една история."
+
+#: heritage v168
+msgid "%(name)s holds a special place at the centre of the resort. One of its oldest landmarks, the hut is part of the story of the place that grew around it."
+msgstr "%(name)s заема специално място в центъра на курорта. Един от най-старите му символи, хижата е част от историята на мястото, израснало около нея."
+
+#: heritage v168
+msgid "These photographs tell that story: a small mountain refuge, changing seasons, and a familiar meeting place through the years."
+msgstr "Тези снимки разказват историята: малък планински подслон, сменящи се сезони и познато място за срещи през годините."
+
+#: heritage v168
+msgid "The original Studenets hut"
+msgstr "Първата хижа „Студенец“"
+
+#: heritage v168
+msgid "Open photograph of the original hut"
+msgstr "Отвори снимката на първата хижа"
+
+#: heritage v168
+msgid "Archival photograph of the original Studenets hut, with its timber balcony and name above the entrance."
+msgstr "Архивна снимка на първата хижа „Студенец“ с дървен балкон и надпис над входа."
+
+#: heritage v168
+msgid "The original hut"
+msgstr "Първата хижа"
+
+#: heritage v168
+msgid "Archive photograph"
+msgstr "Архивна снимка"
+
+#: heritage v168
+msgid "BEFORE THE BUSTLE"
+msgstr "ПРЕДИ ГОЛЕМИЯ КУРОРТ"
+
+#: heritage v168
+msgid "It started"
+msgstr "Всичко започва"
+
+#: heritage v168
+msgid "with a hut."
+msgstr "с една хижа."
+
+#: heritage v168
+msgid "A modest building among the trees. A place to arrive, take shelter and feel part of the mountain. The beginning of a much bigger story."
+msgstr "Скромна сграда сред дърветата. Място за подслон, където да почувстваш планината. Началото на една много по-голяма история."
+
+#: heritage v168
+msgid "The buildings have changed. The hut’s place in the resort’s story has endured."
+msgstr "Сградите се променят. Мястото на хижата в историята на курорта остава."
+
+#: heritage v168
+msgid "THE YEARS BETWEEN"
+msgstr "ПРЕЗ ГОДИНИТЕ"
+
+#: heritage v168
+msgid "A different time."
+msgstr "Друго време."
+
+#: heritage v168
+msgid "The same special place."
+msgstr "Същото специално място."
+
+#: heritage v168
+msgid "Look back at the hut in 1984, then return to the view today. Different chapters of a place that belongs to the mountain."
+msgstr "Виж хижата през 1984 г., а после се върни към днешния ѝ облик. Различни глави от историята на едно планинско място."
+
+#: heritage v168
+msgid "Choose a period"
+msgstr "Избери период"
+
+#: heritage v168
+msgid "Then"
+msgstr "Тогава"
+
+#: heritage v168
+msgid "Now"
+msgstr "Сега"
+
+#: heritage v168
+msgid "Studenets in 1984"
+msgstr "Студенец през 1984 г."
+
+#: heritage v168
+msgid "Open the 1984 photograph"
+msgstr "Отвори снимката от 1984 г."
+
+#: heritage v168
+msgid "Studenets in 1984: the hut, skiers and snow-covered pine forest."
+msgstr "Студенец през 1984 г.: хижата, скиори и заснежена борова гора."
+
+#: heritage v168
+msgid "From the archive"
+msgstr "От архива"
+
+#: heritage v168
+msgid "Studenets today"
+msgstr "Студенец днес"
+
+#: heritage v168
+msgid "Open the present-day photograph"
+msgstr "Отвори съвременната снимка"
+
+#: heritage v168
+msgid "The present-day hut with its expanded buildings surrounded by snowy forest."
+msgstr "Съвременният облик на хижата с разширените сгради сред заснежена гора."
+
+#: heritage v168
+msgid "Still at the heart of it"
+msgstr "Все така в сърцето на курорта"
+
+#: heritage v168
+msgid "A living landmark. A story still being written."
+msgstr "Жив символ. История, която продължава."
+
+#: heritage v168
+msgid "MOUNTAIN MEMORIES"
+msgstr "ПЛАНИНСКИ СПОМЕНИ"
+
+#: heritage v168
+msgid "The mountain changes us."
+msgstr "Планината ни променя."
+
+#: heritage v168
+msgid "The memories stay."
+msgstr "Спомените остават."
+
+#: heritage v168
+msgid "Snow on the pines. Friends on the slopes. A hut to come back to. Small moments, kept in photographs."
+msgstr "Сняг по боровете. Приятели по пистите. Хижа, в която да се върнеш. Малки моменти, запазени в снимки."
+
+#: heritage v168
+msgid "Friends in front of the hut"
+msgstr "Приятели пред хижата"
+
+#: heritage v168
+msgid "Open the hut archive photograph"
+msgstr "Отвори архивната снимка на хижата"
+
+#: heritage v168
+msgid "Black-and-white archive photograph of friends in the snow, with the hut behind them. Original source credit remains visible."
+msgstr "Черно-бяла архивна снимка на приятели в снега с хижата зад тях. Оригиналният надпис за източника е запазен."
+
+#: heritage v168
+msgid "A place to meet"
+msgstr "Място за срещи"
+
+#: heritage v168
+msgid "Winter on the mountain"
+msgstr "Зима в планината"
+
+#: heritage v168
+msgid "Open the mountain archive photograph"
+msgstr "Отвори архивната снимка на планината"
+
+#: heritage v168
+msgid "Black-and-white archive photograph of a ski slope through pine forest. Original source credit remains visible."
+msgstr "Черно-бяла архивна снимка на ски писта сред борова гора. Оригиналният надпис за източника е запазен."
+
+#: heritage v168
+msgid "A mountain to remember"
+msgstr "Планина, която се помни"
+
+#: heritage v168
+msgid "YOUR NEXT CHAPTER"
+msgstr "ТВОЯТА СЛЕДВАЩА ИСТОРИЯ"
+
+#: heritage v168
+msgid "Come for the mountain."
+msgstr "Ела заради планината."
+
+#: heritage v168
+msgid "Stay for the feeling."
+msgstr "Остани заради усещането."
+
+#: heritage v168
+msgid "Make your own memories here. Explore the rooms, choose your dates and send a request for your mountain stay."
+msgstr "Създай своите спомени тук. Разгледай стаите, избери дати и изпрати заявка за планинския си престой."
+
+#: heritage v168
+msgid "Rooms & reservations"
+msgstr "Стаи и резервации"
+
+#: heritage v168
+msgid "Choose your dates on the booking page to see current availability and prices."
+msgstr "Избери дати на страницата за резервации, за да видиш свободните места и цените."
+
+#: heritage v168
+msgid "FIND YOUR WAY HERE"
+msgstr "КАК ДА НИ НАМЕРИШ"
+
+#: heritage v168
+msgid "Right at the heart."
+msgstr "В самото сърце."
+
+#: heritage v168
+msgid "Rhodope Mountains, Bulgaria"
+msgstr "Родопите, България"
+
+#: heritage v168
+msgid "Get directions"
+msgstr "Как да стигнеш"
+
+#: heritage v168
+msgid "Mountain stories. Shared."
+msgstr "Планински истории. Споделени."
+
+#: heritage v168
+msgid "Policies and staff"
+msgstr "Условия и служители"
+
+#: heritage v168
+msgid "Back to top"
+msgstr "Към началото"
+
+#: heritage v168
+msgid "Photograph viewer"
+msgstr "Преглед на снимки"
+
+#: heritage v168
+msgid "Close photograph"
+msgstr "Затвори снимката"
+
+#: heritage v168
+msgid "Previous photograph"
+msgstr "Предишна снимка"
+
+#: heritage v168
+msgid "Next photograph"
+msgstr "Следваща снимка"
+
+#: heritage v168
+msgid "Discover %(hut)s, a historic mountain hut at the heart of the resort. Explore its story in photographs, then plan your stay."
+msgstr "Открий %(hut)s — историческа планинска хижа в сърцето на курорта. Разгледай историята ѝ в снимки и планирай своя престой."
+
+#: heritage v168
+msgid "%(hut)s surrounded by snow-covered forest."
+msgstr "%(hut)s сред заснежена гора."
+
+#: heritage v168
+msgid "%(name)s surrounded by snow-covered forest."
+msgstr "%(name)s сред заснежена гора."
+
+#: heritage v168
+msgid "%(hut)s · At the heart of the mountain"
+msgstr "%(hut)s · В сърцето на планината"
+
+#: heritage v168
+msgid "%(name)s home"
+msgstr "%(name)s — начало"
+
+#: heritage history v169
+msgid "Welcoming mountain travellers since the 1930s. A familiar landmark as Pamporovo grew into a ski resort."
+msgstr "Посреща планинари още от 30-те години на XX век. Познат символ през годините, в които Пампорово се превръща в ски курорт."
+
+#: heritage history v169
+msgid "A former border post found a new purpose: shelter for mountain travellers. The original Studenets refuge belongs to the beginnings of organised tourism in the Rhodopes."
+msgstr "Бивша гранична застава получава нов живот като подслон за планинари. Първата хижа „Студенец“ е част от началото на организирания туризъм в Родопите."
+
+#: heritage history v169
+msgid "The larger hut would open in 1964. Two buildings, connected by the same mountain story."
+msgstr "По-голямата хижа ще отвори врати през 1964 г. Две сгради, свързани от една планинска история."
+
+#: heritage history v169
+msgid "SINCE THE 1930s"
+msgstr "ОТ 30-ТЕ ГОДИНИ НА XX ВЕК"
+
+#: heritage history v169
+msgid "One place."
+msgstr "Едно място."
+
+#: heritage history v169
+msgid "Many chapters."
+msgstr "Много истории."
+
+#: heritage history v169
+msgid "Studenets connects the early days of organised hiking with the growth of skiing in Pamporovo. Its story belongs to two distinct buildings: the original refuge and the larger hut opened in 1964."
+msgstr "„Студенец“ свързва началото на организирания туризъм с развитието на ски спорта в Пампорово. Историята ѝ обхваща две различни сгради: първоначалния подслон и по-голямата хижа, открита през 1964 г."
+
+#: heritage history v169
+msgid "A border post becomes a refuge"
+msgstr "От гранична застава до туристическа хижа"
+
+#: heritage history v169
+msgid "Hikers from Chepelare established the first hut in a former border-post building. Eho, the Bulgarian Tourist Union newspaper, dates its conversion to 1936 and counts it among the Smolyan region’s earliest huts. The hut’s own history gives the founding period as 1936–1937."
+msgstr "Туристи от Чепеларе създават първата хижа в сградата на бивша гранична застава. Вестник „Ехо“, издание на БТС, датира преустройството през 1936 г. и я нарежда сред първите хижи в Смолянския регион. Историческата справка на самата хижа посочва периода 1936–1937 г."
+
+#: heritage history v169
+msgid "The building had served the old Bulgarian–Ottoman border, which remained here until 1912. The place’s story began before its life as a mountain refuge."
+msgstr "Сградата е обслужвала старата българо-турска граница, минавала тук до 1912 г. Историята на мястото започва още преди превръщането му в планински подслон."
+
+#: heritage history v169
+msgid "Lost to fire. Brought back together."
+msgstr "След пожара — отново заедно."
+
+#: heritage history v169
+msgid "A fire destroyed the hut in 1946. The hikers of Chepelare rebuilt it the following year, keeping this mountain meeting place alive."
+msgstr "През 1946 г. хижата е опожарена. Още през следващата година чепеларските туристи я възстановяват и запазват това място за срещи в планината."
+
+#: heritage history v169
+msgid "1950s–1960"
+msgstr "50-те г. – 1960"
+
+#: heritage history v169
+msgid "At the centre of a growing ski resort"
+msgstr "В центъра на развиващия се ски курорт"
+
+#: heritage history v169
+msgid "During the 1950s, work began on Stenata, the first ski piste running from Snezhanka peak to Studenets. The hut became an important point in the resort’s emerging mountain infrastructure."
+msgstr "През 50-те години започва просичането на „Стената“ — първата ски писта от връх Снежанка до хижа „Студенец“. Хижата се утвърждава като важна точка в изграждащата се планинска инфраструктура на курорта."
+
+#: heritage history v169
+msgid "The 1960 regional scheme already envisaged lifts from the resort to the hut, onwards to Snezhanka, and from the peak towards the Smolyan Lakes area. These were planning proposals at that date."
+msgstr "В районната схема от 1960 г. вече са предвидени лифтове от курорта до хижата, от нея до Снежанка и от върха към района на Смолянските езера. Към тази дата това са устройствени предвиждания."
+
+#: heritage history v169
+msgid "28 October"
+msgstr "28 октомври"
+
+#: heritage history v169
+msgid "A new hut, a larger welcome"
+msgstr "Нова хижа за повече планинари"
+
+#: heritage history v169
+msgid "The larger Studenets hut opened on 28 October 1964 with a tourist celebration bringing together societies from across the region. This is the later building, distinct from the original 1930s refuge."
+msgstr "По-голямата хижа „Студенец“ е открита на 28 октомври 1964 г. с туристически празник и участие на дружества от целия регион. Това е по-късната сграда, различна от първоначалния подслон от 30-те години."
+
+#: heritage history v169
+msgid "The hut’s historical account dates construction to 1962–1964; the 1977 guidebook gives 1960–1964. Both agree on the year it was completed."
+msgstr "Историческата справка на хижата посочва строителство през 1962–1964 г., а справочникът от 1977 г. — през 1960–1964 г. Двата източника съвпадат за годината на завършване."
+
+#: heritage history v169
+msgid "A mountain base for hikers and skiers"
+msgstr "Планинска база за туристи и скиори"
+
+#: heritage history v169
+msgid "The guidebook Huts in Bulgaria records the scale of the newer hut in 1977: rooms of different sizes, shared spaces and facilities for a growing mountain community."
+msgstr "Справочникът „Хижите в България“ показва мащаба на новата хижа през 1977 г.: стаи с различен брой легла, общи пространства и удобства за все повече туристи и скиори."
+
+#: heritage history v169
+msgid "AS RECORDED IN 1977"
+msgstr "ПО ДАННИ ОТ 1977 ГОДИНА"
+
+#: heritage history v169
+msgid "Accommodation places"
+msgstr "Места за настаняване"
+
+#: heritage history v169
+msgid "Restaurant seats"
+msgstr "Места в ресторанта"
+
+#: heritage history v169
+msgid "Guests could use a self-catering kitchen and dining room, a lounge with a television, indoor toilets and bathrooms on each floor. Central heating, a year-round refreshment counter and a telephone connection to Smolyan completed the picture."
+msgstr "Гостите са разполагали с туристическа кухня и столова, занималня с телевизор, вътрешни санитарни възли и етажни бани. Централното отопление, целогодишният бюфет и телефонната връзка със Смолян допълват облика на базата."
+
+#: heritage history v169
+msgid "A snapshot from 1977. For today’s rooms, facilities, prices and availability, see the booking page."
+msgstr "Поглед към 1977 г. За днешните стаи, удобства, цени и свободни места виж страницата за резервации."
+
+#: heritage history v169
+msgid "Sources & historical notes"
+msgstr "Източници и исторически бележки"
+
+#: heritage history v169
+msgid "The dates above follow the published accounts below. Where the accounts differ, both dates are retained."
+msgstr "Датите следват публикуваните по-долу източници. Където има разминаване, са запазени и двете датировки."
+
+#: heritage history v169
+msgid "Eho · Bulgarian Tourist Union, February 2025, p. 12"
+msgstr "В. „Ехо“ · БТС, февруари 2025 г., стр. 12"
+
+#: heritage history v169
+msgid "The former border post, the 1912 border and the hut’s conversion in 1936."
+msgstr "Бившата гранична застава, границата до 1912 г. и преустройството в хижа през 1936 г."
+
+#: heritage history v169
+msgid "Studenets · The hut’s historical account"
+msgstr "„Студенец“ · Историческа справка на хижата"
+
+#: heritage history v169
+msgid "The 1936–1937 beginning, the fire and rebuilding, and the opening on 28 October 1964."
+msgstr "Началото през 1936–1937 г., пожарът и възстановяването, откриването на 28 октомври 1964 г."
+
+#: heritage history v169
+msgid "MOEW · Pamporovo planning document, 2020, §2.4.1, p. 84"
+msgstr "МОСВ · Устройствена документация за Пампорово, 2020 г., §2.4.1, стр. 84"
+
+#: heritage history v169
+msgid "The Stenata piste and the lift connections envisaged in the 1960 regional scheme."
+msgstr "Писта „Стената“ и лифтовите връзки, предвидени в районната схема от 1960 г."
+
+#: heritage history v169
+msgid "Huts in Bulgaria · H. Peychev, P. Bozhkov & D. Dushkov, 1977"
+msgstr "„Хижите в България“ · Хр. Пейчев, П. Божков и Д. Душков, 1977 г."
+
+#: heritage history v169
+msgid "Separate entries for the old and new huts; the 1960–1964 construction dates and the facilities recorded in 1977."
+msgstr "Отделни описания на старата и новата хижа, строителният период 1960–1964 г. и базата през 1977 г."
+
+#: heritage history v169
+msgid "Studenets in the archive"
+msgstr "Студенец в архива"
+
+#: heritage history v169
+msgid "Open the archival Studenets postcard"
+msgstr "Отвори архивната картичка на Студенец"
+
+#: heritage history v169
+msgid "Archival postcard of a small two-storey Studenets hut in a forest clearing, with two people outside. The original border, handwritten caption and archives.bg watermark are preserved."
+msgstr "Архивна картичка на малка двуетажна хижа „Студенец“ на горска поляна с двама души отпред. Оригиналната рамка, ръкописният надпис и водният знак archives.bg са запазени."
+
+#: heritage history v169
+msgid "Original mark: archives.bg · Date not established"
+msgstr "Оригинален знак: archives.bg · Без установена дата"
+
+#: booking redesign v170
+msgid "02 · YOUR ROOM"
+msgstr "02 · ИЗБЕРИ СТАЯ"
+
+#: booking redesign v170
+msgid "03 · YOUR DETAILS"
+msgstr "03 · ТВОИТЕ ДАННИ"
+
+#: booking redesign v170
+msgid "A few simple steps. A stay worth looking forward to."
+msgstr "Няколко лесни стъпки до твоя планински престой."
+
+#: booking redesign v170
+msgid "A question before you arrive?"
+msgstr "Имаш въпрос преди пристигането?"
+
+#: booking redesign v170
+msgid "Availability is checked for every night of your stay."
+msgstr "Проверяваме свободните места за всяка нощ от престоя."
+
+#: booking redesign v170
+msgid "Back to the hut"
+msgstr "Обратно към хижата"
+
+#: booking redesign v170
+msgid "Choose beds in one room, or share your group across several."
+msgstr "Избери легла в една стая или разпредели групата в няколко."
+
+#: booking redesign v170
+msgid "Choose your beds"
+msgstr "Избери своите легла"
+
+#: booking redesign v170
+msgid "Choose your dates"
+msgstr "Избери дати"
+
+#: booking redesign v170
+msgid "Continue to your details"
+msgstr "Продължи към данните"
+
+#: booking redesign v170
+msgid "Dates"
+msgstr "Дати"
+
+#: booking redesign v170
+msgid "Discover the hut"
+msgstr "Разгледай хижата"
+
+#: booking redesign v170
+msgid "Find the hut’s contact details and directions below."
+msgstr "Свържи се с хижата или виж как да стигнеш до нея."
+
+#: booking redesign v170
+msgid "HERE TO HELP"
+msgstr "НАСРЕЩА СМЕ"
+
+#: booking redesign v170
+msgid "Questions about booking?"
+msgstr "Въпроси за резервацията?"
+
+#: booking redesign v170
+msgid "ROOMS & RESERVATIONS"
+msgstr "СТАИ И РЕЗЕРВАЦИИ"
+
+#: booking redesign v170
+msgid "Start with your dates. We’ll show the beds available for your whole stay."
+msgstr "Започни с датите. Ще покажем леглата, свободни за целия ти престой."
+
+#: booking redesign v170
+msgid "Tell us who’s coming."
+msgstr "Кой ще гостува?"
+
+#: booking redesign v170
+msgid "YOUR CHOSEN HUT"
+msgstr "ТВОЯТА ХИЖА"
+
+#: booking redesign v170
+msgid "Your mountain base"
+msgstr "Твоят планински подслон"
+
+#: booking redesign v170
+msgid "Your request is reviewed by the hut manager."
+msgstr "Заявката ти се преглежда от управителя на хижата."
+
+#: booking redesign v170
+msgid "Your selection"
+msgstr "Твоят избор"
+
+#: booking redesign v170
+msgid "Your stay at the hut"
+msgstr "Твоят престой в хижата"
+
+#: booking redesign v170
+msgid "Beds available for your stay"
+msgstr "Има свободни легла за престоя ти"
+
+#: targeted history edit v173
+msgid "Modernisation completed"
+msgstr "Завършена модернизация"
+
+#: targeted history edit v173
+msgid "In 2021, the modernisation of Studenets hut is completed. A new chapter for a familiar landmark at the heart of Pamporovo."
+msgstr "През 2021 г. завършва модернизацията на хижа „Студенец“. Нова глава за познатото място в сърцето на Пампорово."
+
+#: horizontal history v174
+msgid "From the first refuge to the hut we know today. Five moments in a story at the heart of Pamporovo."
+msgstr "От първия подслон до хижата, която познаваме днес. Пет момента от една история в сърцето на Пампорово."
+
+#: horizontal history v174
+msgid "Hut history, in chronological order"
+msgstr "Историята на хижата през годините"
+
+#: horizontal history v174
+msgid "Scroll across the years"
+msgstr "Плъзни по годините"
+
+#: horizontal history v174
+msgid "The first refuge"
+msgstr "Първият подслон"
+
+#: horizontal history v174
+msgid "Hikers from Chepelare turn a former border post into the first Studenets hut."
+msgstr "Туристите от Чепеларе превръщат бивша гранична застава в първата хижа „Студенец“."
+
+#: horizontal history v174
+msgid "Rebuilt together"
+msgstr "Възстановена заедно"
+
+#: horizontal history v174
+msgid "After the fire of 1946, Chepelare’s hikers rebuild the hut in 1947."
+msgstr "След пожара през 1946 г. туристите от Чепеларе възстановяват хижата през 1947 г."
+
+#: horizontal history v174
+msgid "At the resort’s heart"
+msgstr "В сърцето на курорта"
+
+#: horizontal history v174
+msgid "The Stenata piste and plans for new lifts place the hut at the heart of the growing resort."
+msgstr "Първата писта „Стената“ и плановете за лифтове поставят хижата в центъра на растящия курорт."
+
+#: horizontal history v174
+msgid "A larger welcome"
+msgstr "Нова хижа, нови срещи"
+
+#: horizontal history v174
+msgid "On 28 October, the larger hut opens: a new home for hikers and skiers in Pamporovo."
+msgstr "На 28 октомври отваря по-голямата хижа — нов дом за туристи и скиори в Пампорово."
+
+#: staff overview and hub v176
+msgid "DAILY OVERVIEW"
+msgstr "ДНЕВЕН ПРЕГЛЕД"
+
+#: staff overview and hub v176
+msgid "Your front desk, at a glance."
+msgstr "Всичко важно за рецепцията с един поглед."
+
+#: staff overview and hub v176
+msgid "Today's operations"
+msgstr "Днешната работа"
+
+#: staff overview and hub v176
+msgid "YOUR NEXT ACTION"
+msgstr "СЛЕДВАЩО ДЕЙСТВИЕ"
+
+#: staff overview and hub v176
+msgid "You're up to date."
+msgstr "Всичко е прегледано."
+
+#: staff overview and hub v176
+msgid "View reservations"
+msgstr "Виж резервациите"
+
+#: staff overview and hub v176
+msgid "COMING UP"
+msgstr "ПРЕДСТОЯЩО"
+
+#: staff overview and hub v176
+msgid "Hut snapshot"
+msgstr "Хижата накратко"
+
+#: staff overview and hub v176
+msgid "TONIGHT"
+msgstr "ТАЗИ ВЕЧЕР"
+
+#: staff overview and hub v176
+msgid "%(held)s of %(total)s beds held tonight"
+msgstr "%(held)s от %(total)s легла са заети тази вечер"
+
+#: staff overview and hub v176
+msgid "Pending and confirmed stays. This is expected occupancy, not an actual check-in count."
+msgstr "Чакащи и потвърдени престои. Това е очаквана заетост, а не брой настанени гости."
+
+#: staff overview and hub v176
+msgid "Open booking calendar"
+msgstr "Отвори календара с резервации"
+
+#: staff overview and hub v176
+msgid "MONTHLY SNAPSHOT"
+msgstr "МЕСЕЦЪТ НАКРАТКО"
+
+#: staff overview and hub v176
+msgid "Choose a month"
+msgstr "Избери месец"
+
+#: staff overview and hub v176
+msgid "Booking value for pending and confirmed stays; not payments received."
+msgstr "Стойност на чакащите и потвърдените престои, а не получени плащания."
+
+#: staff overview and hub v176
+msgid "PROPERTY OVERVIEW"
+msgstr "ПРЕГЛЕД НА ХИЖАТА"
+
+#: staff overview and hub v176
+msgid "Your front desk at a glance. Everything important for today's operations."
+msgstr "Рецепцията с един поглед. Всичко важно за работата днес."
+
+#: staff overview and hub v176
+msgid "Your housekeeping workspace for today."
+msgstr "Твоето работно място за почистването днес."
+
+#: staff overview and hub v176
+msgid "View calendar"
+msgstr "Виж календара"
+
+#: staff overview and hub v176
+msgid "Urgent operations alerts"
+msgstr "Спешни оперативни сигнали"
+
+#: staff overview and hub v176
+msgid "Review the next seven days before making changes."
+msgstr "Прегледай следващите седем дни преди промени."
+
+#: staff overview and hub v176
+msgid "Review alerts"
+msgstr "Прегледай сигналите"
+
+#: staff overview and hub v176
+msgid "Today's property statistics"
+msgstr "Днешните показатели за хижата"
+
+#: staff overview and hub v176
+msgid "Reserved beds tonight"
+msgstr "Запазени легла тази вечер"
+
+#: staff overview and hub v176
+msgid "Confirmed bookings + pending holds"
+msgstr "Потвърдени и чакащи резервации"
+
+#: staff overview and hub v176
+msgid "Arrivals today"
+msgstr "Пристигащи днес"
+
+#: staff overview and hub v176
+msgid "Reserved bed places arriving"
+msgstr "Запазени места за пристигащи"
+
+#: staff overview and hub v176
+msgid "Departures today"
+msgstr "Заминаващи днес"
+
+#: staff overview and hub v176
+msgid "Reserved bed places leaving"
+msgstr "Освобождавани запазени места"
+
+#: staff overview and hub v176
+msgid "Cleaning to do"
+msgstr "Предстоящо почистване"
+
+#: staff overview and hub v176
+msgid "in progress"
+msgstr "в изпълнение"
+
+#: staff overview and hub v176
+msgid "done"
+msgstr "завършени"
+
+#: staff overview and hub v176
+msgid "My open tasks"
+msgstr "Моите незавършени задачи"
+
+#: staff overview and hub v176
+msgid "Ready to start"
+msgstr "Готови за започване"
+
+#: staff overview and hub v176
+msgid "In progress"
+msgstr "В изпълнение"
+
+#: staff overview and hub v176
+msgid "Currently being cleaned"
+msgstr "В процес на почистване"
+
+#: staff overview and hub v176
+msgid "Completed today"
+msgstr "Завършени днес"
+
+#: staff overview and hub v176
+msgid "Marked as done"
+msgstr "Отбелязани като завършени"
+
+#: staff overview and hub v176
+msgid "CAPACITY"
+msgstr "КАПАЦИТЕТ"
+
+#: staff overview and hub v176
+msgid "The next 7 nights"
+msgstr "Следващите 7 нощувки"
+
+#: staff overview and hub v176
+msgid "Room-level reserved places across your property"
+msgstr "Запазени места по стаи в хижата"
+
+#: staff overview and hub v176
+msgid "Open calendar"
+msgstr "Отвори календара"
+
+#: staff overview and hub v176
+msgid "Forecast legend"
+msgstr "Легенда на прогнозата"
+
+#: staff overview and hub v176
+msgid "Free capacity"
+msgstr "Свободни места"
+
+#: staff overview and hub v176
+msgid "Reservations and holds exceed usable capacity"
+msgstr "Резервациите надвишават наличния капацитет"
+
+#: staff overview and hub v176
+msgid "No forecast data available."
+msgstr "Няма налични данни за прогнозата."
+
+#: staff overview and hub v176
+msgid "HOUSEKEEPING"
+msgstr "ПОЧИСТВАНЕ"
+
+#: staff overview and hub v176
+msgid "Today's tasks"
+msgstr "Днешните задачи"
+
+#: staff overview and hub v176
+msgid "My assigned tasks"
+msgstr "Възложените ми задачи"
+
+#: staff overview and hub v176
+msgid "Open task board"
+msgstr "Отвори таблото със задачи"
+
+#: staff overview and hub v176
+msgid "View all tasks"
+msgstr "Виж всички задачи"
+
+#: staff overview and hub v176
+msgid "Bed"
+msgstr "Легло"
+
+#: staff overview and hub v176
+msgid "priority"
+msgstr "приоритет"
+
+#: staff overview and hub v176
+msgid "No tasks scheduled for today"
+msgstr "Няма планирани задачи за днес"
+
+#: staff overview and hub v176
+msgid "New assignments will appear here."
+msgstr "Новите задачи ще се показват тук."
+
+#: staff overview and hub v176
+msgid "NEEDS ATTENTION"
+msgstr "ИЗИСКВА ВНИМАНИЕ"
+
+#: staff overview and hub v176
+msgid "Operations alerts"
+msgstr "Оперативни сигнали"
+
+#: staff overview and hub v176
+msgid "Priority checks for the coming week"
+msgstr "Приоритетни проверки за идната седмица"
+
+#: staff overview and hub v176
+msgid "Manager operations"
+msgstr "Управление на дейностите"
+
+#: staff overview and hub v176
+msgid "No operations alerts"
+msgstr "Няма оперативни сигнали"
+
+#: staff overview and hub v176
+msgid "No alerts detected in the current seven-day check."
+msgstr "Няма открити сигнали за следващите седем дни."
+
+#: staff overview and hub v176
+msgid "QUICK SNAPSHOT"
+msgstr "НАКРАТКО"
+
+#: staff overview and hub v176
+msgid "Looking ahead"
+msgstr "Поглед напред"
+
+#: staff overview and hub v176
+msgid "Confirmed bookings only"
+msgstr "Само потвърдени резервации"
+
+#: staff overview and hub v176
+msgid "Confirmed beds tonight"
+msgstr "Потвърдени легла тази вечер"
+
+#: staff overview and hub v176
+msgid "Tomorrow's arriving bed places"
+msgstr "Места за пристигащите утре"
+
+#: staff overview and hub v176
+msgid "Estimated booking value tonight"
+msgstr "Очаквана стойност на нощувките тази вечер"
+
+#: staff overview and hub v176
+msgid "Booking value is an estimate, not payments received."
+msgstr "Стойността е прогнозна и не представлява получени плащания."
+
+#: staff overview and hub v176
+msgid "YOUR WORKSPACE"
+msgstr "ТВОЕТО РАБОТНО МЯСТО"
+
+#: staff overview and hub v176
+msgid "Manage your property"
+msgstr "Управлявай хижата"
+
+#: staff overview and hub v176
+msgid "Everything you need, in one place"
+msgstr "Всичко необходимо на едно място"
+
+#: staff overview and hub v176
+msgid "Reservation calendar"
+msgstr "Календар с резервации"
+
+#: staff overview and hub v176
+msgid "Availability and bookings"
+msgstr "Наличност и резервации"
+
+#: staff overview and hub v176
+msgid "Manage today's guests"
+msgstr "Управление на днешните гости"
+
+#: staff overview and hub v176
+msgid "Assignments and layout"
+msgstr "Разпределение и подредба"
+
+#: staff overview and hub v176
+msgid "Housekeeping board"
+msgstr "Табло за почистване"
+
+#: staff overview and hub v176
+msgid "Readiness and maintenance"
+msgstr "Готовност и поддръжка"
+
+#: staff overview and hub v176
+msgid "Reservation analytics"
+msgstr "Анализ на резервациите"
+
+#: staff overview and hub v176
+msgid "Occupancy and performance"
+msgstr "Заетост и резултати"
+
+#: staff overview and hub v176
+msgid "Staff & cleaning team"
+msgstr "Персонал и екип за почистване"
+
+#: staff overview and hub v176
+msgid "memberships"
+msgstr "членове"
+
+#: staff overview and hub v176
+msgid "Assignments and progress"
+msgstr "Задачи и напредък"
+
+#: staff overview and hub v176
+msgid "Advanced reports & exports"
+msgstr "Подробни справки и експортиране"
+
+#: staff overview and hub v176
+msgid "Forecasts, capacity warnings, comparisons and CSV tools"
+msgstr "Прогнози, сигнали за капацитет, сравнения и CSV инструменти"
+
+#: staff overview and hub v176
+msgid "These are the original management reports. They're still available whenever you need more detail."
+msgstr "Подробните управленски справки остават на разположение, когато са ти нужни."
+
+#: staff overview and hub v176
+msgid "Full manager operations ↗"
+msgstr "Всички управленски дейности ↗"
+
+#: staff overview and hub v176
+msgid "Financial analytics ↗"
+msgstr "Финансов анализ ↗"
+
+#: staff overview and hub v176
+msgid "Reservation audit ↗"
+msgstr "История на резервациите ↗"
+
+#: staff overview and hub v176
+msgid "Team invitations ↗"
+msgstr "Покани за екипа ↗"
+
+#: staff overview and hub v176
+msgid "Property management"
+msgstr "Управление на хижата"
+
+#: staff overview and hub v176
+msgid "Showing 8 of %(total)s tasks. Open the task board for the full list."
+msgstr "Показани са 8 от %(total)s задачи. Отвори таблото със задачи за пълния списък."
+
+#: staff overview and hub v176
+msgid "Today's cleaning tasks"
+msgstr "Днешните задачи за почистване"
+
+#: staff overview and hub v176
+msgid "scheduled today"
+msgstr "планирани за днес"
+
+#: staff overview and hub v176
+msgid "View all"
+msgstr "Виж всички"
+
+#: staff overview and hub v176
+msgid "Availability reflects room capacity minus closures and holds; it does not guarantee a specific numbered bed."
+msgstr "Наличността отчита капацитета на стаите, затворените легла и резервациите; не гарантира конкретно номерирано легло."
+
+#: staff overview and hub v176
+msgid "%(held)s of %(total)s beds reserved tonight"
+msgstr "%(held)s от %(total)s легла са запазени тази вечер"
+
+#: huts directory and information pages v177
+msgid "THE HUT COLLECTION"
+msgstr "НАШИТЕ ХИЖИ"
+
+#: huts directory and information pages v177
+msgid "A little closer"
+msgstr "Малко по-близо"
+
+#: huts directory and information pages v177
+msgid "to the mountains."
+msgstr "до планината."
+
+#: huts directory and information pages v177
+msgid "Different huts. One love for the mountains. Find your next stop, explore the place and plan your visit."
+msgstr "Различни хижи. Една обич към планината. Открий следващата си спирка, опознай мястото и планирай посещението си."
+
+#: huts directory and information pages v177
+msgid "Discover the huts"
+msgstr "Открий хижите"
+
+#: huts directory and information pages v177
+msgid "PLACES TO DISCOVER"
+msgstr "МЕСТА ЗА ОТКРИВАНЕ"
+
+#: huts directory and information pages v177
+msgid "Our huts"
+msgstr "Нашите хижи"
+
+#: huts directory and information pages v177
+msgid "Name or destination"
+msgstr "Име или местоположение"
+
+#: huts directory and information pages v177
+msgid "Showing matches for “%(term)s”."
+msgstr "Резултати за „%(term)s“."
+
+#: huts directory and information pages v177
+msgid "Clear search"
+msgstr "Изчисти търсенето"
+
+#: huts directory and information pages v177
+msgid "OUR MAIN HUT"
+msgstr "НАШАТА ОСНОВНА ХИЖА"
+
+#: huts directory and information pages v177
+msgid "Online reservation requests are available at %(name)s. Our other huts are here to explore."
+msgstr "Онлайн заявки за резервации се приемат за %(name)s. Разгледай и останалите ни хижи."
+
+#: huts directory and information pages v177
+msgid "Check dates & rooms"
+msgstr "Провери дати и стаи"
+
+#: huts directory and information pages v177
+msgid "Hut photograph coming soon"
+msgstr "Скоро ще добавим снимка на хижата"
+
+#: huts directory and information pages v177
+msgid "Photograph coming soon"
+msgstr "Очаквайте снимка"
+
+#: huts directory and information pages v177
+msgid "Get to know the hut"
+msgstr "Опознай хижата"
+
+#: huts directory and information pages v177
+msgid "Listed capacity, not live availability"
+msgstr "Общ капацитет, а не свободни места"
+
+#: huts directory and information pages v177
+msgid "THE PLACE"
+msgstr "МЯСТОТО"
+
+#: huts directory and information pages v177
+msgid "More about this hut will be shared here soon."
+msgstr "Скоро тук ще разкажем повече за тази хижа."
+
+#: huts directory and information pages v177
+msgid "INSIDE THE HUT"
+msgstr "В ХИЖАТА"
+
+#: huts directory and information pages v177
+msgid "Plan your visit"
+msgstr "Планирай посещението си"
+
+#: huts directory and information pages v177
+msgid "PLAN YOUR VISIT"
+msgstr "ПЛАНИРАЙ ПОСЕЩЕНИЕТО СИ"
+
+#: huts directory and information pages v177
+msgid "Contact & directions"
+msgstr "Контакти и маршрут"
+
+#: huts directory and information pages v177
+msgid "For more information, contact the tourist society."
+msgstr "За повече информация се свържи с туристическото дружество."
+
+#: huts directory and information pages v177
+msgid "Looking for an online reservation?"
+msgstr "Искаш да заявиш резервация онлайн?"
+
+#: huts directory and information pages v177
+msgid "Explore %(name)s"
+msgstr "Разгледай %(name)s"
+
+#: huts directory and information pages v177
+msgid "KEEP EXPLORING"
+msgstr "ПРОДЪЛЖИ ДА ОТКРИВАШ"
+
+#: huts directory and information pages v177
+msgid "Another place. Another story."
+msgstr "Друго място. Друга история."
+
+#: private reservation presentation v178
+msgid "Keep this link private"
+msgstr "Пази тази връзка лична"
+
+#: private reservation presentation v178
+msgid "Print reservation"
+msgstr "Разпечатай резервацията"
+
+#: private reservation presentation v178
+msgid "THE STAY"
+msgstr "ПРЕСТОЯТ"
+
+#: private reservation presentation v178
+msgid "GUEST DETAILS"
+msgstr "ДАННИ НА ГОСТА"
+
+#: private reservation presentation v178
+msgid "Travelling with us"
+msgstr "Гостуваш при нас"
+
+#: private reservation presentation v178
+msgid "YOUR PLANS"
+msgstr "ТВОИТЕ ПЛАНОВЕ"
+
+#: private reservation presentation v178
+msgid "Manage your stay"
+msgstr "Управление на престоя"
+
+#: private reservation presentation v178
+msgid "Staff reservation controls"
+msgstr "Управление на резервацията от персонала"
+
+#: private reservation presentation v178
+msgid "Changes and cancellations are reviewed by the hut manager."
+msgstr "Промените и анулиранията се разглеждат от управителя на хижата."
+
+#: private reservation presentation v178
+msgid "Cancel this reservation?"
+msgstr "Да се анулира ли резервацията?"
+
+#: private reservation presentation v178
+msgid "The reserved beds will be released. This does not process a refund."
+msgstr "Запазените легла ще бъдат освободени. Това действие не възстановява плащания."
+
+#: private reservation presentation v178
+msgid "Confirm cancellation"
+msgstr "Потвърди анулирането"
+
+#: private reservation presentation v178
+msgid "Reservation summary"
+msgstr "Резервацията накратко"
+
+#: private reservation presentation v178
+msgid "AT A GLANCE"
+msgstr "НАКРАТКО"
+
+#: private reservation presentation v178
+msgid "Original booking total"
+msgstr "Първоначална стойност на резервацията"
+
+#: private reservation presentation v178
+msgid "Booking total, not a payment receipt."
+msgstr "Стойност на резервацията, а не документ за плащане."
+
+#: private reservation presentation v178
+msgid "Payment information"
+msgstr "Информация за плащането"
+
+#: private reservation presentation v178
+msgid "Hut contact"
+msgstr "Контакт с хижата"
+
+#: private reservation presentation v178
+msgid "SAFE & PERSONAL"
+msgstr "ЛИЧНО И ЗАЩИТЕНО"
+
+#: private reservation presentation v178
+msgid "Your stay, in your inbox."
+msgstr "Твоят престой. В твоята поща."
+
+#: private reservation presentation v178
+msgid "Open the reservation email and follow its private link. If you cannot find it, contact the hut for help."
+msgstr "Отвори имейла за резервацията и последвай личната връзка в него. Ако не го намираш, свържи се с хижата."
+
+#: guest portal v179
+msgid "Manage your stay."
+msgstr "Управлявай престоя си."
+
+#: guest portal v179
+msgid "Your booking, requests and conversations. All in one place."
+msgstr "Резервация, заявки и съобщения. Всичко на едно място."
+
+#: guest portal v179
+msgid "View reservation receipt"
+msgstr "Виж потвърждението"
+
+#: guest portal v179
+msgid "Your current booking"
+msgstr "Твоята текуща резервация"
+
+#: guest portal v179
+msgid "Manage your stay sections"
+msgstr "Раздели за управление на престоя"
+
+#: guest portal v179
+msgid "Requests"
+msgstr "Заявки"
+
+#: guest portal v179
+msgid "Messages"
+msgstr "Съобщения"
+
+#: guest portal v179
+msgid "Stay details"
+msgstr "За престоя"
+
+#: guest portal v179
+msgid "Changes & cancellations"
+msgstr "Промени и анулиране"
+
+#: guest portal v179
+msgid "Your request is with the hut team."
+msgstr "Заявката ти е при екипа на хижата."
+
+#: guest portal v179
+msgid "A request is already awaiting review. You can read its details below or send the team a message."
+msgstr "Вече има заявка, която очаква преглед. Виж подробностите по-долу или изпрати съобщение на екипа."
+
+#: guest portal v179
+msgid "Message the hut"
+msgstr "Пиши на хижата"
+
+#: guest portal v179
+msgid "Check your request"
+msgstr "Провери заявката си"
+
+#: guest portal v179
+msgid "Optional · up to 2,000 characters"
+msgstr "По желание · до 2000 знака"
+
+#: guest portal v179
+msgid "Approval does not update the booking automatically. Check the current booking details above or contact the hut team."
+msgstr "Одобрението не променя автоматично резервацията. Провери текущите данни по-горе или се свържи с екипа на хижата."
+
+#: guest portal v179
+msgid "STAY IN TOUCH"
+msgstr "ПОДДЪРЖАЙ ВРЪЗКА"
+
+#: guest portal v179
+msgid "Messages and replies for this booking. Refresh the page to check for updates."
+msgstr "Съобщения и отговори за тази резервация. Обнови страницата, за да видиш новите отговори."
+
+#: guest portal v179
+msgid "Enter a message before sending."
+msgstr "Напиши съобщение, преди да го изпратиш."
+
+#: guest portal v179
+msgid "Up to 2,000 characters"
+msgstr "До 2000 знака"
+
+#: guest portal v179
+msgid "YOUR CURRENT BOOKING"
+msgstr "ТВОЯТА ТЕКУЩА РЕЗЕРВАЦИЯ"
+
+#: guest portal v179
+msgid "PAYMENT RECORDS"
+msgstr "ДАННИ ЗА ПЛАЩАНИЯТА"
+
+#: guest portal v179
+msgid "Payment record"
+msgstr "Данни за плащанията"
+
+#: guest portal v179
+msgid "Choose an arrival date."
+msgstr "Избери дата на пристигане."
+
+#: guest portal v179
+msgid "Choose a departure date."
+msgstr "Избери дата на напускане."
+
+#: guest portal v179
+msgid "Change request"
+msgstr "Заявка за промяна"
+
+#: guest portal v179
+msgid "Cancellation request"
+msgstr "Заявка за отмяна"
+
+#: guest portal v179
+msgid "Approved for manual processing"
+msgstr "Одобрена за обработка от екипа"
+
+#: guest portal v179
+msgid "Rejected"
+msgstr "Отхвърлена"
+
+#: guest portal v179
+msgid "For urgent matters, contact the hut directly."
+msgstr "За спешни въпроси се свържи директно с хижата."
+
+#: guest portal v179
+msgid "Awaiting review"
+msgstr "Очаква преглед"
+
+#: guest portal v179
+msgid "This reservation can no longer accept change requests."
+msgstr "Вече не се приемат заявки за промяна на тази резервация."
+
+#: guest portal v179
+msgid "This reservation can no longer accept requests."
+msgstr "Вече не се приемат заявки за тази резервация."
+
+#: guest portal v179
+msgid "A request is already awaiting manager review."
+msgstr "Вече има заявка, която очаква преглед от управителя."
+
+#: guest portal v179
+msgid "Request received. The hut manager will review it."
+msgstr "Заявката е получена. Управителят на хижата ще я разгледа."
+
+#: guest portal v179
+msgid "Messaging for this stay has closed."
+msgstr "Съобщенията за този престой вече са затворени."
+
+#: guest portal v179
+msgid "Enter a message of 1–2000 characters."
+msgstr "Въведи съобщение от 1 до 2000 знака."
+
+#: guest portal v179
+msgid "Too many messages. Please try again in an hour."
+msgstr "Изпратени са твърде много съобщения. Опитай отново след час."
+
+#: guest portal v179
+msgid "Your message was saved. The hut team can read it in SummitDesk."
+msgstr "Съобщението е запазено. Екипът на хижата може да го прочете в системата."
+
+#: deposit lifecycle v180
+msgid "A past stay cannot start a new deposit hold."
+msgstr "Не може да се одобри депозит за минал престой."
+
+#: deposit lifecycle v180
+msgid "A zero deposit explicitly waives this step. Otherwise, enter actual payment instructions in at least one language. The deadline uses the hut's local time."
+msgstr "Нулев депозит означава изрично освобождаване от тази стъпка. В останалите случаи въведи конкретни указания за плащане на поне един език. Срокът е по местното време на хижата."
+
+#: deposit lifecycle v180
+msgid "Add the guest email before approving a deposit request."
+msgstr "Добави имейла на госта, преди да одобриш депозита."
+
+#: deposit lifecycle v180
+msgid "Approval holds beds; it does not confirm an unpaid stay."
+msgstr "Одобрението задържа местата; неплатеният престой все още не е потвърден."
+
+#: deposit lifecycle v180
+msgid "Approve and send deposit instructions"
+msgstr "Одобри и изпрати указанията за депозит"
+
+#: deposit lifecycle v180
+msgid "Approve the guest request and record its required deposit before confirmation."
+msgstr "Одобри заявката и отчети необходимия депозит преди потвърждение."
+
+#: deposit lifecycle v180
+msgid "Approved — awaiting deposit"
+msgstr "Одобрена — очаква депозит"
+
+#: deposit lifecycle v180
+msgid "Awaiting deposit"
+msgstr "Очаква депозит"
+
+#: deposit lifecycle v180
+msgid "Approved holds"
+msgstr "Одобрени заявки със задържани места"
+
+#: deposit lifecycle v180
+msgid "Beds are held until this deadline. The booking confirms when the hut records the required deposit. An insufficient deposit releases the hold at the deadline."
+msgstr "Местата се задържат до този срок. Резервацията се потвърждава, когато хижата отчете необходимия депозит. При недостатъчен депозит местата се освобождават в крайния срок."
+
+#: deposit lifecycle v180
+msgid "Choose a future deadline no later than the end of the arrival day."
+msgstr "Избери бъдещ срок, не по-късно от края на деня на пристигане."
+
+#: deposit lifecycle v180
+msgid "Confirm your stay with a deposit."
+msgstr "Потвърди престоя си с депозит."
+
+#: deposit lifecycle v180
+msgid "Contact the hut about any payment or refund. Expiry does not automatically refund recorded funds."
+msgstr "Свържи се с хижата за плащане или възстановяване на суми. Изтичането на срока не възстановява автоматично отчетените средства."
+
+#: deposit lifecycle v180
+msgid "Contact the hut before paying or travelling. Check availability before making a new booking."
+msgstr "Свържи се с хижата преди плащане или пътуване. Провери свободните места, преди да направиш нова резервация."
+
+#: deposit lifecycle v180
+msgid "Create a guest request as pending, then use the approval and deposit workflow."
+msgstr "Създай заявката като чакаща, след което използвай одобрението и депозита."
+
+#: deposit lifecycle v180
+msgid "Deposit approval withdrawn. Review the stay and issue new terms before requesting payment again."
+msgstr "Одобрението за депозит е оттеглено. Прегледай престоя и задай нови условия, преди отново да поискаш плащане."
+
+#: deposit lifecycle v180
+msgid "Deposit deadline (hut local time)"
+msgstr "Краен срок за депозит (местно време на хижата)"
+
+#: deposit lifecycle v180
+msgid "Deposit deadline passed"
+msgstr "Срокът за депозит е изтекъл"
+
+#: deposit lifecycle v180
+msgid "Deposit recorded — hut review required"
+msgstr "Депозитът е отчетен — необходим е преглед от хижата"
+
+#: deposit lifecycle v180
+msgid "Deposit recorded — staff review"
+msgstr "Депозитът е отчетен — преглед от екипа"
+
+#: deposit lifecycle v180
+msgid "Deposit requirement met"
+msgstr "Необходимият депозит е отчетен"
+
+#: deposit lifecycle v180
+msgid "Do not send payment for this hold. Contact the hut to check availability before booking or paying again."
+msgstr "Не плащай за тази заявка. Свържи се с хижата за свободни места, преди отново да резервираш или платиш."
+
+#: deposit lifecycle v180
+msgid "Enter a withdrawal reason of 1–1,000 characters."
+msgstr "Въведи причина за оттеглянето от 1 до 1000 знака."
+
+#: deposit lifecycle v180
+msgid "Enter actual payment instructions in at least one language."
+msgstr "Въведи конкретни указания за плащане на поне един език."
+
+#: deposit lifecycle v180
+msgid "Funds are recorded, but room availability needs review. Withdraw the approval to change the stay, then approve again with the existing payment credit."
+msgstr "Средствата са отчетени, но свободните места изискват преглед. Оттегли одобрението, за да промениш престоя, след което одобри отново, като използваш вече отчетените плащания."
+
+#: deposit lifecycle v180
+msgid "If approved, you will receive the required deposit, payment deadline and instructions. Your stay confirms when the hut records the required deposit, unless no deposit is required."
+msgstr "При одобрение ще получиш размера на депозита, срока и указанията за плащане. Престоят се потвърждава, когато хижата отчете необходимия депозит, освен ако не се изисква депозит."
+
+#: deposit lifecycle v180
+msgid "NEXT STEP · DEPOSIT"
+msgstr "СЛЕДВАЩА СТЪПКА · ДЕПОЗИТ"
+
+#: deposit lifecycle v180
+msgid "No deposit required"
+msgstr "Не се изисква депозит"
+
+#: deposit lifecycle v180
+msgid "Only an unpaid deposit request can be withdrawn."
+msgstr "Може да се оттегли само заявка, която очаква депозит или преглед."
+
+#: deposit lifecycle v180
+msgid "Payment deadline"
+msgstr "Краен срок за плащане"
+
+#: deposit lifecycle v180
+msgid "Payment instructions"
+msgstr "Указания за плащане"
+
+#: deposit lifecycle v180
+msgid "Payment instructions (Bulgarian)"
+msgstr "Указания за плащане (български)"
+
+#: deposit lifecycle v180
+msgid "Payment instructions (English)"
+msgstr "Указания за плащане (английски)"
+
+#: deposit lifecycle v180
+msgid "Payment reference"
+msgstr "Номер за основание на плащането"
+
+#: deposit lifecycle v180
+msgid "Reason"
+msgstr "Причина"
+
+#: deposit lifecycle v180
+msgid "Record deposit received"
+msgstr "Отчети получен депозит"
+
+#: deposit lifecycle v180
+msgid "Record funds only after verifying receipt. Reaching the required deposit confirms this stay automatically. A payment recorded after the deadline does not reopen an expired hold."
+msgstr "Отчитай средствата само след проверка на получаването им. Достигането на необходимия депозит потвърждава престоя автоматично. Плащане, отчетено след срока, не възстановява изтекла заявка."
+
+#: deposit lifecycle v180
+msgid "Recorded net payments"
+msgstr "Отчетени нетни плащания"
+
+#: deposit lifecycle v180
+msgid "Reissue the guest private link before approving this request."
+msgstr "Издай отново личната връзка на госта, преди да одобриш заявката."
+
+#: deposit lifecycle v180
+msgid "Remaining booking balance"
+msgstr "Остатък по резервацията"
+
+#: deposit lifecycle v180
+msgid "Required deposit"
+msgstr "Необходим депозит"
+
+#: deposit lifecycle v180
+msgid "Review deposit approval"
+msgstr "Преглед на одобрението за депозит"
+
+#: deposit lifecycle v180
+msgid "Review the deposit amount, deadline and payment instructions."
+msgstr "Провери размера, срока и указанията за плащане на депозита."
+
+#: deposit lifecycle v180
+msgid "Still to be recorded"
+msgstr "Остава да се отчете"
+
+#: deposit lifecycle v180
+msgid "The deadline has passed; the unpaid hold was released."
+msgstr "Срокът е изтекъл; неплатените задържани места са освободени."
+
+#: deposit lifecycle v180
+msgid "The deposit cannot exceed the booking total."
+msgstr "Депозитът не може да надвишава общата сума на резервацията."
+
+#: deposit lifecycle v180
+msgid "The deposit deadline has passed."
+msgstr "Срокът за депозит е изтекъл."
+
+#: deposit lifecycle v180
+msgid "The deposit request was withdrawn."
+msgstr "Заявката за депозит е оттеглена."
+
+#: deposit lifecycle v180
+msgid "The guest receives the amount, deadline and these payment instructions. The booking confirms when the required deposit is recorded."
+msgstr "Гостът получава сумата, срока и тези указания за плащане. Резервацията се потвърждава след отчитане на необходимия депозит."
+
+#: deposit lifecycle v180
+msgid "The hold expired. Record any actual late funds, then review availability and refunds manually."
+msgstr "Задържането е изтекло. Отчети реално получените закъснели средства и прегледай свободните места и възстановяванията ръчно."
+
+#: deposit lifecycle v180
+msgid "The hut is reviewing your stay."
+msgstr "Хижата преглежда престоя ти."
+
+#: deposit lifecycle v180
+msgid "The old payment request is withdrawn. Existing funds stay in the ledger. Review and approve new terms before asking the guest to pay again."
+msgstr "Предишната заявка за плащане е оттеглена. Отчетените средства остават в регистъра. Прегледай и одобри нови условия, преди отново да поискаш плащане от госта."
+
+#: deposit lifecycle v180
+msgid "This request is already approved and awaiting its deposit."
+msgstr "Тази заявка вече е одобрена и очаква депозит."
+
+#: deposit lifecycle v180
+msgid "We'll send your request to the hut manager. Approval is followed by deposit instructions. Your stay is not confirmed until the required deposit is recorded, unless no deposit is required."
+msgstr "Ще изпратим заявката ти до управителя. След одобрение ще получиш указания за депозит. Престоят не е потвърден, докато не се отчете необходимият депозит, освен ако не се изисква депозит."
+
+#: deposit lifecycle v180
+msgid "Withdraw approval and review terms"
+msgstr "Оттегли одобрението и прегледай условията"
+
+#: deposit lifecycle v180
+msgid "Withdraw deposit approval"
+msgstr "Оттегли одобрението за депозит"
+
+#: deposit lifecycle v180
+msgid "Withdraw the deposit request before changing rooms, beds or rates."
+msgstr "Оттегли заявката за депозит, преди да променяш стаи, легла или цени."
+
+#: deposit lifecycle v180
+msgid "Withdraw the deposit request before changing the stay or its booking type."
+msgstr "Оттегли заявката за депозит, преди да променяш престоя или вида на резервацията."
+
+#: deposit lifecycle v180
+msgid "Your beds are held."
+msgstr "Местата ти са задържани."
+
+#: deposit lifecycle v180
+msgid "Your booking is confirmed."
+msgstr "Резервацията ти е потвърдена."
+
+#: deposit lifecycle v180
+msgid "Your deposit is recorded, but the hut needs to review room availability. Do not pay the deposit again or travel until the stay is confirmed."
+msgstr "Депозитът ти е отчетен, но хижата трябва да прегледа свободните места. Не плащай повторно депозита и не пътувай, докато престоят не е потвърден."
+
+#: deposit lifecycle v180
+msgid "Your deposit is recorded. Please wait for the hut to confirm room availability before travelling."
+msgstr "Депозитът ти е отчетен. Изчакай хижата да потвърди свободните места, преди да пътуваш."
+
+#: deposit lifecycle v180
+msgid "Your request is approved. The stay will be confirmed when the hut records your required deposit."
+msgstr "Заявката ти е одобрена. Престоят ще бъде потвърден, когато хижата отчете необходимия депозит."
+
+#: deposit lifecycle v180
+msgid "Your request is awaiting review again. Do not pay using the previous deposit terms."
+msgstr "Заявката ти отново очаква преглед. Не плащай по предишните условия за депозит."
+
+#: deposit lifecycle v180
+msgid "Your request is saved. Approval is followed by deposit instructions. Your stay is not confirmed until the required deposit is recorded, unless no deposit is required."
+msgstr "Заявката ти е запазена. След одобрение ще получиш указания за депозит. Престоят не е потвърден, докато не се отчете необходимият депозит, освен ако не се изисква депозит."
+
+#: deposit lifecycle v180
+msgid "Deposit follow-up"
+msgstr "Проследяване на депозити"
+
+#: deposit lifecycle v180
+msgid "Paid deposits needing review"
+msgstr "Платени депозити за преглед"
+
+#: deposit lifecycle v180
+msgid "Expired — deposit unpaid"
+msgstr "Изтекла — неплатен депозит"
+
+#: deposit lifecycle v180
+msgid "The hold has expired. Contact the hut before requesting changes."
+msgstr "Задържането е изтекло. Свържи се с хижата, преди да поискаш промени."
+
+#: deposit lifecycle v180
+msgid "Approved; payment instructions have been queued. The stay awaits its deposit."
+msgstr "Одобрено; указанията за плащане са подготвени за изпращане. Престоят очаква депозит."
+
+#: deposit lifecycle v180
+msgid "Deposit terms follow approval. Wait for the amount, deadline and payment instructions before paying."
+msgstr "Условията за депозит следват одобрението. Изчакай сумата, срока и указанията за плащане, преди да платиш."
+
+#: deposit lifecycle v180
+msgid "Deposit received — staff review"
+msgstr "Депозитът е отчетен — преглед от екипа"
+
+#: deposit lifecycle v180
+msgid "View payment record"
+msgstr "Виж данните за плащанията"
+
+#: deposit dashboard v181
+msgid "All records"
+msgstr "Всички записи"
+
+#: deposit dashboard v181
+msgid "Beds held until the approved deadline"
+msgstr "Местата са задържани до одобрения срок"
+
+#: deposit dashboard v181
+msgid "Booking balance may still remain"
+msgstr "Може да има остатък за доплащане по резервацията"
+
+#: deposit dashboard v181
+msgid "Check payment balance"
+msgstr "Провери салдото по плащанията"
+
+#: deposit dashboard v181
+msgid "Check the deadline worker and recorded payments."
+msgstr "Провери задачата за крайните срокове и отчетените плащания."
+
+#: deposit dashboard v181
+msgid "Checked in; overdue hold needs review"
+msgstr "Гостите са настанени; просроченото задържане изисква преглед"
+
+#: deposit dashboard v181
+msgid "Closed"
+msgstr "Приключени"
+
+#: deposit dashboard v181
+msgid "Counts follow the hut and search filters."
+msgstr "Броят следва избраната хижа и търсенето."
+
+#: deposit dashboard v181
+msgid "Days after approval until due"
+msgstr "Дни след одобрението до крайния срок"
+
+#: deposit dashboard v181
+msgid "Deadline passed"
+msgstr "Срокът е изтекъл"
+
+#: deposit dashboard v181
+msgid "Deposit defaults"
+msgstr "Настройки за депозит по подразбиране"
+
+#: deposit dashboard v181
+msgid "Deposit met"
+msgstr "Депозитът е отчетен"
+
+#: deposit dashboard v181
+msgid "Deposit pages"
+msgstr "Страници с депозити"
+
+#: deposit dashboard v181
+msgid "Deposit percentage (%)"
+msgstr "Процент на депозита (%)"
+
+#: deposit dashboard v181
+msgid "Deposit received; room availability needs review"
+msgstr "Депозитът е отчетен; свободните места изискват преглед"
+
+#: deposit dashboard v181
+msgid "Deposit status filters"
+msgstr "Филтри по състояние на депозита"
+
+#: deposit dashboard v181
+msgid "Deposit target"
+msgstr "Размер на депозита"
+
+#: deposit dashboard v181
+msgid "Due within 24 hours"
+msgstr "Срок до 24 часа"
+
+#: deposit dashboard v181
+msgid "Enable email reminders"
+msgstr "Включи напомнянията по имейл"
+
+#: deposit dashboard v181
+msgid "Expired"
+msgstr "Изтекла"
+
+#: deposit dashboard v181
+msgid "Expired or cancelled with recorded funds"
+msgstr "Изтекла или отменена резервация с отчетени средства"
+
+#: deposit dashboard v181
+msgid "Funds settled"
+msgstr "Средствата са уредени"
+
+#: deposit dashboard v181
+msgid "Guest, email, phone or reference"
+msgstr "Гост, имейл, телефон или номер"
+
+#: deposit dashboard v181
+msgid "Hut time"
+msgstr "Време на хижата"
+
+#: deposit dashboard v181
+msgid "Legacy policy"
+msgstr "Предишна политика"
+
+#: deposit dashboard v181
+msgid "Legacy policy; check payment arrangements."
+msgstr "Предишна политика; провери условията за плащане."
+
+#: deposit dashboard v181
+msgid "Legacy policy; no automatic v180 expiry"
+msgstr "Предишна политика; без автоматично изтичане по v180"
+
+#: deposit dashboard v181
+msgid "Needs attention"
+msgstr "За проследяване"
+
+#: deposit dashboard v181
+msgid "Needs review"
+msgstr "За преглед"
+
+#: deposit dashboard v181
+msgid "Net recorded"
+msgstr "Отчетена нетна сума"
+
+#: deposit dashboard v181
+msgid "New approvals use these defaults. Approved amounts, deadlines and instructions stay fixed. Legacy bookings keep their previous policy calculation."
+msgstr "Новите одобрения използват тези настройки. Одобрените суми, срокове и указания остават непроменени. Старите резервации запазват изчисленията по предишната политика."
+
+#: deposit dashboard v181
+msgid "New hold deadlines are capped at the end of arrival day. Zero days means the end of the approval day. Expiry does not automatically refund funds; recording money here does not transfer money."
+msgstr "Сроковете на новите задържания са най-късно до края на деня на пристигане. Нула дни означава края на деня на одобрение. Изтичането не възстановява автоматично средства; отчитането тук не извършва паричен превод."
+
+#: deposit dashboard v181
+msgid "Next"
+msgstr "Напред"
+
+#: deposit dashboard v181
+msgid "No approved deadline"
+msgstr "Няма одобрен срок"
+
+#: deposit dashboard v181
+msgid "No deposit payment is requested"
+msgstr "Не се изисква плащане на депозит"
+
+#: deposit dashboard v181
+msgid "No matching deposits"
+msgstr "Няма съответстващи депозити"
+
+#: deposit dashboard v181
+msgid "Overdue"
+msgstr "Просрочени"
+
+#: deposit dashboard v181
+msgid "PAYMENT FOLLOW-UP"
+msgstr "ПРОСЛЕДЯВАНЕ НА ПЛАЩАНИЯТА"
+
+#: deposit dashboard v181
+msgid "Partial payment"
+msgstr "Частично плащане"
+
+#: deposit dashboard v181
+msgid "Partial payments"
+msgstr "Частични плащания"
+
+#: deposit dashboard v181
+msgid "Payment history"
+msgstr "История на плащанията"
+
+#: deposit dashboard v181
+msgid "Payment recorded before approval"
+msgstr "Плащане, отчетено преди одобрението"
+
+#: deposit dashboard v181
+msgid "Previous"
+msgstr "Назад"
+
+#: deposit dashboard v181
+msgid "Record received payment"
+msgstr "Отчети получено плащане"
+
+#: deposit dashboard v181
+msgid "Recorded payments, held beds and the next action."
+msgstr "Отчетени плащания, задържани места и следващото действие."
+
+#: deposit dashboard v181
+msgid "Reminder delivery failed"
+msgstr "Неуспешно изпращане на напомнянето"
+
+#: deposit dashboard v181
+msgid "Reminder queued"
+msgstr "Напомнянето е на опашка"
+
+#: deposit dashboard v181
+msgid "Reminder scheduled"
+msgstr "Планирано напомняне"
+
+#: deposit dashboard v181
+msgid "Reminder sent"
+msgstr "Напомнянето е изпратено"
+
+#: deposit dashboard v181
+msgid "Reminder skipped"
+msgstr "Напомнянето е пропуснато"
+
+#: deposit dashboard v181
+msgid "Reminders disabled"
+msgstr "Напомнянията са изключени"
+
+#: deposit dashboard v181
+msgid "Review payments"
+msgstr "Прегледай плащанията"
+
+#: deposit dashboard v181
+msgid "Save deposit defaults"
+msgstr "Запази настройките за депозит"
+
+#: deposit dashboard v181
+msgid "Stay"
+msgstr "Престой"
+
+#: deposit dashboard v181
+msgid "Try another status or clear the search. Unapproved requests without payments stay in the approval queue."
+msgstr "Избери друго състояние или изчисти търсенето. Неодобрените заявки без плащания остават в опашката за одобрение."
+
+#: deposit dashboard v181
+msgid "View bookings"
+msgstr "Виж резервациите"
+
+#: deposit dashboard v181
+msgid "Waiting for the deadline worker; do not request payment"
+msgstr "Очаква задачата за крайните срокове; не изисквай плащане"
+
+#: deposit dashboard v181
+msgid "matching bookings"
+msgstr "съответстващи резервации"
+
+#: deposit dashboard v181
+msgid "overdue"
+msgstr "просрочени"
+
+#: deposit dashboard v181
+msgid "Approved holds also keep their saved reminder setting."
+msgstr "Одобрените задържания запазват и настройката си за напомняния."
+
+#: deposit dashboard v181
+msgid "Bookings found"
+msgstr "Намерени резервации"
+
+#: deposit dashboard v181
+msgid "Review overdue bookings and recorded payments."
+msgstr "Прегледай просрочените резервации и отчетените плащания."
+
+#: deposit dashboard v181
+msgid "Deadline passed; awaiting hold release. Do not request payment."
+msgstr "Срокът е изтекъл; очаква освобождаване на местата. Не изисквай плащане."
+
+#: deposit dashboard v181
+msgid "Previous deposit policy; no automatic hold release"
+msgstr "Предишна политика за депозит; без автоматично освобождаване на местата"
+
+#: whole-unit booking v183
+msgid "Whole unit"
+msgstr "Цяло помещение"
+
+#: whole-unit booking v183
+msgid "Exclusive use · fixed nightly price"
+msgstr "Самостоятелно ползване · фиксирана цена на нощ"
+
+#: whole-unit booking v183
+msgid "Choose rooms"
+msgstr "Изберете помещения"
+
+#: whole-unit booking v183
+msgid "Rooms & apartments"
+msgstr "Стаи и апартаменти"
+
+#: whole-unit booking v183
+msgid "Choose a room, studio or apartment for exclusive use. Enter the guests staying in each unit; 0 leaves it unselected."
+msgstr "Изберете стая, студио или апартамент за самостоятелно ползване. Въведете броя гости за всяко помещение; 0 означава, че не го избирате."
+
+#: whole-unit booking v183
+msgid "per unit / night"
+msgstr "за цялото помещение / нощ"
+
+#: whole-unit booking v183
+msgid "Guests in this unit"
+msgstr "Гости в помещението"
+
+#: whole-unit booking v183
+msgid "Choose a room to see the total"
+msgstr "Изберете помещение, за да видите сумата"
+
+#: whole-unit booking v183
+msgid "Choose your accommodation"
+msgstr "Изберете настаняване"
+
+#: whole-unit booking v183
+msgid "Accommodation available for your stay"
+msgstr "Има свободни помещения за престоя ви"
+
+#: whole-unit booking v183
+msgid "No accommodation available for these dates"
+msgstr "Няма свободни помещения за тези дати"
+
+#: whole-unit booking v183
+msgid "Start with your dates. We’ll show the accommodation available for your whole stay."
+msgstr "Започнете с датите. Ще покажем свободните помещения за целия ви престой."
+
+#: whole-unit booking v183
+msgid "Choose accommodation above and enter the guests in each unit."
+msgstr "Изберете помещение по-горе и въведете гостите във всяко помещение."
+
+#: whole-unit booking v183
+msgid "Your accommodation is held."
+msgstr "Помещението ви е задържано."
+
+#: whole-unit booking v183
+msgid "Your selected accommodation is held exclusively while the hut manager reviews your reservation."
+msgstr "Избраните помещения са задържани само за вас, докато управителят разгледа заявката ви."
+
+#: whole-unit booking v183
+msgid "Your accommodation is held exclusively. Your reservation is not yet confirmed."
+msgstr "Помещенията са задържани само за вас. Резервацията ви все още не е потвърдена."
+
+#: whole-unit booking v183
+msgid "The selected accommodation is held exclusively while the hut manager reviews your request."
+msgstr "Избраните помещения са задържани само за вас, докато управителят разгледа заявката ви."
+
+#: whole-unit booking v183
+msgid "Choose at least one room and enter its guests."
+msgstr "Изберете поне едно помещение и въведете гостите в него."
+
+#: whole-unit booking v183
+msgid "Assign exactly %(count)s guests to your selected units, or update the group size."
+msgstr "Разпределете точно %(count)s гости в избраните помещения или променете броя на групата."
+
+#: whole-unit booking v183
+msgid "%(selected)s of %(target)s guests"
+msgstr "%(selected)s от %(target)s гости"
+
+#: whole-unit booking v183
+msgid "%(selected)s of %(target)s guests assigned. Assign %(remaining)s more."
+msgstr "Разпределени са %(selected)s от %(target)s гости. Разпределете още %(remaining)s."
+
+#: whole-unit booking v183
+msgid "All %(target)s guests assigned. Each selected unit is reserved exclusively."
+msgstr "Всички %(target)s гости са разпределени. Всяко избрано помещение е само за вашата резервация."
+
+#: whole-unit booking v183
+msgid "You assigned %(selected)s guests for a group of %(target)s. Adjust guests or group size."
+msgstr "Разпределили сте %(selected)s гости за група от %(target)s. Променете разпределението или броя на групата."
+
+#: whole-unit booking v183
+msgid "Availability updated. Review your accommodation."
+msgstr "Наличността е обновена. Проверете избраните помещения."
+
+#: whole-unit booking v183
+msgid "This unit is unavailable on %(date)s. Choose another unit or adjust your stay."
+msgstr "Помещението не е свободно на %(date)s. Изберете друго помещение или променете датите."
+
+#: whole-unit booking v183
+msgid "Choose accommodation and assign guests to continue"
+msgstr "Изберете помещение и разпределете гостите, за да продължите"
+
+#: whole-unit booking v183
+msgid "%(selected)s of %(target)s guests assigned. Choose %(remaining)s more."
+msgstr "Избрани легла: %(selected)s от %(target)s. Избери още %(remaining)s."
+
+#: whole-unit booking v183
+msgid "%(v0)s guests assigned"
+msgstr "Избрани легла: %(v0)s"
+
+#: whole-unit booking v183
+msgid "%(v0)s beds · %(v1)s %(v2)s / unit / night"
+msgstr "Легла: %(v0)s · %(v1)s %(v2)s / помещение / нощ"
+
+#: whole-unit booking v183
+msgid "%(v0)s of %(v1)s guests assigned."
+msgstr "Избрани легла: %(v0)s от %(v1)s."
+
+#: whole-unit booking v183
+msgid "%(v0)s · %(v1)s free · %(v2)s %(v3)s / unit / night"
+msgstr "%(v0)s · свободни: %(v1)s · %(v2)s %(v3)s / помещение / нощ"
+
+#: whole-unit booking v183
+msgid "%(v0)s – %(v1)s · %(v2)s guest places available in unreserved units"
+msgstr "%(v0)s – %(v1)s · свободни места в помещения: %(v2)s"
+
+#: whole-unit booking v183
+msgid "/ unit / night"
+msgstr "/ помещение / нощ"
+
+#: whole-unit booking v183
+msgid "Add one guest in %(v0)s"
+msgstr "Добави един гост в %(v0)s"
+
+#: whole-unit booking v183
+msgid "All %(target)s guests assigned. Review your details and send the request."
+msgstr "Всички %(target)s легла са избрани. Прегледай данните и изпрати заявката."
+
+#: whole-unit booking v183
+msgid "No guest places available in unreserved units for these dates"
+msgstr "Няма свободни места в помещения за тези дати"
+
+#: whole-unit booking v183
+msgid "Remove one guest from %(v0)s"
+msgstr "Премахни един гост от %(v0)s"
+
+#: whole-unit booking v183
+msgid "Search results show guest places available in unreserved units for every night of your selected stay. Check-out day is not an overnight stay."
+msgstr "Резултатите показват свободни места в помещения за всяка нощ от избрания престой. Денят на напускане не включва нощувка."
+
+#: whole-unit booking v183
+msgid "See guest places available in unreserved units for your entire stay, room by room."
+msgstr "Виж свободните легла за целия престой във всяка стая."
+
+#: whole-unit booking v183
+msgid "Start with your dates. We’ll show the guest places available in unreserved units for your whole stay."
+msgstr "Започни с датите. Ще покажем леглата, свободни за целия ти престой."
+
+msgid "%(v0)s · whole unit · %(v1)s guests · %(v2)s nights"
+msgstr "%(v0)s · цяло помещение · %(v1)s гости · %(v2)s нощувки"
+
+msgid "Guests expected tonight"
+msgstr "Очаквани гости тази вечер"
+
+msgid "Available units"
+msgstr "Свободни помещения"
+
+msgid "Reserved units"
+msgstr "Резервирани помещения"
+
+msgid "Units under maintenance"
+msgstr "Помещения в поддръжка"
+
+msgid "Units unavailable"
+msgstr "Недостъпни помещения"
+
+msgid "%(capacity)s active units total"
+msgstr "Общо %(capacity)s активни помещения"
+
+msgid "Available rooms only"
+msgstr "Само свободни помещения"
+
+msgid "rooms shown"
+msgstr "показани помещения"
+
+msgid "Availability at a glance"
+msgstr "Наличност с един поглед"
+
+msgid "Availability overview"
+msgstr "Обобщение на наличността"
+
+#: room types v184
+msgid "Normal room"
+msgstr "Стандартна стая"
+
+#: room types v184
+msgid "Studio"
+msgstr "Студио"
+
+#: room types v184
+msgid "Accommodation type"
+msgstr "Тип настаняване"
+
+#: room types v184
+msgid "Extras (English)"
+msgstr "Екстри (на английски)"
+
+#: room types v184
+msgid "Extras (Bulgarian)"
+msgstr "Екстри (на български)"
+
+#: room types v184
+msgid "List only extras this unit actually has, one per line. Leave blank if none are listed."
+msgstr "Посочете само наличните екстри, по една на ред. Оставете празно, ако няма изброени екстри."
+
+#: room types v184
+msgid "Bulgarian version of the actual extras, one per line."
+msgstr "Наличните екстри на български, по една на ред."
+
+#: room types v184
+msgid "Accommodation details"
+msgstr "Данни за помещението"
+
+#: room types v184
+msgid "Accommodation details saved."
+msgstr "Данните за помещението са запазени."
+
+#: room types v184
+msgid "Back to calendar"
+msgstr "Обратно към календара"
+
+#: room types v184
+msgid "Choose the accommodation type and list the extras guests can expect. Both types are booked exclusively at the saved whole-unit nightly price."
+msgstr "Изберете типа настаняване и посочете екстрите за гостите. И двата типа се резервират самостоятелно на запазената цена за цялото помещение на нощ."
+
+#: room types v184
+msgid "Save accommodation details"
+msgstr "Запази данните за помещението"
+
+#: room types v184
+msgid "Edit type & extras"
+msgstr "Тип и екстри"
+
+#: seasonal_v186
+msgid "Summer"
+msgstr "Лято"
+
+#: seasonal_v186
+msgid "Winter"
+msgstr "Зима"
+
+#: seasonal_v186
+msgid "Stay total"
+msgstr "Общо за престоя"
+
+#: seasonal_v186
+msgid "Summer: 1 May–31 October"
+msgstr "Лято: 1 май–31 октомври"
+
+#: seasonal_v186
+msgid "Summer price / unit / night"
+msgstr "Лятна цена / помещение / нощувка"
+
+#: seasonal_v186
+msgid "Winter price / unit / night"
+msgstr "Зимна цена / помещение / нощувка"
+
+#: seasonal_v186
+msgid "1 May–31 October. Blank uses the fallback nightly price."
+msgstr "1 май–31 октомври. Празното поле използва основната цена за нощувка."
+
+#: seasonal_v186
+msgid "1 November–30 April. Blank uses the fallback nightly price."
+msgstr "1 ноември–30 април. Празното поле използва основната цена за нощувка."
+
+#: seasonal_v186
+msgid "Summer: 1 May–31 October. Winter: 1 November–30 April. Rates are per whole unit per night. Existing bookings keep their agreed rates."
+msgstr "Лято: 1 май–31 октомври. Зима: 1 ноември–30 април. Цените са за цялото помещение на нощувка. Съществуващите резервации запазват договорените цени."
+
+#: seasonal_v186
+msgid "Fallback price / unit / night"
+msgstr "Основна цена / помещение / нощувка"
+
+#: seasonal_v186
+msgid "Used when a seasonal price is blank. Set summer and winter prices for seasonal bookings."
+msgstr "Използва се, когато сезонната цена е празна. Задайте лятна и зимна цена за сезонните резервации."
+
+#: room_photo_v187
+msgid "Room photo"
+msgstr "Снимка на помещението"
+
+#: room_photo_v187
+msgid "Optional. Shown only in booking room options. Leave blank until you have a photo."
+msgstr "Незадължително. Показва се само при избор на помещение за резервация. Оставете празно, докато имате снимка."
+
+#: room_photo_v187
+msgid "%(name)s at %(hut)s"
+msgstr "%(name)s в %(hut)s"
+
+#: room_gallery_v188
+msgid "Photo"
+msgstr "Снимка"
+
+#: room_gallery_v188
+msgid "Caption / image description"
+msgstr "Надпис / описание на снимката"
+
+#: room_gallery_v188
+msgid "Order"
+msgstr "Подредба"
+
+#: room_gallery_v188
+msgid "Additional room photo"
+msgstr "Допълнителна снимка на помещението"
+
+#: room_gallery_v188
+msgid "Additional room photos"
+msgstr "Допълнителни снимки на помещението"
+
+#: room_gallery_v188
+msgid "Your main room photo appears first. Add more photos below; use Order to arrange them. Leave unused rows blank."
+msgstr "Основната снимка се показва първа. Добавете още снимки отдолу; използвайте Подредба, за да ги подредите. Оставете неизползваните редове празни."
+
+#: room_gallery_v188
+msgid "Add another photo"
+msgstr "Добави още снимка"
+
+#: room_gallery_v188
+msgid "Photos of %(name)s"
+msgstr "Снимки на %(name)s"
+
+#: room_gallery_v188
+msgid "Room photos — swipe or use arrow keys"
+msgstr "Снимки на помещението — плъзнете или използвайте стрелките"
+
+#: room_gallery_v188
+msgid "Previous photo"
+msgstr "Предишна снимка"
+
+#: room_gallery_v188
+msgid "Next photo"
+msgstr "Следваща снимка"
+
+#: room_gallery_v188
+msgid "Show photo %(number)s"
+msgstr "Покажи снимка %(number)s"
+
+#: arrival_v189
+msgid "Arrival information"
+msgstr "Информация за пристигане"
+
+#: arrival_v189
+msgid "Check-in from"
+msgstr "Настаняване от"
+
+#: arrival_v189
+msgid "Check-in until"
+msgstr "Настаняване до"
+
+#: arrival_v189
+msgid "Check-out by"
+msgstr "Освобождаване до"
+
+#: arrival_v189
+msgid "Directions (English)"
+msgstr "Упътване (английски)"
+
+#: arrival_v189
+msgid "Directions (Bulgarian)"
+msgstr "Упътване (български)"
+
+#: arrival_v189
+msgid "Parking (English)"
+msgstr "Паркиране (английски)"
+
+#: arrival_v189
+msgid "Parking (Bulgarian)"
+msgstr "Паркиране (български)"
+
+#: arrival_v189
+msgid "Arrival notes (English)"
+msgstr "Бележки за пристигане (английски)"
+
+#: arrival_v189
+msgid "Arrival notes (Bulgarian)"
+msgstr "Бележки за пристигане (български)"
+
+#: arrival_v189
+msgid "Directions"
+msgstr "Упътване"
+
+#: arrival_v189
+msgid "Parking"
+msgstr "Паркиране"
+
+#: arrival_v189
+msgid "Arrival notes"
+msgstr "Бележки за пристигане"
+
+#: arrival_v189
+msgid "From %(time)s"
+msgstr "От %(time)s"
+
+#: arrival_v189
+msgid "Until %(time)s"
+msgstr "До %(time)s"
+
+#: arrival_v189
+msgid "Times are local to the hut."
+msgstr "Часовете са по местното време на хижата."
+
+#: arrival_v189
+msgid "Arrival information saved."
+msgstr "Информацията за пристигане е запазена."
+
+#: arrival_v189
+msgid "Hut arrival and contact information"
+msgstr "Информация за пристигане и контакти на хижата"
+
+#: arrival_v189
+msgid "Add the actual hut directions, parking and arrival times. Leave unknown details blank. Guests see this on their booking page and in new confirmation and pre-arrival emails."
+msgstr "Добавете действителните упътвания, паркиране и часове за пристигане. Оставете неизвестните данни празни. Гостите виждат информацията в страницата на резервацията и в новите имейли за потвърждение и преди пристигане."
+
+#: arrival_v189
+msgid "Select hut"
+msgstr "Избери хижа"
+
+#: arrival_v189
+msgid "Save arrival information"
+msgstr "Запази информацията за пристигане"
+
+#: arrival_v189
+msgid "Guest preview"
+msgstr "Преглед за гостите"

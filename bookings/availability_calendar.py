@@ -23,6 +23,8 @@ def build_month(first, rooms, *, visible_ids=None):
         reservation__check_in__lt=end,
         reservation__check_out__gt=first,
     ).select_related('reservation', 'room').order_by('reservation__check_in', 'pk'))
+    from .deposit_flow_v180 import exclude_elapsed
+    items = exclude_elapsed(items)
     occupancy = {room.pk: {} for room in room_list}
     for item in items:
         booking = item.reservation
@@ -41,7 +43,7 @@ def build_month(first, rooms, *, visible_ids=None):
             active = occupancy[room.pk].get(day, [])
             booked = sum(item.beds for item in active)
             blocked = len({bed for room_id, bed, start, stop in closures if room_id == room.pk and start <= day < stop})
-            available = max(room.capacity - booked - blocked, 0) if room.is_active else 0
+            available = remaining(room.capacity, booked, blocked) if room.is_active else 0
             cells.append({
                 'day': day, 'booked': booked, 'available': available,
                 'overbooked': booked + blocked > room.capacity,
@@ -98,3 +100,5 @@ def availability_calendar(request):
         'total_beds': total_beds, 'occupied_bed_nights': occupancy_days,
         'overbooked_room_nights': warnings,
     })
+
+from bookings.whole_units_v183 import remaining

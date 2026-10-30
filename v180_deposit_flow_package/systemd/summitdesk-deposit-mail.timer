@@ -1,0 +1,11 @@
+[Unit]
+Description=Run SummitDesk deposit mail every minute
+
+[Timer]
+OnCalendar=*-*-* *:*:00
+AccuracySec=1s
+Persistent=true
+Unit=summitdesk-deposit-mail.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,1 @@
+{% load i18n %}<span class="room184-type room184-type-{{ room.room_type }}">{{ room.get_room_type_display }}</span>{% if room.extra_features %}<ul class="room184-extras"{% if room.extras_language %} lang="{{ room.extras_language }}"{% endif %}>{% for extra in room.extra_features %}<li>{{ extra }}</li>{% endfor %}</ul>{% endif %}

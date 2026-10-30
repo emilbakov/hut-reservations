@@ -8,11 +8,11 @@
 {% endif %}
 
 {% translate "Your request is AWAITING APPROVAL. Your stay is not confirmed yet." %}
-{% translate "The selected beds are held while the hut manager reviews your request." %}
+{% if WHOLE_UNITS %}{% translate "The selected accommodation is held exclusively while the hut manager reviews your request." %}{% else %}{% translate "The selected beds are held while the hut manager reviews your request." %}{% endif %}
 
 {% translate "Arrival" %}: {{ reservation.check_in|date:"j F Y" }}
 {% translate "Departure" %}: {{ reservation.check_out|date:"j F Y" }}
-{% translate "Beds requested" %}: {{ reservation.total_beds }}
+{% if WHOLE_UNITS %}{% translate "Guests" %}{% else %}{% translate "Beds requested" %}{% endif %}: {{ reservation.total_beds }}
 {% translate "Estimated total" %}: {{ reservation.total_price }} {{ currency }}
 {% translate "Reference:" %} {{ reservation.code }}
 
@@ -20,9 +20,11 @@
 {{ link }}
 
 {% translate "We will email you when the hut manager approves or declines your request." %}
+{% translate "If approved, you will receive the required deposit, payment deadline and instructions. Your stay confirms when the hut records the required deposit, unless no deposit is required." %}
 {% if hut_info.reply %}{{ hut_info.reply }}
 {% endif %}{% translate "If your arrival is soon, contact the hut directly." %}
 {% translate "Please do not travel assuming the request is confirmed." %}
 
 {% translate "When and how do I pay?" %}
+{% translate 'Deposit terms follow approval. Wait for the amount, deadline and payment instructions before paying.' %}
 {% if hut_info.payment %}{{ hut_info.payment }}{% else %}{% translate "No payment is collected by this booking request form. The hut manager will confirm how and when to pay, including any deposit." %}{% endif %}

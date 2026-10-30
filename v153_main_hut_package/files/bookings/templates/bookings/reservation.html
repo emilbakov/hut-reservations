@@ -1,0 +1,200 @@
+
+{% extends reservation_base_template|default:"bookings/public_base_v124.html" %}
+{% load i18n ui_v147 static %}
+{% block title %}{% blocktranslate with v0=reservation.code %}Reservation {{ v0 }}{% endblocktranslate %}{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'bookings/reservation_v150.css' %}">
+
+<div class="pub-container rs-page">
+
+  <header class="rs-hero">
+    <p class="rs-eyebrow">{{ HUT_NAME }}</p>
+
+    {% if reservation.status == 'cancelled' %}
+      <span class="rs-status rs-cancelled">{% translate "Cancelled" %}</span>
+      <h1>{% translate "Reservation cancelled." %}</h1>
+      <p class="rs-hero-description">
+        {% translate "Your booking has been cancelled. You can still review the reservation details below." %}
+      </p>
+
+    {% elif reservation.status == 'pending' %}
+      <span class="rs-status rs-pending">
+        {% if reservation.guest_request %}
+          {% translate "Awaiting hut approval" %}
+        {% else %}
+          {% translate "Awaiting confirmation" %}
+        {% endif %}
+      </span>
+      <h1>{% translate "Request received." %}</h1>
+      <p class="rs-hero-description">
+        {% if reservation.guest_request %}
+          {% translate "Your request has been received. Your selected beds are held while the hut manager reviews your reservation." %}
+        {% else %}
+          {% translate "Your beds are currently on hold. Your reservation is not yet confirmed." %}
+        {% endif %}
+      </p>
+
+    {% else %}
+      <span class="rs-status rs-confirmed">{% translate "Confirmed" %}</span>
+      <h1>{% translate "See you in the mountains." %}</h1>
+      <p class="rs-hero-description">
+        {% translate "Your reservation is confirmed. Keep this private booking link to review or manage your stay." %}
+      </p>
+    {% endif %}
+
+    <div class="rs-ref">
+      <span>{% translate "Booking reference" %}</span>
+      <strong>{{ reservation.code }}</strong>
+    </div>
+  </header>
+
+  {% for hut_info in receipt_huts %}{% include "bookings/hut_contact_v150.html" %}{% endfor %}
+  <section class="rs-date-grid" aria-label="{% translate "Stay dates" %}">
+    <div class="rs-date-card">
+      <div class="rs-label">{% translate "Check-in" %}</div>
+      <div class="rs-date-value">{{ reservation.check_in|date:"j M Y" }}</div>
+      <div class="rs-date-sub">{{ reservation.check_in|date:"l" }}</div>
+    </div>
+
+    <div class="rs-date-card">
+      <div class="rs-label">{% translate "Check-out" %}</div>
+      <div class="rs-date-value">{{ reservation.check_out|date:"j M Y" }}</div>
+      <div class="rs-date-sub">{{ reservation.check_out|date:"l" }}</div>
+    </div>
+
+    <div class="rs-date-card">
+      <div class="rs-label">{% translate "Duration" %}</div>
+      <div class="rs-date-value">
+        {{ reservation.nights|night_count }}
+      </div>
+      <div class="rs-date-sub">{% translate "Your mountain stay" %}</div>
+    </div>
+  </section>
+
+  <div class="rs-layout">
+
+    <section class="rs-panel" aria-labelledby="rs-booking-title">
+      <p class="rs-section-tag">{% translate "Reservation details" %}</p>
+      <h2 id="rs-booking-title">{% translate "Your booking" %}</h2>
+
+      {% if reservation.status == 'cancelled' %}
+        <div class="rs-note cancelled">
+          {% translate "This reservation has been cancelled." %}
+        </div>
+      {% elif reservation.status == 'pending' %}
+        <div class="rs-note pending">
+          {% if reservation.guest_request %}
+            {% translate "Your reservation request is awaiting approval from the hut manager." %}
+          {% else %}
+            {% translate "Your reservation is awaiting confirmation." %}
+          {% endif %}
+        </div>
+      {% else %}
+        <div class="rs-note">
+          {% translate "Your reservation is confirmed." %}
+          {% if reservation.email %}
+            {% blocktranslate with v0=reservation.email %}Confirmation details were sent to {{ v0 }}.{% endblocktranslate %}
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <div class="rs-info-grid">
+        <div class="rs-info-item">
+          <div class="rs-label">{% translate "Guest name" %}</div>
+          <div class="rs-info-value">{{ reservation.name }}</div>
+        </div>
+
+        <div class="rs-info-item">
+          <div class="rs-label">{% translate "Reservation status" %}</div>
+          <div class="rs-info-value">
+            {% if reservation.guest_request and reservation.status == 'pending' %}
+              {% translate "Awaiting approval" %}
+            {% else %}
+              {% translate reservation.get_status_display %}
+            {% endif %}
+          </div>
+        </div>
+
+        {% if reservation.email %}
+          <div class="rs-info-item rs-email">
+            <div class="rs-label">{% translate "Email address" %}</div>
+            <div class="rs-info-value">{{ reservation.email }}</div>
+          </div>
+        {% endif %}
+
+        {% if reservation.phone %}
+          <div class="rs-info-item">
+            <div class="rs-label">{% translate "Phone number" %}</div>
+            <div class="rs-info-value">{{ reservation.phone }}</div>
+          </div>
+        {% endif %}
+      </div>
+
+      {% if email_delivery_delayed %}<p class="rs-note" role="status">{% translate "Your reservation is saved. Email delivery is delayed. Keep this page and check your status here." %}</p>{% endif %}
+      {% if reservation.status != 'cancelled' %}
+        <div class="rs-actions">
+        {% if can_manage_directly %}
+          <a class="rs-button rs-button-primary"
+             href="{% url 'bookings:modify' reservation.code %}">
+            {% translate "Change dates or beds &rarr;" %}
+          </a>
+
+          <form method="post"
+                action="{% url 'bookings:cancel' reservation.code %}"
+                onsubmit="return confirm('Cancel this reservation? This action cannot be undone.');">
+            {% csrf_token %}
+            <button class="rs-button rs-button-danger" type="submit">
+              {% translate "Cancel reservation" %}
+            </button>
+          </form>
+        {% elif can_request_changes %}
+          <a class="rs-button rs-button-primary" href="{{ guest_portal_url }}">{% translate "Request a change or cancellation &rarr;" %}</a>
+        {% endif %}
+        </div>
+      {% endif %}
+
+      {% if reservation.status != 'cancelled' and not can_request_changes and not can_manage_directly %}<p class="rs-note">{% translate "This stay has started or passed. Please contact the hut about changes." %}</p>{% endif %}
+      {% if reservation.status == 'pending' %}<section class="sd150-next"><h3>{% translate "What happens next?" %}</h3><p>{% translate "The hut manager will email their decision. Please wait for approval before travelling." %}</p>{% for hut_info in receipt_huts %}{% if hut_info.reply %}<p lang="{{ hut_info.reply_lang }}">{{ hut_info.reply }}</p>{% endif %}{% endfor %}<p>{% translate "If your arrival is soon, contact the hut directly." %}</p></section>{% endif %}
+      <p class="rs-help">
+        {% translate "This page is accessible through your private reservation link. Please avoid sharing it publicly." %}
+      </p>
+    </section>
+
+    <section class="rs-panel" aria-labelledby="rs-rooms-title">
+      <p class="rs-section-tag">{% translate "Accommodation" %}</p>
+      <h2 id="rs-rooms-title">
+        {% if reservation.guest_request and reservation.status == 'pending' %}
+          {% translate "Beds requested" %}
+        {% else %}
+          {% translate "Reserved beds" %}
+        {% endif %}
+      </h2>
+
+      {% for item in reservation.items.all %}
+        <div class="rs-room">
+          <div>
+            <div class="rs-hut-name">{{ item.room.hut.name }}</div><div class="rs-room-name">{{ item.room.name }}</div>
+            <div class="rs-room-beds">
+              {{ item.beds|bed_count }}
+            </div>
+          </div>
+
+          <div class="rs-room-price">
+            {{ item.subtotal }} {{ CURRENCY }}
+          </div>
+        </div>
+      {% empty %}
+        <p>{% translate "No beds are listed for this reservation." %}</p>
+      {% endfor %}
+
+      <div class="rs-total">
+        <span>{% if reservation.status == 'pending' %}{% translate "Estimated total" %}{% else %}{% translate "Total price" %}{% endif %}</span>
+        <strong>{{ reservation.total_price }} {{ CURRENCY }}</strong>
+      </div>
+    </section>
+
+  </div>
+  {% if reservation.status != 'cancelled' %}{% if receipt_huts %}{% for hut_info in receipt_huts %}{% include "bookings/payment_note_v150.html" %}{% endfor %}{% else %}{% include "bookings/payment_note_v150.html" %}{% endif %}{% endif %}
+</div>
+{% endblock %}

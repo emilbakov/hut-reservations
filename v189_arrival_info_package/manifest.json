@@ -1,0 +1,140 @@
+{
+  "release": "v189-editable-hut-arrival-information",
+  "compatible_baselines": [
+    "v188 room galleries"
+  ],
+  "prerequisites": [
+    {
+      "path": "bookings/migrations/0033_room_gallery_v188.py",
+      "sha256": "a3ef902d261a89db9d0ee4b557df95e3da4d9f57d7ae694a454916a5d4f356b2"
+    },
+    {
+      "path": "bookings/seasonal_v186.py",
+      "sha256": "499ca2f880d4861b2994cd6bb548d968aad30f6e2799cc41bbb7c8665fb55df6"
+    },
+    {
+      "path": "config/settings.py",
+      "sha256": "30f47432055712227ae84dad39782c237a1986461a0c05a53a0d839c801055ad"
+    },
+    {
+      "path": "config/settings_deposit_pg_test_v180.py",
+      "sha256": "5439149b17fad3e6e0de4606487bc1a27fe5a52123b666d3fce19e1276681af3"
+    }
+  ],
+  "files": [
+    {
+      "path": "bookings/admin.py",
+      "before_sha256": "a79f28dc5964845d7cb0994223c6ae6ebb1a59715ec3a8abf346377e436d04a1",
+      "after_sha256": "d8e466b7e6ef313aafcccf66d132386dc153490d0a7c1edc05c486b1e176ebf1",
+      "compatible_sha256": []
+    },
+    {
+      "path": "bookings/arrival_v189.py",
+      "before_sha256": null,
+      "after_sha256": "09ad3471b12649f331b1cf05fd8005956cb51edd86f67c91559ce73886014725",
+      "compatible_sha256": []
+    },
+    {
+      "path": "bookings/booking_flow_v150.py",
+      "before_sha256": "e43cd2f93c7fe99c8388533475af7ca52d88fb69a906aa3d4dcf102e50848bc4",
+      "after_sha256": "e56551c4c95f8c50b7d4e470969fb62efc10a98331afe8ac0a12a0f52b58812c",
+      "compatible_sha256": []
+    },
+    {
+      "path": "bookings/communications.py",
+      "before_sha256": "de73e1fe9261c2b88a804fd3930f52b285ba4f98e18d0797acad2f49249a3920",
+      "after_sha256": "e78121f4bebfe8ebf762c9e11266fee50e22295d2d64004d7549aa6f6e23e5d9",
+      "compatible_sha256": []
+    },
+    {
+      "path": "bookings/locale/bg/LC_MESSAGES/django.mo",
+      "before_sha256": "ffddab886a06539d6b5fd4dfa45c36d8f7f67cc716297427fa9495a9ba045a68",
+      "after_sha256": "364d16043cc0d7cbd77aefb1cf0510d10fa6385cbd1509d6c5a612037d75af92",
+      "compatible_sha256": []
+    },
+    {
+      "path": "bookings/locale/bg/LC_MESSAGES/django.po",
+      "before_sha256": "ff330818e086d84dc39ec0dc61ee9afabb9d3eb4119151e6631c824203f154ca",
+      "after_sha256": "fe7389c4267a74d4c8d9a9fd53c55f962f2b5915cc26097147c5f4890c44a3ae",
+      "compatible_sha256": []
+    },
+    {
+      "path": "bookings/migrations/0034_arrival_info_v189.py",
+      "before_sha256": null,
+      "after_sha256": "307b6d561c7f0b7e7d75e9afc388049284b6a91a2ba26bebbd9f91eb58661fa1",
+      "compatible_sha256": []
+    },
+    {
+      "path": "bookings/models.py",
+      "before_sha256": "b873e03b9bb5f990942a1337fd50fe0d8974913f2e81335f971ef65c1bf63bdd",
+      "after_sha256": "ec2e8308c643b03c99c44601b6632181deb5a1cad30cabf93dc4bf25770ae3ed",
+      "compatible_sha256": []
+    },
+    {
+      "path": "bookings/static/bookings/arrival-v189.css",
+      "before_sha256": null,
+      "after_sha256": "9fc3b80a5e03d59988e06df92c29766fd58a8b55be690bad593abbc1d68020ad",
+      "compatible_sha256": []
+    },
+    {
+      "path": "bookings/templates/bookings/arrival_info_v189.html",
+      "before_sha256": null,
+      "after_sha256": "a56b7653db333fce61a44ad69a5f0d82cef46150b43b2370966547f72a5ffb87",
+      "compatible_sha256": []
+    },
+    {
+      "path": "bookings/templates/bookings/arrival_settings_v189.html",
+      "before_sha256": null,
+      "after_sha256": "3b62e801b9cedd92994a79be472c7d7a655978aed5fffd8fe5a1eaa412ed8e93",
+      "compatible_sha256": []
+    },
+    {
+      "path": "bookings/templates/bookings/communications_dashboard.html",
+      "before_sha256": "dc085321946e74d5268d9ab3cc4d951f42a64b06bc7f014fa58f37ccdf28fd6b",
+      "after_sha256": "22d9d6f11adcac59c81bcfe12c6c8a4fafdbb652a6ef8c29cdf657d6ad6e8524",
+      "compatible_sha256": []
+    },
+    {
+      "path": "bookings/templates/bookings/guest_self_service.html",
+      "before_sha256": "2d858b88aacfc000d3269f2baada1bd2d81913a31142c918e224733cbcba8f2b",
+      "after_sha256": "1fdfc6c86b52dda81af9746e254c8016429dd0df946b18ed16b230a71eab7201",
+      "compatible_sha256": []
+    },
+    {
+      "path": "bookings/templates/bookings/reservation.html",
+      "before_sha256": "62c657af14b052c0d5a59fb5a224031886f7bced27b85a0935c5671cf598eb4d",
+      "after_sha256": "aceb11b8ed976b46936dcc447c3883b199b5236ba500b65c74a096bdd1bc6bec",
+      "compatible_sha256": []
+    },
+    {
+      "path": "bookings/templates/bookings/reservation_base_v178.html",
+      "before_sha256": "adb737e09c922b02c2f79df06d3cde6b31da86001e2d12571223f85b876e462b",
+      "after_sha256": "65f959412da2016332ba7c847819d19693b45b256445871855735dc151135dc9",
+      "compatible_sha256": []
+    },
+    {
+      "path": "bookings/test_arrival_v189.py",
+      "before_sha256": null,
+      "after_sha256": "74ee79e9c8ca47b61e855075c212db8582c526abe270cf4881fc734796ee1161",
+      "compatible_sha256": []
+    },
+    {
+      "path": "bookings/urls.py",
+      "before_sha256": "f54b88396c5d2fc86c74cf6c8bbd775d99f06b1288494588913aa98952a0b19b",
+      "after_sha256": "f5d44b80c039537f5b8139386a2d3e78cdda6e5552fdf65f4abc735e839c87d2",
+      "compatible_sha256": []
+    },
+    {
+      "path": "bookings/views.py",
+      "before_sha256": "7c34ef42b883bf9d61521d396b58b93871b43f211e15c80de5f53109d32490f1",
+      "after_sha256": "3122171985e85c45d51b990853bb2e8d12baea57b0869b7a464bbb24ba3ecaf5",
+      "compatible_sha256": []
+    },
+    {
+      "path": "floorplans/templatetags/summitdesk_nav.py",
+      "before_sha256": "a0512e34b05a33dc32a28b1c5a39e423dd332dcb70efbf16db8507df2e0ca4c8",
+      "after_sha256": "e37781c6b2fa582bc64f7c791a75a74d09749e51bd839ff106b52844cc6637ef",
+      "compatible_sha256": []
+    }
+  ]
+}

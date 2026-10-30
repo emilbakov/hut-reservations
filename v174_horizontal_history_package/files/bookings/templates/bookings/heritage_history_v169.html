@@ -1,0 +1,46 @@
+{% load static i18n %}
+<link rel="stylesheet" href="{% static 'bookings/heritage-v174/history.css' %}">
+<section class="h169-history h174-history" id="history" aria-labelledby="h169-history-title">
+  <div class="h174-heading">
+    <div>
+      <p class="h168-eyebrow">{% translate "SINCE THE 1930s" %}</p>
+      <h2 id="h169-history-title">{% translate "One place." %} <em>{% translate "Many chapters." %}</em></h2>
+    </div>
+    <p>{% translate "From the first refuge to the hut we know today. Five moments in a story at the heart of Pamporovo." %}</p>
+  </div>
+  <p class="h174-scroll-hint">{% translate "Scroll across the years" %}<span aria-hidden="true">← &nbsp; →</span></p>
+  <div class="h174-track" role="region" tabindex="0" aria-label="{% translate 'Hut history, in chronological order' %}">
+    <ol class="h174-timeline" role="list">
+      <li>
+        <div class="h174-date">1936–1937</div>
+        <span class="h174-marker" aria-hidden="true"></span>
+        <h3>{% translate "The first refuge" %}</h3>
+        <p>{% translate "Hikers from Chepelare turn a former border post into the first Studenets hut." %}</p>
+      </li>
+      <li>
+        <div class="h174-date">1946–1947</div>
+        <span class="h174-marker" aria-hidden="true"></span>
+        <h3>{% translate "Rebuilt together" %}</h3>
+        <p>{% translate "After the fire of 1946, Chepelare’s hikers rebuild the hut in 1947." %}</p>
+      </li>
+      <li>
+        <div class="h174-date">{% translate "1950s–1960" %}</div>
+        <span class="h174-marker" aria-hidden="true"></span>
+        <h3>{% translate "At the resort’s heart" %}</h3>
+        <p>{% translate "The Stenata piste and plans for new lifts place the hut at the heart of the growing resort." %}</p>
+      </li>
+      <li>
+        <div class="h174-date"><time datetime="1964-10-28">1964</time></div>
+        <span class="h174-marker" aria-hidden="true"></span>
+        <h3>{% translate "A larger welcome" %}</h3>
+        <p>{% translate "On 28 October, the larger hut opens: a new home for hikers and skiers in Pamporovo." %}</p>
+      </li>
+      <li class="h174-present">
+        <div class="h174-date"><time datetime="2021">2021</time></div>
+        <span class="h174-marker" aria-hidden="true"></span>
+        <h3>{% translate "Modernisation completed" %}</h3>
+        <p>{% translate "In 2021, the modernisation of Studenets hut is completed. A new chapter for a familiar landmark at the heart of Pamporovo." %}</p>
+      </li>
+    </ol>
+  </div>
+</section>

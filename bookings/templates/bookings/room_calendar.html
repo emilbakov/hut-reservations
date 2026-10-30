@@ -1,7 +1,7 @@
 {% extends "bookings/base.html" %}
 {% load i18n %}
 {% block title %}Room ledger | Mountain Operations{% endblock %}
-{% block content %}
+{% load static %}{% block content %}<link rel="stylesheet" href="{% static 'bookings/room-types-v184/rooms.css' %}">{% load static %}
 <style>
   .adventure-calendar{--ac-ink:#17231d;--ac-forest:#163d31;--ac-lime:#c8f568;--ac-muted:#62716b;--ac-border:#dfe8e1;--ac-bg:#f4f7f2;color:var(--ac-ink);padding-bottom:3rem}
   .adventure-calendar *{box-sizing:border-box}
@@ -121,7 +121,7 @@
             {% for row in rows %}
               <tr>
                 <th scope="row" class="ac-room-head">
-                  <strong>{{ row.room.name }}</strong>
+                  <strong>{{ row.room.name }}</strong>{% include "bookings/room_type_v184.html" with room=row.room %}<a class="room184-edit" href="{% url 'bookings:room_details' row.room.pk %}">{% translate "Edit type & extras" %}</a>
                   <small>{{ row.room.capacity }} beds{% if not row.room.is_active %} · Inactive{% endif %}</small>
                   <a href="{% url 'bookings:bed_management' row.room.pk %}?day={{ today|date:'Y-m-d' }}">Manage beds ↗</a>
                 </th>

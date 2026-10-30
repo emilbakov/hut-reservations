@@ -62,6 +62,9 @@ def room_calendar(request):
         reservation__check_out__gt=first,
     ).select_related("reservation"))
 
+    from bookings.deposit_flow_v180 import exclude_elapsed
+    active_ids = set(exclude_elapsed(ReservationItem.objects.filter(pk__in=[i.pk for i in items])).values_list("pk", flat=True))
+    items = [i for i in items if i.pk in active_ids]
     # Guest names/codes are only shown for fully manageable single-hut bookings.
     visible_ids = set(manageable_reservations(request.user).filter(
         pk__in=[item.reservation_id for item in items]
@@ -89,7 +92,7 @@ def room_calendar(request):
             ]
             blocked = len({bed_id for room_id, bed_id, start, stop in closures
                            if room_id == room.pk and start <= day < stop})
-            free = max(room.capacity - occupied - blocked, 0) if room.is_active else 0
+            free = remaining(room.capacity, occupied, blocked) if room.is_active else 0
             cells.append({"date": day, "occupied": occupied, "free": free,
                           "details": details, "is_full": free == 0,
                           "is_empty": occupied == 0 and blocked == 0 and room.is_active})
@@ -100,3 +103,5 @@ def room_calendar(request):
         "month": first, "prev": first - timedelta(days=1), "next": end,
         "today": today,
     })
+
+from bookings.whole_units_v183 import remaining

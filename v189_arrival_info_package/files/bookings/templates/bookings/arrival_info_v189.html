@@ -1,0 +1,8 @@
+{% load i18n %}<section class="a189-card" aria-label="{% translate 'Hut arrival and contact information' %}">
+{% if hut_info.arrival_available and reservation.status != 'cancelled' and not deposit180.expired %}<h2>{% translate "Arrival information" %}</h2><dl class="a189-facts">
+{% if hut_info.check_in_window %}<div><dt>{% translate "Check-in" %}</dt><dd>{{ hut_info.check_in_window }}</dd></div>{% endif %}
+{% if hut_info.check_out_time %}<div><dt>{% translate "Check-out by" %}</dt><dd>{{ hut_info.check_out_time }}</dd></div>{% endif %}</dl>
+{% if hut_info.check_in_window or hut_info.check_out_time %}<p class="a189-local">{% translate "Times are local to the hut." %}</p>{% endif %}
+{% for section in hut_info.arrival_sections %}<div class="a189-note"><h3>{{ section.label }}</h3><p lang="{{ section.lang }}">{{ section.text|linebreaksbr }}</p></div>{% endfor %}{% endif %}
+{% include "bookings/hut_contact_v150.html" %}
+</section>

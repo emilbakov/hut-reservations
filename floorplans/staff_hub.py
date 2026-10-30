@@ -155,7 +155,7 @@ def staff_hub(request, hut_id):
             reservation = item.reservation
             if reservation.check_in <= today < reservation.check_out:
                 confirmed_today += item.beds
-                confirmed_value_today += item.price_per_night * item.beds
+                confirmed_value_today += item.nightly_total_on(today)
             if reservation.check_in == tomorrow:
                 arrivals_tomorrow += item.beds
         context.update({

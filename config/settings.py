@@ -174,3 +174,6 @@ EMAIL_HOST_USER = os.environ.get("DJANGO_EMAIL_USER", "")
 EMAIL_HOST_PASSWORD = os.environ.get("DJANGO_EMAIL_APP_PASSWORD", "")
 
 EMAIL_TIMEOUT = 20
+
+# Every room, studio and apartment is rented exclusively at its saved nightly price.
+BOOKING_UNIT = "room"

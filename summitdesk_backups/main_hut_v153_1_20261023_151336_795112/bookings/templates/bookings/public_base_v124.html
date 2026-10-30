@@ -1,0 +1,51 @@
+{% load i18n ui_v147 static %}
+<!doctype html>
+{% get_current_language as current_language %}
+<html lang="{{ current_language }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#183c30">
+  {% include "bookings/public_head_v149.html" %}
+  <title>{% block title %}{% translate "Find your mountain stay" %}{% endblock %} · {{ HUT_NAME }}</title>
+  <link rel="stylesheet" href="{% static 'bookings/public_v149.css' %}">
+  <link rel="stylesheet" href="{% static 'bookings/ui_v146.css' %}">
+  <link rel="stylesheet" href="{% static 'bookings/ui_v147.css' %}">
+  <link rel="stylesheet" href="{% static 'bookings/public_shared_v149.css' %}">
+  <link rel="stylesheet" href="{% static 'bookings/booking_flow_v150.css' %}">
+  <link rel="stylesheet" href="{% static 'bookings/karlak_nav_v154.css' %}">
+  <link rel="stylesheet" href="{% static 'bookings/karlak_links_v155.css' %}">
+  <link rel="stylesheet" href="{% static 'bookings/karlak_links_right_v156.css' %}">
+  <link rel="stylesheet" href="{% static 'bookings/karlak_language_nav_v157.css' %}">
+  <link rel="stylesheet" href="{% static 'bookings/karlak_language_last_v158.css' %}">
+  <link rel="stylesheet" href="{% static 'bookings/karlak_footer_right_v160.css' %}">
+  <script src="{% static 'bookings/booking_feedback_v150.js' %}" defer></script>
+  {{ UI147|json_script:"sd147-i18n" }}
+  <script src="{% static 'bookings/ui_v147.js' %}"></script>
+</head>
+<body class="public-v124">
+  <a class="pub-skip" href="#main-content">{% translate "Skip to content" %}</a>
+  <header class="pub-header">
+    <div class="pub-container pub-header-inner">
+      <a class="pub-brand" href="{% url 'bookings:public_home' %}" aria-label="Karlak home">
+        <img class="pub-brand-icon karlak-public-logo" src="{% static 'bookings/karlak-logo-dark-v153.png' %}" width="60" height="60" alt="" decoding="async">
+        <span class="pub-brand-name">Karlak<small>{% translate "Mountain stays" %}</small></span>
+      </a>
+      <nav class="pub-nav" aria-label="{% translate "Public navigation" %}">
+        <a href="{% url 'bookings:public_home' %}" {% if homepage %}aria-current="page"{% endif %}>{% translate "Home" %}</a>
+        <a href="{% url 'bookings:hut_list' %}" {% if not homepage %}aria-current="page"{% endif %}>{% translate "Explore huts" %}</a>
+      </nav>
+      {% include "bookings/language_v147.html" %}
+      <details class="pub-mobile-menu">
+        <summary aria-label="{% translate "Open navigation menu" %}">{% translate "Menu" %} <span aria-hidden="true">☰</span></summary>
+        <nav aria-label="{% translate "Mobile navigation" %}">
+          <a href="{% url 'bookings:public_home' %}">{% translate "Home" %}</a>
+          <a href="{% url 'bookings:hut_list' %}">{% translate "Explore huts" %}</a>
+        </nav>
+      </details>
+    </div>
+  </header>
+  <main id="main-content">{% if messages %}<div class="pub-container pub150-notices">{% for message in messages %}<p role="status">{{ message }}</p>{% endfor %}</div>{% endif %}{% block content %}{% endblock %}</main>
+  {% include "bookings/public_footer_v149.html" %}
+</body>
+</html>

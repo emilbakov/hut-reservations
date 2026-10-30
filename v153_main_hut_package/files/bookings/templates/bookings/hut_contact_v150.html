@@ -1,0 +1,12 @@
+{% load i18n %}
+<section class="sd150-hut-info" aria-label="{% translate 'Your hut' %}">
+  <h3><a href="{% url 'bookings:hut_detail' hut_info.hut.slug %}">{{ hut_info.hut.name }}</a></h3>
+  {% if hut_info.hut.location %}<p>{{ hut_info.hut.location }}</p>{% endif %}
+  <div class="sd150-contact-links">
+  {% if hut_info.phone %}<a href="tel:{{ hut_info.tel }}">{{ hut_info.phone }}</a>{% endif %}
+  {% if hut_info.email %}<a href="mailto:{{ hut_info.email }}">{{ hut_info.email }}</a>{% endif %}
+  {% if hut_info.directions %}<a href="{{ hut_info.directions }}" rel="external nofollow">{% translate "Location and directions" %} ↗</a>{% endif %}
+  {% if not hut_info.phone and not hut_info.email and PUBLIC149.phone %}<span>{% translate "Booking support" %}: <a href="tel:{{ PUBLIC149.tel }}">{{ PUBLIC149.phone }}</a></span>{% endif %}
+  {% if not hut_info.phone and not hut_info.email and not PUBLIC149.phone and PUBLIC149.email %}<span>{% translate "Booking support" %}: <a href="mailto:{{ PUBLIC149.email }}">{{ PUBLIC149.email }}</a></span>{% endif %}
+  </div>
+</section>

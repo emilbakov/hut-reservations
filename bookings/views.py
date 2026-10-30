@@ -10,6 +10,7 @@ from datetime import timedelta
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.http import Http404, JsonResponse
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.views.decorators.http import require_GET
@@ -40,13 +41,24 @@ def hut_detail(request, slug):
         is_active=True,
     )
 
+    from .main_hut_v153 import public_booking_allowed
+    if request.method in {'GET', 'HEAD'} and public_booking_allowed(request, hut):
+        from .heritage_v168 import heritage_home
+        return heritage_home(request, hut)
     return book(request, hut=hut, template_name="bookings/public_hut_v125.html")
 
 
 @never_cache
-def book(request, hut=None, *, template_name="bookings/book.html"):
+def book(request, hut=None, *, template_name="bookings/public_hut_v125.html", homepage=False):
     """Pick dates, see available beds and book a selected hut."""
 
+    from .main_hut_v153 import main_hut, public_booking_allowed, require_public_booking, hut_information_page
+    if hut is None:
+        hut = main_hut(request)
+    if not public_booking_allowed(request, hut):
+        if hut is not None:
+            return hut_information_page(request, hut, status=403 if request.method == 'POST' else 200)
+        return render(request, 'bookings/public_unavailable_v153.html', status=403 if request.method == 'POST' else 200)
     params = request.POST if request.method == "POST" else request.GET
     preview_only = request.method == 'POST' and bool(request.POST.get('preview_stay'))
     if preview_only:
@@ -61,7 +73,9 @@ def book(request, hut=None, *, template_name="bookings/book.html"):
 
     context = {
         "search": search, "empty_total_message": _("Choose beds to see the total"),
-        "hut": hut, "requested_beds": requested_beds, "party_error": beds_error,
+        "hut": hut, "homepage": homepage, "booking_page": True,
+        "public_booking_url": reverse('bookings:book'),
+        "requested_beds": requested_beds, "party_error": beds_error,
         "submission_token": request.POST.get("submission_token") or submission_token(request, hut),
     }
     response_status = 200
@@ -69,13 +83,13 @@ def book(request, hut=None, *, template_name="bookings/book.html"):
     booking = None
     if hut is not None:
         context["hut_info"] = hut_information(hut)
-        context["public_rooms"] = Room.objects.filter(hut=hut, is_active=True).order_by("position", "name")
+        context["public_rooms"] = Room.objects.filter(hut=hut, is_active=True).select_related("hut").prefetch_related("photos").order_by("position", "name")
 
     if has_dates and search.is_valid():
         check_in = search.cleaned_data["check_in"]
         check_out = search.cleaned_data["check_out"]
 
-        rooms_query = Room.objects.filter(is_active=True)
+        rooms_query = Room.objects.filter(is_active=True).select_related("hut").prefetch_related("photos")
 
         if hut is not None:
             rooms_query = rooms_query.filter(hut=hut)
@@ -89,9 +103,15 @@ def book(request, hut=None, *, template_name="bookings/book.html"):
                 rooms=rooms,
                 free=free_beds(rooms, check_in, check_out),
                 guests=requested_beds,
+                check_in=check_in, check_out=check_out,
             )
 
         booking = booking_form()
+        if request.method == 'POST' and not preview_only:
+            allowed_room_fields = {f'room_{room.pk}' for room in rooms}
+            if any(key.startswith('room_') and key not in allowed_room_fields and value.strip() not in {'', '0'}
+                   for key, value in request.POST.items()):
+                booking.add_error(None, _('These rooms are not available for online booking.'))
         identity = None
         identity_error = beds_error
         if beds_error and booking.is_bound:
@@ -117,6 +137,7 @@ def book(request, hut=None, *, template_name="bookings/book.html"):
             try:
                 def save_request():
                     # Called only for a new idempotent submission, under its lock.
+                    require_public_booking(request, hut)
                     reserve_budget(request, guest["email"])
                     reservation = create_reservation(
                         check_in=check_in, check_out=check_out,
@@ -237,6 +258,9 @@ def dashboard(request):
         .order_by("check_in", "name")
     )
 
+    from .whole_units_v183 import whole_units
+    from .availability_v147 import nightly_availability
+    unit_availability = nightly_availability(rooms, first, after) if whole_units() else {}
     daily = []
     revenue = Decimal("0")
     booked_nights = 0
@@ -248,7 +272,7 @@ def dashboard(request):
         for reservation in reservations:
             if reservation.check_in <= current_day < reservation.check_out:
                 beds = sum(item.beds for item in reservation.dashboard_items)
-                price = sum((item.beds * item.price_per_night for item in reservation.dashboard_items), Decimal("0"))
+                price = sum((item.nightly_total_on(current_day) for item in reservation.dashboard_items), Decimal("0"))
                 if beds:
                     occupied += beds
                     day_revenue += price
@@ -257,7 +281,7 @@ def dashboard(request):
         revenue += day_revenue
         daily.append({
             "date": current_day, "occupied": occupied,
-            "free": max(capacity - occupied, 0),
+            "free": sum(unit_availability[current_day].values()) if whole_units() else max(capacity - occupied, 0),
             "revenue": day_revenue, "reservations": occupants,
         })
 
@@ -285,7 +309,8 @@ def dashboard(request):
     if selected_hut:
         scoped = scoped.filter(items__room__hut=selected_hut)
     scoped = scoped.distinct()
-    pending = list(scoped.filter(status='pending').prefetch_related('items__room__hut').order_by('created', 'pk')[:3])
+    from .deposit_flow_v180 import unreviewed
+    pending = list(unreviewed(scoped).prefetch_related('items__room__hut').order_by('created', 'pk')[:3])
     decorate_requests(pending)
     confirmed = scoped.filter(status='confirmed')
     in_house_count = confirmed.filter(guest_stay__checked_in_at__isnull=False, guest_stay__checked_out_at__isnull=True).count()
@@ -295,7 +320,9 @@ def dashboard(request):
         "rooms": rooms, "capacity": capacity, "occupied": today_occupied,
         "arrival_count": confirmed.filter(check_in=today).count(),
         "departure_count": confirmed.filter(check_out=today).count(),
-        "pending_count": scoped.filter(status=Reservation.Status.PENDING).count(),
+        "pending_count": unreviewed(scoped).count(),
+        "deposit_review_count": scoped.filter(status="pending", deposit_request__state="review").count(),
+        "awaiting_deposit_count": scoped.filter(status="pending", deposit_request__state__in=["awaiting", "review"]).count(),
         "pending_requests": pending, "in_house_count": in_house_count, "undo_decision": undo_context(request, scoped),
         "upcoming": upcoming, "daily": daily, "month": first,
         "previous_year": prev_month.year, "previous_month": prev_month.month,
@@ -356,7 +383,7 @@ def dashboard_export(request):
         beds = sum(item.beds for item in reservation.export_items)
         nights = (reservation.check_out - reservation.check_in).days
         total = sum(
-            (item.beds * item.price_per_night * nights for item in reservation.export_items),
+            (item.subtotal for item in reservation.export_items),
             Decimal("0"),
         )
         writer.writerow([
@@ -410,7 +437,7 @@ def manager_reservation_action_v145(request, reservation):
 
 
 
-def send_confirmation(request, reservation, *, event=''):
+def send_confirmation(request, reservation, *, event='', defer_delivery=False):
     """Email the guest (and the hut keeper, if configured). A mail failure
     must never lose a booking that is already saved, so errors are logged."""
     from .notifications_v145 import supersede_request_notifications
@@ -438,6 +465,19 @@ def send_confirmation(request, reservation, *, event=''):
     )
     if custom_confirmation_body is not None:
         body = custom_confirmation_body
+    else:
+        from .arrival_v189 import reservation_arrival_email
+        body += reservation_arrival_email(reservation)
+    if reservation.deposit_request_id:
+        from .payments import balance
+        hold = reservation.deposit_request
+        totals = balance(reservation)
+        body += ('\n\nHut / Хижа: ' + Hut.objects.get(pk=hut_id).name + '\nPAYMENT / ПЛАЩАНЕ\n' +
+                 ('No deposit is required. / Не се изисква депозит.\n' if hold.state == 'waived' else
+                  f'Deposit requirement met / Необходимият депозит е отчетен: {hold.amount:.2f} {settings.BOOKING_CURRENCY}\n') +
+                 f'Net payments recorded / Отчетени нетни плащания: {totals["net"]:.2f} {settings.BOOKING_CURRENCY}\n' +
+                 f'Remaining booking balance / Остатък по резервацията: {max(totals["due"], 0):.2f} {settings.BOOKING_CURRENCY}\n' +
+                 'Payment arrangements / Условия за плащане:\n' + (hold.instructions_en or hold.instructions_bg) + '\n')
     recipients = [reservation.email]
     if settings.BOOKING_NOTIFY_EMAIL:
         recipients.append(settings.BOOKING_NOTIFY_EMAIL)
@@ -447,7 +487,7 @@ def send_confirmation(request, reservation, *, event=''):
     for recipient in set(recipients):
         queue_notification(reservation, 'confirmation_guest' if recipient == reservation.email else 'confirmation_manager',
             custom_confirmation_subject or f"Your reservation at {settings.HUT_NAME}",
-            guest_body if recipient == reservation.email else body, recipient, event=event)
+            guest_body if recipient == reservation.email else body, recipient, event=event, defer_delivery=defer_delivery)
 
 
 @require_GET
@@ -464,17 +504,11 @@ def availability_calendar(request):
     today = timezone.localdate()
     if first > today + timedelta(days=settings.BOOKING_MAX_DAYS_AHEAD) or (year, month) < (today.year, today.month):
         return JsonResponse({"error": "Month outside booking window."}, status=400)
-    rooms_query = Room.objects.filter(is_active=True, hut__is_active=True)
-
-    hut_slug = request.GET.get("hut")
-
-    if hut_slug:
-        hut = get_object_or_404(
-            Hut,
-            slug=hut_slug,
-            is_active=True,
-        )
-        rooms_query = rooms_query.filter(hut=hut)
+    from .main_hut_v153 import main_hut
+    selected = main_hut(request)
+    if selected is None or request.GET.get('hut', selected.slug) != selected.slug:
+        raise Http404('Public booking availability is unavailable for this hut.')
+    rooms_query = Room.objects.filter(is_active=True, hut=selected)
 
     from .availability_v147 import nightly_availability
     rooms = list(rooms_query)
@@ -541,6 +575,7 @@ def reservation_modify(request, code):
             rooms=rooms,
             free=free,
             initial=initial_beds,
+            check_in=start, check_out=end, price_items={i.room_id: i for i in existing_items},
         )
 
         if request.method == "POST" and booking.is_valid():
@@ -632,7 +667,12 @@ def manager_reservations(request):
             | Q(code__icontains=search)
         )
     status = request.GET.get("status", "").strip()
-    if status in dict(Reservation.Status.choices):
+    if status == "awaiting_deposit":
+        qs = qs.filter(status="pending", deposit_request__state__in=["awaiting", "review"])
+    elif status == "pending":
+        from .deposit_flow_v180 import unreviewed
+        qs = unreviewed(qs)
+    elif status in dict(Reservation.Status.choices):
         qs = qs.filter(status=status)
     else:
         status = ""
@@ -647,7 +687,7 @@ def manager_reservations(request):
         "page": page, "huts": huts, "selected_hut": selected_hut,
         "selected_slug": selected_slug, "manager_mode": not request.user.is_superuser,
         "q": search, "status_filter": status,
-        "statuses": Reservation.Status.choices,
+        "statuses": [*Reservation.Status.choices, ("awaiting_deposit", _("Awaiting deposit"))],
     })
 
 

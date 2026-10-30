@@ -16,7 +16,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         sent = skipped = 0
-        candidates = Reservation.objects.filter(status__in=Reservation.HOLDING).exclude(email='').values_list('pk', flat=True)
+        from bookings.deposit_flow_v180 import process_holds
+        process_holds(dry_run=options['dry_run'], expire=False)
+        candidates = Reservation.objects.filter(deposit_request__isnull=True, status__in=Reservation.HOLDING).exclude(email='').values_list('pk', flat=True)
         for pk in candidates.iterator():
             with transaction.atomic():
                 reservation = Reservation.objects.select_for_update().get(pk=pk)

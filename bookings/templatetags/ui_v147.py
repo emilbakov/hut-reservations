@@ -36,3 +36,7 @@ def room_count(value):
 @register.filter
 def hut_count(value):
     return quantity(value, '%(count)s hut', '%(count)s huts')
+
+@register.filter
+def guest_count(value):
+    return quantity(value, "%(count)s guest", "%(count)s guests")

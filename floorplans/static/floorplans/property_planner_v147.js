@@ -24,7 +24,7 @@
   if(chosen){for(const shift of [1,-1,2,-2,3,-3]){const x=iso(utc(a)+shift*86400000),y=iso(utc(b)+shift*86400000);if(available(chosen,x,y,q))choices.push({row:chosen,a:x,b:y});if(choices.length>=3)break;}}
   if(!choices.length)return;
   box.hidden=false;const title=document.createElement('p');title.textContent=t('Available alternatives — your guest details are kept:');box.append(title);
-  choices.slice(0,3).forEach(choice=>{const button=document.createElement('button');button.type='button';button.textContent=choice.row.dataset.name+' · '+fmt(choice.a)+' – '+fmt(choice.b)+' · '+money(Math.round(Number(choice.row.dataset.price)*100)*q*daysBetween(choice.a,choice.b)/100);button.addEventListener('click',()=>{room.value=choice.row.dataset.room;arrival.value=choice.a;departure.value=choice.b;awaitingEnd=false;showSelection();validate();});box.append(button);});
+  choices.slice(0,3).forEach(choice=>{const button=document.createElement('button');button.type='button';button.textContent=choice.row.dataset.name+' · '+fmt(choice.a)+' – '+fmt(choice.b)+' · '+money(Math.round(Number(choice.row.dataset.price)*100)*(document.documentElement.dataset.bookingUnit==='room'?1:q)*daysBetween(choice.a,choice.b)/100);button.addEventListener('click',()=>{room.value=choice.row.dataset.room;arrival.value=choice.a;departure.value=choice.b;awaitingEnd=false;showSelection();validate();});box.append(button);});
  }
  function validate(){
   const row=rows.find(r=>r.dataset.room===room.value),q=Number(beds.value),a=arrival.value,b=departure.value,n=daysBetween(a,b);let error='',message='';
@@ -39,15 +39,15 @@
   else{let checked=0;for(const [day,cell] of dayMaps.get(row.dataset.room)){if(day>=a&&day<b){checked++;if(Number(cell.dataset.free)<q){error=t('Not enough beds on %(date)s. Choose an alternative below or adjust your stay.',{date:fmt(day)});break;}}}
    if(!error)message=checked<n?t('Some nights are outside this calendar. Full availability is checked when you confirm.'):t('Available for %(count)s %(unit)s · checkout is not charged.',{count:n,unit:t(n===1?'night':'nights')});
   }
-  const valid=Boolean(row&&a&&b&&!error&&n>0),total=row&&n>0&&Number.isInteger(q)?Math.round(Number(row.dataset.price)*100)*q*n/100:0;
+  const valid=Boolean(row&&a&&b&&!error&&n>0),total=row&&n>0&&Number.isInteger(q)?Math.round(Number(row.dataset.price)*100)*(document.documentElement.dataset.bookingUnit==='room'?1:q)*n/100:0;
   status.textContent=error||message;status.classList.toggle('warning',Boolean(error)||Boolean(row&&a&&b&&n>0&&Array.from(dayMaps.get(row.dataset.room).keys()).filter(d=>d>=a&&d<b).length<n));status.classList.toggle('is-awaiting',Boolean(a&&!b&&!error));
   submit.disabled=!valid;beds.max=row?row.dataset.capacity:'';
   departure.min=a?iso(utc(a)+86400000):today;
   $('sd140-summary-room').textContent=row?row.dataset.name:t('Choose a room');$('sd140-summary-dates').textContent=a&&b?fmt(a)+' – '+fmt(b):a?t('Arrival: %(date)s · choose departure',{date:fmt(a)}):t('Select arrival and departure');$('sd140-summary-beds').textContent=(Number.isInteger(q)?q:0)+' '+t(q===1?'guest':'guests')+' · '+(n>0?n+' '+t(n===1?'night':'nights'):t('select dates'));
-  $('sd146-price-detail').textContent=row&&n>0?q+' '+t(q===1?'bed':'beds')+' × '+money(Number(row.dataset.price))+' × '+n+' '+t(n===1?'night':'nights'):'';$('sd140-total').textContent=valid?money(total):'—';
+  $('sd146-price-detail').textContent=row&&n>0?(document.documentElement.dataset.bookingUnit==='room'?t('Whole unit'):q+' '+t(q===1?'bed':'beds'))+' × '+money(Number(row.dataset.price))+' × '+n+' '+t(n===1?'night':'nights'):'';$('sd140-total').textContent=valid?money(total):'—';
   $('sd146-mobile-summary').hidden=!valid;$('sd146-mobile-text').textContent=(row?.dataset.name||'')+' · '+money(total);
   cells.forEach(c=>{const same=c.closest('.sd142-roomrow').dataset.room===room.value,d=c.dataset.day,start=Boolean(same&&a===d),end=Boolean(same&&b===d),selected=Boolean(same&&a&&b&&d>=a&&d<b);c.classList.toggle('is-selected',selected);c.classList.toggle('is-start',start);c.classList.toggle('is-end',end);c.querySelector('.sd146-boundary').textContent=start?t('Arrival'):end?t('Departure'):'';c.querySelector('.sd140-pick').setAttribute('aria-pressed',String(start||end||selected));});
-  syncTabstop();alternatives(a,b,q,Boolean(error));return valid;
+  applyAvailabilityRoomFilter();syncTabstop();alternatives(a,b,q,Boolean(error));return valid;
  }
  function preview(entry,row,trigger){
   previewTrigger=trigger;$('sd146-preview-status').textContent=entry.status==='pending'?t('Pending request'):t('Confirmed reservation');$('sd146-preview-code').textContent=entry.code;$('sd146-preview-guest').textContent=entry.guest;$('sd146-preview-room').textContent=row.dataset.name;$('sd146-preview-arrival').textContent=fmt(entry.arrival);$('sd146-preview-departure').textContent=fmt(entry.departure);$('sd146-preview-beds').textContent=entry.beds;$('sd146-preview-link').href=entry.href;
@@ -65,10 +65,29 @@
    });row.style.setProperty('--sd142-lanes',Math.max(1,lanes.length));
   });
  }
+ function applyAvailabilityRoomFilter(){
+  const only=$('sd148-available-only'),count=$('sd148-visible-count');
+  if(!only||!count)return;
+  const a=arrival.value,b=departure.value,q=Number(beds.value);
+  const ready=Boolean(a&&b&&Number.isInteger(q)&&q>=1&&daysBetween(a,b)>0);
+  only.disabled=!ready;
+  if(!ready)only.checked=false;
+  let shown=0;
+  rows.forEach(r=>{
+   const chosen=$('sd146-room-filter').value;
+   const match=(!chosen||chosen===r.dataset.room);
+   // Keep the selected room visible so staff can correct an unavailable selection.
+   const eligible=!only.checked||r.dataset.room===room.value||available(r,a,b,q);
+   r.hidden=!(match&&eligible);
+   board.querySelector('[data-room-label="'+r.dataset.room+'"]').hidden=r.hidden;
+   if(!r.hidden)shown++;
+  });
+  count.textContent=shown+' / '+rows.length+' '+t('rooms shown');
+ }
  function renderWindow(){
   const total=heads.length,count=$('sd146-window').value==='all'?total:Number($('sd146-window').value);windowCount=count;offset=Math.max(0,Math.min(offset,total-count));
   board.style.setProperty('--sd142-days',Math.min(count,total));heads.forEach((h,i)=>{h.hidden=i<offset||i>=offset+count;});
-  rows.forEach(r=>{r.hidden=Boolean($('sd146-room-filter').value&&$('sd146-room-filter').value!==r.dataset.room);board.querySelector('[data-room-label="'+r.dataset.room+'"]').hidden=r.hidden;Array.from(r.querySelectorAll('.sd142-day')).forEach((c,i)=>{c.hidden=i<offset||i>=offset+count;});});
+  rows.forEach(r=>{Array.from(r.querySelectorAll('.sd142-day')).forEach((c,i)=>{c.hidden=i<offset||i>=offset+count;});});applyAvailabilityRoomFilter();
   $('sd146-prev').disabled=offset<=0;$('sd146-next').disabled=offset+count>=total;$('sd146-window-label').textContent=total?fmt(heads[offset].dataset.day)+' – '+fmt(heads[Math.min(total-1,offset+count-1)].dataset.day):t('No dates');renderBars();syncTabstop();scroll.scrollLeft=0;
  }
  function showSelection(){const index=heads.findIndex(h=>h.dataset.day===arrival.value);if(index>=0&&(index<offset||index>=offset+windowCount)){offset=index;renderWindow();}if($('sd146-room-filter').value&&$('sd146-room-filter').value!==room.value){$('sd146-room-filter').value='';renderWindow();}}
@@ -99,6 +118,7 @@
  });
  [room,arrival,departure,beds].forEach(el=>el.addEventListener('change',()=>{awaitingEnd=Boolean(arrival.value&&!departure.value);showSelection();validate();}));beds.addEventListener('input',validate);
  $('sd146-reset').addEventListener('click',()=>{room.value='';arrival.value='';departure.value='';beds.value='1';awaitingEnd=false;validate();status.textContent=t('Stay selection reset. Your guest details are kept.');arrival.focus();});
+ $('sd148-available-only').addEventListener('change',()=>{applyAvailabilityRoomFilter();syncTabstop();});
  $('sd146-window').addEventListener('change',renderWindow);$('sd146-room-filter').addEventListener('change',renderWindow);$('sd146-prev').addEventListener('click',()=>{offset-=windowCount;renderWindow();});$('sd146-next').addEventListener('click',()=>{offset+=windowCount;renderWindow();});
  $('sd146-preview-close').addEventListener('click',()=>$('sd146-preview').close());$('sd146-preview').addEventListener('close',()=>(previewTrigger?.isConnected?previewTrigger:$('sd146-window')).focus());
  form.addEventListener('submit',e=>{if(!validate()){e.preventDefault();status.focus();}else{submit.disabled=true;submit.textContent=t('Saving reservation…');}});

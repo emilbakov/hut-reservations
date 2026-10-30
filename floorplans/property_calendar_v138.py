@@ -25,6 +25,9 @@ def month_rows(first, rooms, visible_ids=None):
         room_id__in=ids, reservation__status__in=Reservation.HOLDING,
         reservation__check_in__lt=end, reservation__check_out__gt=first,
     ).select_related('reservation').order_by('reservation__check_in', 'pk'))
+    from bookings.deposit_flow_v180 import exclude_elapsed
+    active_ids = set(exclude_elapsed(ReservationItem.objects.filter(pk__in=[i.pk for i in bookings])).values_list("pk", flat=True))
+    bookings = [i for i in bookings if i.pk in active_ids]
     occupancy = {room.pk: {} for room in rooms}
     for item in bookings:
         day = max(first, item.reservation.check_in)
@@ -49,11 +52,11 @@ def month_rows(first, rooms, visible_ids=None):
             booked = sum(item.beds for item in active)
             blocked = len(closed[room.pk].get(day, ()))
             remaining = room.capacity - booked - blocked
-            available = max(0, remaining) if room.is_active else 0
+            available = unit_remaining(room.capacity, booked, blocked) if room.is_active else 0
             cells.append({
                 'day': day, 'booked': booked, 'blocked': blocked,
                 'available': available, 'full': available == 0,
-                'overbooked': remaining < 0, 'inactive': not room.is_active,
+                'overbooked': (remaining < 0 or len({item.reservation_id for item in active}) > 1 or bool(booked and blocked)) if whole_units() else remaining < 0, 'inactive': not room.is_active,
                 'reservations': [
                     {'code': item.reservation.code, 'guest': item.reservation.name,
                      'beds': item.beds, 'status': item.reservation.status,
@@ -64,6 +67,34 @@ def month_rows(first, rooms, visible_ids=None):
             })
         rows.append({'room': room, 'days': cells})
     return rows
+
+
+def availability_overview(rows, days, focus_day):
+    """Summarize the already-scoped calendar cells; no extra reservation queries.
+
+    Inactive rooms are excluded from usable capacity and all counts. The focus
+    date is today in the current month, or the first day of another month.
+    """
+    active = [row for row in rows if row['room'].is_active]
+    units = whole_units()
+    capacity = len(active) if units else sum(row['room'].capacity for row in active)
+    totals = []
+    for index, day in enumerate(days):
+        cells = [row['days'][index] for row in active]
+        totals.append({
+            'day': day,
+            'capacity': capacity,
+            'booked': sum(bool(cell['booked']) if units else cell['booked'] for cell in cells),
+            'blocked': sum(bool(cell['blocked']) if units else cell['blocked'] for cell in cells),
+            'available': sum(bool(cell['available']) if units else cell['available'] for cell in cells),
+            'overbooked_rooms': sum(bool(cell['overbooked']) for cell in cells),
+        })
+    focus = next((total for total in totals if total['day'] == focus_day), None)
+    if focus is None:
+        focus = {'day': focus_day, 'capacity': capacity, 'booked': 0,
+                 'blocked': 0, 'available': capacity, 'overbooked_rooms': 0}
+    focus['occupancy_pct'] = round(100 * focus['booked'] / capacity) if capacity else 0
+    return {'focus': focus, 'days': totals, 'active_rooms': len(active)}
 
 
 def render_property_month(request, hut, quickstay_form=None, quickstay_initial=None, quickstay_arrival=None):
@@ -97,12 +128,15 @@ def render_property_month(request, hut, quickstay_form=None, quickstay_initial=N
     following_rows = month_rows(next_first, rooms, visible_ids=visible_ids)
     for row, following in zip(rows, following_rows):
         row['days'].extend(following['days'][:14])
+    display_days = [first + timedelta(days=n) for n in range(monthrange(first.year, first.month)[1] + 14)]
+    focus_day = today if first <= today < next_first else first
+    overview = availability_overview(rows, display_days, focus_day)
     prev_month = first - timedelta(days=1)
     next_month = first.replace(day=monthrange(first.year, first.month)[1]) + timedelta(days=1)
     return render(request, 'floorplans/property_calendar_v138.html', {
         'hut': hut, 'selected_hut': hut, 'selected_slug': hut.slug,
         'first': first, 'prev_month': prev_month, 'next_month': next_month,
-        'days': [first + timedelta(days=n) for n in range(monthrange(first.year, first.month)[1] + 14)],
+        'days': display_days, 'overview': overview,
         'rows': rows, 'today': today, 'currency': settings.BOOKING_CURRENCY,
         'max_nights': settings.BOOKING_MAX_NIGHTS,
         'latest_arrival': today + timedelta(days=settings.BOOKING_MAX_DAYS_AHEAD),
@@ -112,3 +146,7 @@ def render_property_month(request, hut, quickstay_form=None, quickstay_initial=N
         'blocked_bed_nights': sum(cell['blocked'] for row in rows for cell in row['days']),
         'overbooked_room_nights': sum(cell['overbooked'] for row in rows for cell in row['days']),
     })
+
+from bookings.whole_units_v183 import remaining as unit_remaining
+
+from bookings.whole_units_v183 import whole_units

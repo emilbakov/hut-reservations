@@ -1,0 +1,36 @@
+{% load static i18n ui_v147 %}{% get_current_language as current_language %}
+<!doctype html>
+<html lang="{{ current_language }}">
+<head>
+  <script src="{% static 'bookings/seasonal-v186.js' %}"></script>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#173c34">
+  <title>{% block title %}{% translate "Rooms & reservations" %}{% endblock %} · {{ HUT_NAME }}</title>
+  {% include "bookings/public_head_v149.html" %}
+  <link rel="stylesheet" href="{% static 'bookings/public_hut_v149.css' %}">
+  <link rel="stylesheet" href="{% static 'bookings/ui_v146.css' %}">
+  <link rel="stylesheet" href="{% static 'bookings/booking_flow_v150.css' %}">
+  <link rel="stylesheet" href="{% static 'bookings/heritage-v168/heritage.css' %}">
+  <link rel="stylesheet" href="{% static 'bookings/booking-v170/booking.css' %}">
+  {{ UI147|json_script:"sd147-i18n" }}
+  <script src="{% static 'bookings/ui_v147.js' %}"></script>
+  <script src="{% static 'bookings/booking_feedback_v150.js' %}" defer></script>
+  <script src="{% static 'bookings/heritage-v168/heritage.js' %}" defer></script>
+</head>
+<body class="h168 b170">
+  <a class="h168-skip" href="#main-content">{% translate "Skip to content" %}</a>
+  <header class="h168-header">
+    <div class="h168-header-inner">
+      <a class="h168-brand" href="{% url 'bookings:public_home' %}" aria-label="{% blocktranslate with name=HUT_NAME %}{{ name }} home{% endblocktranslate %}">
+        <img src="{% static 'bookings/karlak-logo-dark-v153.png' %}" width="68" height="68" alt="">
+        <span><strong>{{ HUT_NAME }}</strong><small>{{ hut.name }}</small></span>
+      </a>
+      <nav class="h168-nav" aria-label="{% translate 'Public navigation' %}">
+        <a href="{% url 'bookings:public_home' %}#story">{% translate "Our story" %}</a><a href="{{ public_booking_url }}" aria-current="page">{% translate "Rooms & reservations" %}</a><a href="{% url 'bookings:hut_list' %}">{% translate "All huts" %}</a>
+      </nav>
+      <div class="h168-header-actions">{% include "bookings/language_v147.html" %}</div>
+      <details class="h168-menu"><summary aria-label="{% translate 'Open navigation menu' %}"><span>{% translate "Menu" %}</span><span class="h168-menu-lines" aria-hidden="true"></span></summary><nav aria-label="{% translate 'Mobile navigation' %}"><a href="{% url 'bookings:public_home' %}#story">{% translate "Our story" %}</a><a href="{{ public_booking_url }}" aria-current="page">{% translate "Rooms & reservations" %}</a><a href="{% url 'bookings:hut_list' %}">{% translate "All huts" %}</a></nav></details>
+    </div>
+  </header>
+  <main id="main-content">{% if messages %}<div class="pub-container pub150-notices">{% for message in messages %}<p role="status">{{ message }}</p>{% endfor %}</div>{% endif %}{% block content %}{% endblock %}</main>
+  <footer class="h168-footer"><div class="h168-wrap"><div class="h168-footer-top"><a class="h168-brand" href="{% url 'bookings:public_home' %}"><img src="{% static 'bookings/karlak-logo-light-v153.png' %}" width="76" height="76" alt=""><span><strong>{{ HUT_NAME }}</strong><small>{% translate "Mountain stories. Shared." %}</small></span></a><nav aria-label="{% translate 'Footer navigation' %}"><a href="{% url 'bookings:public_home' %}#story">{% translate "Our story" %}</a><a href="{% url 'bookings:hut_list' %}">{% translate "All huts" %}</a><a href="{{ public_booking_url }}">{% translate "Book a stay" %} ↗</a></nav></div><div class="h168-footer-bottom"><span>© {% now 'Y' %} {{ HUT_NAME }} · {{ hut.name }}</span><nav aria-label="{% translate 'Policies and staff' %}">{% if PUBLIC149.privacy %}<a href="{% url 'bookings:public_policy' 'privacy' %}">{% translate "Privacy notice" %}</a>{% endif %}{% if PUBLIC149.cancellation %}<a href="{% url 'bookings:public_policy' 'cancellation' %}">{% translate "Cancellation policy" %}</a>{% endif %}<a href="{% url 'bookings:staff_login' %}">{% translate "Staff portal" %}</a></nav><a class="h168-to-top" href="#main-content">{% translate "Back to top" %}<span aria-hidden="true">↑</span></a></div></div></footer>
+</body></html>

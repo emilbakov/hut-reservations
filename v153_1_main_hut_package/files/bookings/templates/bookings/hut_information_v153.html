@@ -1,0 +1,15 @@
+{% extends "bookings/public_base_v124.html" %}
+{% load i18n ui_v147 static %}
+{% block title %}{{ hut.name }} · {% translate "Hut information" %}{% endblock %}
+{% block content %}<link rel="stylesheet" href="{% static 'bookings/public_hut_v149.css' %}">
+<article class="ph-detail">
+  <header class="pub-container ph-intro"><div><span class="pub-eyebrow">{% translate "EXPLORE THE MOUNTAINS" %}</span><h1>{{ hut.name }}</h1><p class="ph-location">{{ hut.location }}</p></div><a href="{% url 'bookings:hut_list' %}">{% translate "All huts" %} →</a></header>
+  {% if hut.image %}<div class="pub-container ph-gallery"><img class="ph-cover" src="{{ hut.image.url }}" alt="{{ hut.name }}" fetchpriority="high"></div>{% endif %}
+  <div class="pub-container sd153-hut-info-layout"><section>
+    <h2>{% translate "About the hut" %}</h2>{{ hut.description|linebreaks }}
+    <h2>{% translate "Rooms & beds" %}</h2><div class="sd153-room-info">{% for room in public_rooms %}<div><h3>{{ room.name }}</h3><p>{{ room.description }}</p><p>{{ room.capacity|bed_count }}</p></div>{% empty %}<p>{% translate "No rooms are listed at this hut yet." %}</p>{% endfor %}</div>
+    {% include "bookings/hut_contact_v150.html" %}
+  </section><aside class="sd153-booking-notice" role="status"><h2>{% translate "Online booking unavailable" %}</h2><p>{% translate "This hut is listed for information only. Reservations through the website are not available here yet." %}</p>
+    {% if MAIN_PUBLIC_HUT %}<a class="sd153-main-link" href="{% url 'bookings:public_home' %}">{% blocktranslate with name=MAIN_PUBLIC_HUT.name %}Visit {{ name }} for online reservation requests{% endblocktranslate %} →</a>{% endif %}
+  </aside></div>
+</article>{% endblock %}

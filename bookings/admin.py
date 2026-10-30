@@ -1,7 +1,6 @@
-
 from collections import defaultdict
 
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.core.exceptions import PermissionDenied
 from django.core.exceptions import ValidationError
 from django.forms.models import BaseInlineFormSet
@@ -16,11 +15,13 @@ from .deposits import deposit_summary
 from .admin_cancellation_v167 import cancellation_view
 from .services import free_beds, lock_rooms
 from .models import PublicWebsiteSettings
+from .admin_room_delete_v185 import delete_unused_rooms
 
 
 @admin.register(PublicWebsiteSettings)
 class PublicWebsiteSettingsAdmin(admin.ModelAdmin):
     fieldsets = (
+        ("Main hut and online booking", {"fields": ("main_hut",)}),
         ("Brand and contact", {"fields": ("brand_name", "operator_name", "contact_phone", "contact_email", "privacy_email", "address_en", "address_bg", "map_url")}),
         ("Homepage photo (optional)", {"fields": ("hero_image", "hero_alt_en", "hero_alt_bg")}),
         ("Privacy notice — publish reviewed wording only", {"fields": ("privacy_en", "privacy_bg", "privacy_published")}),
@@ -80,8 +81,14 @@ class RoomInline(admin.TabularInline):
     fields = [
         "name",
         "description",
+        "image",
+        "room_type",
+        "extras_en",
+        "extras_bg",
         "capacity",
         "price_per_night",
+        "summer_price",
+        "winter_price",
         "is_active",
         "position",
     ]
@@ -127,6 +134,11 @@ class HutAdmin(ProtectManagerAdmin, admin.ModelAdmin):
             "fields": ("public_phone", "public_email", "directions_url", "reply_time_en", "reply_time_bg", "payment_instructions_en", "payment_instructions_bg"),
         }),
     )
+    fieldsets += (("Arrival information", {"fields": (
+        "check_in_from", "check_in_until", "check_out_until",
+        "arrival_directions_en", "arrival_directions_bg", "parking_en", "parking_bg",
+        "arrival_notes_en", "arrival_notes_bg"),
+        "description": "Guest-facing information. Leave unknown details blank; times are local to the hut."}),)
     list_display = [
         "name",
         "location",
@@ -148,25 +160,43 @@ class HutAdmin(ProtectManagerAdmin, admin.ModelAdmin):
 # ROOM ADMIN
 # ----------------------------------
 
+from .models import RoomPhoto
+
+class RoomPhotoInline(admin.TabularInline):
+    model = RoomPhoto
+    fields = ("image", "caption", "position")
+    extra = 1
+
 @admin.register(Room)
 class RoomAdmin(ProtectManagerAdmin, admin.ModelAdmin):
+    inlines = [RoomPhotoInline]
+    actions = ["delete_unused_rooms"]
+    delete_unused_rooms = delete_unused_rooms
+
     list_display = [
         "name",
+        "room_type",
         "hut",
         "capacity",
         "price_per_night",
+        "summer_price",
+        "winter_price",
         "is_active",
         "position",
     ]
 
     list_filter = [
+        "room_type",
         "hut",
         "is_active",
     ]
 
     list_editable = [
+        "room_type",
         "capacity",
         "price_per_night",
+        "summer_price",
+        "winter_price",
         "is_active",
         "position",
     ]
@@ -249,6 +279,13 @@ class ItemFormSet(BaseInlineFormSet):
 
 
 class ItemInline(admin.TabularInline):
+    readonly_fields = ["pricing_unit", "agreed_rates"]
+
+    @admin.display(description="Agreed seasonal rates")
+    def agreed_rates(self, obj):
+        if obj and obj.seasonal_rates:
+            return " · ".join(f"{key.title()}: {value}" for key, value in obj.seasonal_rates.items())
+        return "Flat nightly rate"
     model = ReservationItem
     formset = ItemFormSet
     extra = 1
@@ -452,6 +489,46 @@ class ReservationAdmin(ProtectManagerAdmin, admin.ModelAdmin):
         return instances
 
     actions = ["cancel_with_deposit"]
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+
+        # Prevent bulk deletion of reservations.
+        # Reservations may have protected financial records.
+        actions.pop("delete_selected", None)
+
+        return actions
+
+    def delete_view(self, request, object_id, extra_context=None):
+        """Keep financial audit records attached to their reservations.
+
+        The normal admin deletion flow remains available for reservations
+        without financial records. Protected reservations are redirected
+        with an actionable explanation instead of a confusing delete error.
+        """
+        reservation = self.get_object(request, object_id)
+        if reservation is not None:
+            has_settlement = CancellationSettlement.objects.filter(
+                reservation=reservation
+            ).exists()
+            has_payments = PaymentTransaction.objects.filter(
+                reservation=reservation
+            ).exists()
+
+            if has_settlement or has_payments or reservation.deposit_requests.exists():
+                self.message_user(
+                    request,
+                    "This reservation cannot be deleted because it has "
+                    "cancellation settlement or payment records. "
+                    "Keep it for financial audit purposes. "
+                    "Use 'Cancel / handle deposit' instead when appropriate.",
+                    level=messages.WARNING,
+                )
+                return redirect(
+                    reverse("admin:bookings_reservation_change", args=[reservation.pk])
+                )
+
+        return super().delete_view(request, object_id, extra_context=extra_context)
 
     def get_urls(self):
         custom = [

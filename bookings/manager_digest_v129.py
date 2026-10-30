@@ -62,7 +62,7 @@ def collect_pending_summaries(manager, *, now=None, today=None):
         guest_request=True,
         status=Reservation.Status.PENDING,
         items__room__hut_id__in=allowed,
-    ).distinct().prefetch_related('items__room'))
+    ).exclude(deposit_request__state__in=['awaiting', 'review']).distinct().prefetch_related('items__room'))
     old_cutoff = now - timedelta(hours=24)
     arrival_cutoff = today + timedelta(days=2)
     for reservation in candidates:

@@ -1,0 +1,14 @@
+[
+  {
+    "path": "v180_deposit_flow_package/deploy_v180.sh",
+    "before_sha256": "396685e43caf0489fd15309c47a7db9d0f62e28670382033aed2f29fb10a57ba",
+    "after_sha256": "eaa0af685f361f8e425b8d383bf34e55abc14aa6c8ed52facf211b5d6fbbe9cd",
+    "mode": 420
+  },
+  {
+    "path": "v180_deposit_flow_package/rollback_v180.sh",
+    "before_sha256": "fafaebd205ac26fae2b3591d33947acb0aa5ec745f8f7a0290f586194490e0a0",
+    "after_sha256": "09d2084436d328a3a818c4b2e41e6b9a0aa7442c39fc112aa253e1181ffa520b",
+    "mode": 420
+  }
+]

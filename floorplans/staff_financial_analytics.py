@@ -81,10 +81,8 @@ def staff_financial_analytics(request, hut_id):
         last = min(reservation.check_out, end)
         if first >= last:
             continue
-        rate = item.price_per_night or ZERO
-        per_night = rate * item.beds
         night_count = (last - first).days
-        amount = per_night * night_count
+        amount = item.total_between(first, last)
         if status == 'confirmed':
             confirmed_reservations.add(reservation.pk)
             confirmed_by_room[item.room_id] += amount
@@ -102,7 +100,7 @@ def staff_financial_analytics(request, hut_id):
             night = first
             target = confirmed_by_month if status == 'confirmed' else pending_by_month
             while night < last:
-                target[_month_key(night)] += per_night
+                target[_month_key(night)] += item.nightly_total_on(night)
                 night += timedelta(days=1)
 
     room_rows = []

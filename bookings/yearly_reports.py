@@ -58,7 +58,7 @@ def _yearly_data(request):
                 continue
             reservation_count += 1
             booked_beds += sum(item.beds * nights for item in items)
-            revenue += sum((item.beds * item.price_per_night * nights for item in items), Decimal('0.00'))
+            revenue += sum((item.total_between(first, after) for item in items), Decimal('0.00'))
         available = capacity * (after - first).days
         occupancy = round(100 * booked_beds / available, 1) if available else 0
         rows.append({'month': first, 'count': reservation_count,

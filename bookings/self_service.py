@@ -4,23 +4,24 @@ Approval records a decision; it NEVER changes inventory, dates, payment or statu
 Managers must apply approved requests using existing reservation tools.
 """
 import secrets
-from datetime import date, timedelta
+from datetime import timedelta
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.exceptions import PermissionDenied
-from django.core.mail import send_mail
 from django.db import transaction
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.cache import never_cache
 from .deposits import deposit_summary, single_hut_id
 from .models import GuestAccessLink, GuestChangeRequest, GuestConversationMessage, Hut, Reservation
 from .views import manageable_reservations, permitted_hut_selection
 from .booking_flow_v150 import hut_information
+from .guest_forms_v179 import GuestChangeForm
 
 def issue_guest_link(reservation, request=None):
     """Return a newly created or existing URL. Never expose token in staff listings."""
@@ -48,56 +49,60 @@ def guest_self_service(request, token):
         raise Http404("Booking cannot be managed online.")
     hut = get_object_or_404(Hut, pk=hut_id)
     summary = deposit_summary(reservation)
+
+    def page(form=None):
+        from .deposit_flow_v180 import deposit_context, terms_pending
+        pending_request = reservation.guest_change_requests.filter(status=GuestChangeRequest.Status.PENDING).first()
+        if form is None:
+            form = GuestChangeForm(initial={'request_type': 'change',
+                'requested_check_in': reservation.check_in, 'requested_check_out': reservation.check_out})
+        return render(request, "bookings/guest_self_service.html", {
+            'deposit180': deposit_context(reservation),
+            'deposit_terms_pending': terms_pending(reservation),
+            "reservation": reservation, "hut": hut, "summary": summary,
+            "email_delivery_delayed": guest_delivery_delayed(reservation),
+            "items": reservation.items.select_related("room__hut").all(),
+            "requests": reservation.guest_change_requests.all()[:20],
+            "conversation_messages": list(reversed(list(
+                GuestConversationMessage.objects.filter(reservation=reservation, hut=hut)
+                .order_by("-created_at")[:100]))),
+            "can_message": reservation.check_out >= timezone.localdate() - timedelta(days=7),
+            "guest_token": token,
+            "can_request": reservation.status in Reservation.HOLDING and reservation.check_in > timezone.localdate() and not pending_request and not (deposit_context(reservation) or {}).get("expired"),
+            "pending_request": pending_request, "change_form": form,
+            "currency": getattr(settings, "BOOKING_CURRENCY", "EUR"),
+            "hut_info": hut_information(hut),
+        })
     if request.method == "POST":
-        if reservation.status not in Reservation.HOLDING or reservation.check_in <= timezone.localdate():
-            messages.error(request, "This reservation can no longer accept change requests.")
+        if reservation.status not in Reservation.HOLDING or reservation.check_in <= timezone.localdate() or (reservation.deposit_request_id and reservation.deposit_request.state == "awaiting" and reservation.deposit_request.due_at <= timezone.now()):
+            messages.error(request, _("This reservation can no longer accept change requests."))
             return redirect("bookings:guest_self_service", token=token)
         kind = request.POST.get("request_type")
         if kind not in ("change", "cancellation"):
             raise Http404
-        details = request.POST.get("details", "").strip()
-        if len(details) > 2000:
-            messages.error(request, "Please limit your message to 2000 characters.")
-            return redirect("bookings:guest_self_service", token=token)
-        requested_in = requested_out = None
-        if kind == "change":
-            try:
-                requested_in = date.fromisoformat(request.POST.get("requested_check_in", ""))
-                requested_out = date.fromisoformat(request.POST.get("requested_check_out", ""))
-                if requested_in < timezone.localdate() or requested_out <= requested_in:
-                    raise ValueError
-            except (ValueError, TypeError):
-                messages.error(request, "Enter valid arrival and departure dates.")
-                return redirect("bookings:guest_self_service", token=token)
+        form = GuestChangeForm(request.POST)
+        if not form.is_valid():
+            form.mark_errors()
+            return page(form)
+        details = form.cleaned_data['details']
+        requested_in = form.cleaned_data.get('requested_check_in')
+        requested_out = form.cleaned_data.get('requested_check_out')
         with transaction.atomic():
             locked = Reservation.objects.select_for_update().get(pk=reservation.pk)
             if not GuestAccessLink.objects.select_for_update().filter(reservation=locked, token=token, revoked_at__isnull=True).exists():
                 raise Http404('Private reservation access is unavailable.')
             if locked.status not in Reservation.HOLDING or locked.check_in <= timezone.localdate():
-                messages.error(request, "This reservation can no longer accept requests.")
+                messages.error(request, _("This reservation can no longer accept requests."))
                 return redirect("bookings:guest_self_service", token=token)
             if GuestChangeRequest.objects.filter(reservation=locked, status=GuestChangeRequest.Status.PENDING).exists():
-                messages.error(request, "A request is already awaiting manager review.")
+                messages.error(request, _("A request is already awaiting manager review."))
                 return redirect("bookings:guest_self_service", token=token)
             GuestChangeRequest.objects.create(
                 reservation=locked, request_type=kind, details=details,
                 requested_check_in=requested_in, requested_check_out=requested_out)
-        messages.success(request, "Request received. The hut manager will review it.")
+        messages.success(request, _("Request received. The hut manager will review it."))
         return redirect("bookings:guest_self_service", token=token)
-    return render(request, "bookings/guest_self_service.html", {
-        "reservation": reservation, "hut": hut, "summary": summary,
-        "email_delivery_delayed": guest_delivery_delayed(reservation),
-        "items": reservation.items.select_related("room").all(),
-        "requests": reservation.guest_change_requests.all()[:20],
-        "conversation_messages": list(reversed(list(
-            GuestConversationMessage.objects.filter(reservation=reservation, hut=hut)
-            .order_by("-created_at")[:100]))),
-        "can_message": reservation.check_out >= timezone.localdate() - timedelta(days=7),
-        "guest_token": token,
-        "can_request": reservation.status in Reservation.HOLDING and reservation.check_in > timezone.localdate(),
-        "currency": getattr(settings, "BOOKING_CURRENCY", "EUR"),
-        "hut_info": hut_information(hut),
-    })
+    return page()
 
 @staff_member_required
 @require_http_methods(["GET", "POST"])
@@ -122,24 +127,18 @@ def guest_requests_dashboard(request):
             change.reviewed_at = timezone.now()
             change.manager_note = request.POST.get("manager_note", "").strip()[:2000]
             change.save(update_fields=["status", "reviewed_by", "reviewed_at", "manager_note"])
-            # Mail delivery is best-effort; a failed SMTP connection must not
-            # reverse a recorded decision.
-            recipient = change.reservation.email
-            reference = change.reservation.code
+            # Persist the notification with the review. The existing queue
+            # delivers after commit and retains SMTP failures for retry.
+            from .notifications_v145 import queue_notification
             status_label = change.get_status_display()
-            def notify():
-                if not recipient:
-                    return
-                try:
-                    send_mail(
-                        f"Reservation request {status_label.lower()} — {reference}",
-                        f"Your request for reservation {reference} was {status_label.lower()}.\n"
-                        "Approved requests are processed manually by the hut manager.\n"
-                        f"Manager note: {change.manager_note}",
-                        None, [recipient], fail_silently=False)
-                except Exception:
-                    pass
-            transaction.on_commit(notify)
+            queue_notification(
+                change.reservation, 'change_review_guest',
+                f"Reservation request {status_label.lower()} — {change.reservation.code}",
+                f"Your request for reservation {change.reservation.code} was {status_label.lower()}.\n"
+                "Approved requests are processed manually by the hut manager.\n"
+                f"Manager note: {change.manager_note}",
+                change.reservation.email, event=f'change-review:{change.pk}',
+            )
         messages.success(request, "Decision saved. Approved requests require manual booking updates.")
         return redirect("bookings:guest_requests_dashboard")
     qs = GuestChangeRequest.objects.filter(reservation__in=allowed)

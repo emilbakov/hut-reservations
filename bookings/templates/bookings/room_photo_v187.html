@@ -1,0 +1,7 @@
+{% load i18n %}{% with photos=room.booking_photos %}{% if photos %}<div class="room188-gallery" role="region" aria-label="{% blocktranslate with name=room.name %}Photos of {{ name }}{% endblocktranslate %}">
+<div class="room188-track" tabindex="0" aria-label="{% translate 'Room photos — swipe or use arrow keys' %}">
+{% for photo in photos %}<figure class="room187-photo"><img src="{{ photo.url }}" alt="{% if photo.caption %}{{ photo.caption }}{% else %}{% blocktranslate with name=room.name hut=room.hut.name %}{{ name }} at {{ hut }}{% endblocktranslate %}{% endif %}" width="960" height="600" loading="lazy" decoding="async"></figure>{% endfor %}
+</div>
+{% if photos|length > 1 %}<div class="room188-controls" hidden><button type="button" data-gallery-prev aria-label="{% translate 'Previous photo' %}">←</button><span class="room188-count" aria-live="polite" aria-atomic="true">1 / {{ photos|length }}</span><button type="button" data-gallery-next aria-label="{% translate 'Next photo' %}">→</button></div>
+<div class="room188-thumbs" hidden>{% for photo in photos %}<button type="button" data-gallery-index="{{ forloop.counter0 }}" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}" aria-label="{% blocktranslate with number=forloop.counter %}Show photo {{ number }}{% endblocktranslate %}"><img src="{{ photo.url }}" alt="" width="72" height="48" loading="lazy" decoding="async"></button>{% endfor %}</div>{% endif %}
+</div>{% endif %}{% endwith %}

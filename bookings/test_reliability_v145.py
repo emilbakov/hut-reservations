@@ -28,7 +28,7 @@ class ReliabilityV145Tests(TestCase):
         self.room = Room.objects.create(hut=self.hut, name='Last bed', capacity=1, price_per_night=Decimal('25.50'))
         self.manager = get_user_model().objects.create_user('reliability-manager', email='manager@example.com', is_staff=True)
         self.hut.managers.add(self.manager)
-        self.url = reverse('bookings:hut_detail', args=[self.hut.slug])
+        self.url = reverse('bookings:book')
 
     def payload(self, **extra):
         return {'check_in':self.start.isoformat(), 'check_out':self.end.isoformat(),
@@ -256,7 +256,7 @@ class ReliabilityV145Tests(TestCase):
     def test_approval_supersedes_failed_request_receipts(self):
         r=self.fail_notifications();self.client.force_login(self.manager)
         with self.captureOnCommitCallbacks(execute=True):
-            self.client.post(reverse('bookings:manager_reservation_action',args=[r.code]),{'action':'confirm'})
+            self.client.post(reverse('bookings:manager_reservation_action',args=[r.code]),{'action':'confirm', 'deposit_amount': '0'})
         self.assertEqual(r.delivery_notifications.filter(kind__startswith='request_',status='skipped').count(),2)
         self.assertEqual(r.delivery_notifications.filter(kind='confirmation_guest',status='sent').count(),1)
 
@@ -295,37 +295,89 @@ class ReliabilityV145Tests(TestCase):
 
 
 from django.test import TransactionTestCase
-from django.db import connection, close_old_connections
+from django.db import connection, connections, close_old_connections
 from concurrent.futures import ThreadPoolExecutor
 from threading import Barrier
 
 
 @override_settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend',BOOKING_NOTIFY_EMAIL='')
 class PostgreSQLIdempotencyV145Tests(TransactionTestCase):
+    def setUp(self):
+        from .models import PublicWebsiteSettings
+        self.hut = Hut.objects.create(name='Concurrent request hut', slug='concurrent-request-hut')
+        self.room = Room.objects.create(hut=self.hut, name='Last bed', capacity=1, price_per_night=25)
+        PublicWebsiteSettings.objects.update_or_create(pk=1, defaults={'main_hut': self.hut})
+        self.start = timezone.localdate() + timedelta(days=8)
+        self.url = reverse('bookings:book')
+
+    def booking_form(self):
+        browser = Client()
+        page = browser.get(self.url, {
+            'check_in': self.start.isoformat(),
+            'check_out': (self.start + timedelta(days=2)).isoformat(),
+        })
+        self.assertEqual(page.status_code, 200)
+        self.assertIsNotNone(page.context)
+        self.assertIn('submission_token', page.context)
+        self.assertEqual(page.context['hut'].pk, self.hut.pk)
+        self.assertTrue(page.context['booking_page'])
+        self.assertContains(page, 'name="submission_token"')
+        return browser, page.context['submission_token']
+
+    def test_replay_fixture_loads_and_submits_booking_form_on_every_database(self):
+        # This contract must run on SQLite too. The hut detail GET is a heritage
+        # page, so it deliberately has no booking submission token.
+        self.assertEqual(self.url, '/book/')
+        browser, token = self.booking_form()
+        self.assertTrue(token)
+        self.assertTrue(browser.cookies)
+        detail = browser.get(reverse('bookings:hut_detail', args=[self.hut.slug]))
+        self.assertEqual(detail.status_code, 200)
+        self.assertNotIn('submission_token', detail.context)
+        payload = {'check_in': self.start.isoformat(),
+                   'check_out': (self.start + timedelta(days=2)).isoformat(),
+                   'name': 'Replay fixture guest', 'email': 'fixture@example.test',
+                   f'room_{self.room.pk}': '1', 'submission_token': token}
+        first = browser.post(self.url, payload)
+        repeated = browser.post(self.url, payload)
+        self.assertEqual(first.status_code, 302)
+        self.assertEqual(repeated.status_code, 302)
+        self.assertEqual(first['Location'], repeated['Location'])
+        self.assertEqual(Reservation.objects.count(), 1)
+        self.assertEqual(PublicBookingSubmission.objects.count(), 1)
+
     def test_concurrent_replay_takes_last_bed_once(self):
         if connection.vendor != 'postgresql':
             self.skipTest('Requires PostgreSQL row locking and independent database connections')
-        hut=Hut.objects.create(name='Concurrent request hut',slug='concurrent-request-hut')
-        room=Room.objects.create(hut=hut,name='Last bed',capacity=1,price_per_night=25)
-        start=timezone.localdate()+timedelta(days=8)
-        url=reverse('bookings:hut_detail',args=[hut.slug])
-        browser=Client();token=browser.get(url).context['submission_token']
-        cookies=browser.cookies.copy()
-        payload={'check_in':start.isoformat(),'check_out':(start+timedelta(days=2)).isoformat(),
-                 'name':'Concurrent guest','email':'concurrent@example.com',f'room_{room.pk}':'1','submission_token':token}
-        barrier=Barrier(2,timeout=15)
-        def submit(_):
+        browser, token = self.booking_form()
+        cookies = browser.cookies.copy()
+        payload = {'check_in': self.start.isoformat(),
+                   'check_out': (self.start + timedelta(days=2)).isoformat(),
+                   'name': 'Concurrent guest', 'email': 'concurrent@example.com',
+                   f'room_{self.room.pk}': '1', 'submission_token': token}
+        barrier = Barrier(2, timeout=15)
+
+        def submit():
             close_old_connections()
             try:
-                client=Client();client.cookies=cookies.copy()
+                with connections['default'].cursor() as cursor:
+                    cursor.execute("SET lock_timeout = '12s'")
+                client = Client()
+                client.cookies = cookies.copy()
                 barrier.wait()
-                response=client.post(url,payload)
-                return response.status_code,response.get('Location')
+                response = client.post(self.url, payload)
+                return response.status_code, response.get('Location')
             finally:
-                close_old_connections()
+                connections.close_all()
+
         with ThreadPoolExecutor(max_workers=2) as pool:
-            outcomes=list(pool.map(submit,range(2)))
-        self.assertEqual(outcomes[0],outcomes[1])
-        self.assertEqual(outcomes[0][0],302)
-        self.assertEqual(Reservation.objects.count(),1)
-        self.assertEqual(PublicBookingSubmission.objects.count(),1)
+            futures = [pool.submit(submit) for _ in range(2)]
+            outcomes = [future.result(timeout=30) for future in futures]
+        self.assertEqual(outcomes[0], outcomes[1])
+        self.assertEqual(outcomes[0][0], 302)
+        reservation = Reservation.objects.get()
+        self.assertEqual(PublicBookingSubmission.objects.count(), 1)
+        self.assertEqual(PublicBookingSubmission.objects.get().reservation_id, reservation.pk)
+        self.assertEqual(reservation.items.get().room_id, self.room.pk)
+        self.assertEqual(reservation.total_beds, 1)
+        self.assertEqual(free_beds([self.room], self.start, self.start+timedelta(days=2))[self.room.pk], 0)

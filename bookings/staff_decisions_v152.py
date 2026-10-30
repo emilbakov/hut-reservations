@@ -7,8 +7,9 @@ from urllib.parse import urlencode
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext as _
@@ -24,7 +25,10 @@ def fingerprint(reservation):
     data = [reservation.check_in.isoformat(), reservation.check_out.isoformat(),
             reservation.name, reservation.email, reservation.phone, reservation.notes, reservation.guest_request,
             reservation.staff_history.order_by('-pk').values_list('pk', flat=True).first(),
-            list(reservation.items.order_by('pk').values_list('pk', 'room_id', 'beds', 'price_per_night'))]
+            list(reservation.items.order_by('pk').values_list('pk', 'room_id', 'beds', 'price_per_night', 'seasonal_rates')),
+            reservation.deposit_request_id,
+            reservation.deposit_request.state if reservation.deposit_request_id else None,
+            reservation.payment_transactions.order_by('-pk').values_list('pk', flat=True).first()]
     return hashlib.sha256(json.dumps(data, default=str, ensure_ascii=False).encode()).hexdigest()
 
 
@@ -48,7 +52,12 @@ def decorate_requests(reservations):
     for reservation in reservations:
         hut_ids = {item.room.hut_id for item in reservation.items.all()}
         reservation.last_decision = reservation.staff_decisions.order_by('-pk').first() if reservation.status == 'cancelled' else None
-        reservation.reviewable_here = reservation.status == 'pending' and len(hut_ids) == 1 and None not in hut_ids
+        from .deposit_flow_v180 import awaiting, deposit_context
+        reservation.deposit180 = deposit_context(reservation)
+        reservation.reviewable_here = reservation.status == 'pending' and not awaiting(reservation) and len(hut_ids) == 1 and None not in hut_ids
+        if reservation.reviewable_here and reservation.guest_request:
+            from .deposit_forms_v180 import DepositApprovalForm
+            reservation.deposit_form = DepositApprovalForm(reservation)
         # A manager never receives names/details belonging to another hut here.
         reservation.capacity_rows, reservation.capacity_ok = availability(reservation) if reservation.reviewable_here else ([], False)
     return reservations
@@ -62,9 +71,16 @@ def undo_context(request, scoped):
             .filter(pk=decision_id, actor=request.user, undone_at__isnull=True,
                     created_at__gte=timezone.now()-UNDO_WINDOW,
                     reservation__in=scoped, before='pending').first())
-    if decision and decision.reservation.status == decision.after and fingerprint(decision.reservation) == decision.fingerprint:
+    if decision and deposit_undo_allowed(decision.reservation) and decision.reservation.status == decision.after and fingerprint(decision.reservation) == decision.fingerprint:
         return decision
     return None
+
+
+def deposit_undo_allowed(reservation):
+    if not reservation.deposit_request_id:
+        return True
+    hold = reservation.deposit_request
+    return hold.state in ('awaiting', 'waived', 'withdrawn') and not reservation.payment_transactions.filter(created__gte=hold.approved_at).exists()
 
 
 def destination(request):
@@ -94,6 +110,7 @@ def decide(request, code):
         if len(hut_ids) != 1 or None in hut_ids:
             raise PermissionDenied('This reservation requires administrator review.')
         before = reservation.status
+        deposit_approval = False
         if action == 'confirm':
             if before != 'pending':
                 messages.error(request, _('Only pending reservations can be confirmed.'))
@@ -102,7 +119,21 @@ def decide(request, code):
             if not fits:
                 messages.error(request, _('Capacity conflict: approval was not saved. Review rooms or maintenance closures.'))
                 return redirect(destination(request))
-            after = 'confirmed'
+            if reservation.guest_request:
+                from .deposit_flow_v180 import approve_deposit, DepositTermsError
+                try:
+                    approve_deposit(request, reservation, request.POST)
+                except DepositTermsError as exc:
+                    return render(request, 'bookings/deposit_approval_v180.html', {
+                        'reservation': reservation, 'deposit_form': exc.form, 'source': request.POST.get('source', ''),
+                        'selected_slug': request.POST.get('return_hut', ''), 'capacity_rows': capacity_rows})
+                except ValidationError as exc:
+                    messages.error(request, '; '.join(exc.messages))
+                    return redirect(destination(request))
+                deposit_approval = True
+                after = reservation.status
+            else:
+                after = 'confirmed'
         elif before == 'cancelled':
             messages.error(request, _('Reservation is already cancelled.'))
             return redirect(destination(request))
@@ -114,14 +145,15 @@ def decide(request, code):
         reservation.save(update_fields=['status'])
         decision = ReservationDecision.objects.create(reservation=reservation, actor=request.user,
             before=before, after=after, reason=reason if after == 'cancelled' else '', fingerprint=fingerprint(reservation))
-        supersede_decisions(reservation)
-        if reservation.guest_request:
+        if not deposit_approval:
+            supersede_decisions(reservation)
+        if reservation.guest_request and not deposit_approval:
             if after == 'confirmed':
                 send_confirmation(request, reservation, event=f'decision:{decision.pk}')
             else:
                 send_guest_request_declined(request, reservation, reason=reason, event=f'decision:{decision.pk}')
     request.session['staff_decision_v152'] = decision.pk
-    messages.success(request, _('Reservation confirmed.') if after == 'confirmed' else _('Reservation cancelled; beds are available again.'))
+    messages.success(request, _('Approved; payment instructions have been queued. The stay awaits its deposit.') if deposit_approval and after == 'pending' else _('Reservation confirmed.') if after == 'confirmed' else _('Reservation cancelled; beds are available again.'))
     return redirect(destination(request))
 
 
@@ -136,7 +168,7 @@ def undo_decision(request, code, decision_id):
         decision = get_object_or_404(ReservationDecision.objects.select_for_update(),
                                     pk=decision_id, reservation=reservation, actor=request.user)
         latest = reservation.staff_decisions.order_by('-pk').values_list('pk', flat=True).first()
-        valid = (decision.before == 'pending' and decision.undone_at is None
+        valid = (deposit_undo_allowed(reservation) and decision.before == 'pending' and decision.undone_at is None
                  and decision.created_at >= timezone.now()-UNDO_WINDOW and latest == decision.pk
                  and reservation.status == decision.after and fingerprint(reservation) == decision.fingerprint
                  and not GuestStay.objects.filter(reservation=reservation, checked_in_at__isnull=False).exists())
@@ -147,6 +179,11 @@ def undo_decision(request, code, decision_id):
         if not fits:
             messages.error(request, _('Beds are no longer available. The decision was not undone.'))
             return redirect(destination(request))
+        if reservation.deposit_request_id:
+            hold = reservation.deposit_request
+            hold.state, hold.closed_at, hold.closed_by = 'withdrawn', timezone.now(), request.user
+            hold.close_reason = 'Approval undone by staff.'
+            hold.save(update_fields=['state', 'closed_at', 'closed_by', 'close_reason'])
         reservation.status = 'pending'
         reservation.save(update_fields=['status'])
         decision.undone_at = timezone.now()

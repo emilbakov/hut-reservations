@@ -1,0 +1,5 @@
+{
+  "sha256": "1631bd249a771d0d799ed0744c56855c3d1247dabdc0c8200542ab4e0ef2edb4",
+  "database": "hut_reservations",
+  "purpose": "Pre-v186 full PostgreSQL archive; no source or media files"
+}

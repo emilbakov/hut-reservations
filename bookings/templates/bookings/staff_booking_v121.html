@@ -59,12 +59,12 @@
   {% if not availability.ready and form.non_field_errors %}<div class="sd-error" role="alert">{{ form.non_field_errors }}</div>{% endif %}
   {% if availability.ready and selected_hut %}
     <div class="sd-metrics" aria-label="Property availability for selected dates">
-      <div class="sd-metric primary"><small>Beds available</small><strong>{{ availability.free }} <span style="font-size:15px;color:#66806b">/ {{ availability.capacity }}</span></strong></div>
+      <div class="sd-metric primary"><small>{% if WHOLE_UNITS %}Places in available units{% else %}Beds available{% endif %}</small><strong>{{ availability.free }} <span style="font-size:15px;color:#66806b">/ {{ availability.capacity }}</span></strong></div>
       <div class="sd-metric"><small>Unavailable beds</small><strong>{{ availability.unavailable }}</strong></div>
       <div class="sd-metric"><small>Rooms with space</small><strong>{{ availability.rooms_with_space }} <span style="font-size:15px;color:#718174">/ {{ availability.room_count }}</span></strong></div>
       <div class="sd-metric"><small>Nights</small><strong>{{ availability.nights }}</strong></div>
     </div>
-    <div class="sd-legend">Beds available means the number you can reserve for <strong>the entire stay</strong>. Unavailable beds may be booked or closed for maintenance.</div>
+    <div class="sd-legend">{% if WHOLE_UNITS %}Places in available units{% else %}Beds available{% endif %} means the number you can reserve for <strong>the entire stay</strong>. Unavailable beds may be booked or closed for maintenance.</div>
     <form method="post" action="{{ booking_action }}" id="sd-booking-form" novalidate>
       {% csrf_token %}
       {% if booking_mode == 'manual' %}<input type="hidden" name="hut" value="{{ selected_hut.pk }}">{% endif %}
@@ -75,7 +75,7 @@
       <div class="sd-booking-grid" style="margin-top:16px">
         <div>
           <section class="sd-card" aria-labelledby="sd-rooms-heading">
-            <div class="sd-section-top"><div><h2 id="sd-rooms-heading">2. Choose beds by room</h2><p class="sd-muted">Enter how many beds you need in each room.</p></div><span class="sd-count">{{ availability.room_count }} rooms</span></div>
+            <div class="sd-section-top"><div><h2 id="sd-rooms-heading">2. {% if WHOLE_UNITS %}Choose rooms{% else %}Choose beds{% endif %} by room</h2><p class="sd-muted">Enter how many beds you need in each room.</p></div><span class="sd-count">{{ availability.room_count }} rooms</span></div>
             <div class="sd-cal" aria-label="Daily bed availability calendar">
               <div class="sd-cal-head">
                 <div><strong>{{ booking_calendar.label }}</strong><div class="sd-muted">Beds free per night, across all rooms</div></div>
@@ -98,15 +98,15 @@
               <p class="sd-cal-hint">Tap a date to check a one-night stay. Change check-out above for longer stays. Counts are per night; room availability below covers your whole stay.</p>
             </div>
             {% for row in room_rows %}
-            <div class="sd-room{% if not row.free %} full{% endif %}" data-price="{{ row.room.price_per_night|unlocalize }}" data-free="{{ row.free }}">
+            <div class="sd-room{% if not row.free %} full{% endif %}" data-price="{{ row.room.price_per_night|unlocalize }}" data-summer-price="{{ row.room.summer_rate|unlocalize }}" data-winter-price="{{ row.room.winter_rate|unlocalize }}" data-free="{{ row.free }}">
               <div><div class="sd-room-name">{{ row.room.name }}</div><div class="sd-room-meta">{{ row.room.capacity }} total · {{ row.unavailable }} unavailable</div><div class="sd-free{% if not row.free %} none{% endif %}">{% if row.free %}{{ row.free }} free for your stay{% else %}No beds free for these dates{% endif %}</div>
-                <div class="sd-meter" role="meter" aria-label="Beds available in {{ row.room.name }}" aria-valuemin="0" aria-valuemax="{{ row.room.capacity }}" aria-valuenow="{{ row.free }}"><span style="width:{% widthratio row.free row.room.capacity 100 %}%"></span></div>
-                <div class="sd-room-price">{{ row.room.price_per_night }} {{ currency }} / bed / night</div>
+                <div class="sd-meter" role="meter" aria-label="{% if WHOLE_UNITS %}Places in available units{% else %}Beds available{% endif %} in {{ row.room.name }}" aria-valuemin="0" aria-valuemax="{{ row.room.capacity }}" aria-valuenow="{{ row.free }}"><span style="width:{% widthratio row.free row.room.capacity 100 %}%"></span></div>
+                <div class="sd-room-price">{% include "bookings/seasonal_room_v186.html" with room=row.room %}</div>
               </div>
               <div class="sd-qty"><label for="sd-bed-{{ row.room.pk }}">Beds</label>
                 {% if booking_mode == 'manual' %}<input id="sd-bed-{{ row.room.pk }}" type="number" name="beds_{{ row.room.pk }}" value="{{ row.requested }}" min="0" max="{{ row.free }}" step="1" inputmode="numeric" {% if not row.free %}disabled{% endif %}>
                 {% elif row.field %}{{ row.field }}
-                {% else %}<input id="sd-bed-{{ row.room.pk }}" type="number" value="0" disabled aria-label="No beds available in {{ row.room.name }}">{% endif %}
+                {% else %}<input id="sd-bed-{{ row.room.pk }}" type="number" value="0" disabled aria-label="No {% if WHOLE_UNITS %}guest places available in unreserved units{% else %}beds available{% endif %} in {{ row.room.name }}">{% endif %}
                 {% if row.field.errors %}<div class="sd-error">{{ row.field.errors }}</div>{% endif %}
               </div>
             </div>
@@ -125,7 +125,7 @@
           </section>
         </div>
         <aside class="sd-side" aria-label="Reservation summary">
-          <div class="sd-selection"><div style="font-size:15px;font-weight:800">Your selection</div><span class="sd-selected-number" id="sd-selected-beds">0</span><p class="sd-muted">beds selected</p><hr>
+          <div class="sd-selection"><div style="font-size:15px;font-weight:800">Your selection</div><span class="sd-selected-number" id="sd-selected-beds">0</span><p class="sd-muted">{% if WHOLE_UNITS %}guests assigned{% else %}beds selected{% endif %}</p><hr>
             <div class="sd-pair"><span>Property</span><strong>{{ selected_hut.name }}</strong></div>
             <div class="sd-pair"><span>Nights</span><strong>{{ availability.nights }}</strong></div>
             <div class="sd-pair"><span>Estimated total</span><strong><span id="sd-estimate">0.00</span> {{ currency }}</strong></div>
@@ -152,7 +152,7 @@
   const rows=Array.from(form.querySelectorAll('.sd-room'));
   const totalNode=document.getElementById('sd-selected-beds'),priceNode=document.getElementById('sd-estimate'),statusNode=document.getElementById('sd-selection-status');
   const nights=Number('{{ availability.nights|default:0 }}');
-  function update(){let count=0,cost=0;for(const row of rows){const input=row.querySelector('input[type=number]');if(!input||input.disabled)continue;const value=Number(input.value);if(Number.isInteger(value)&&value>=0){count+=value;cost+=value*Number(row.dataset.price||0)*nights;}}totalNode.textContent=String(count);priceNode.textContent=(window.SummitDeskUI?window.SummitDeskUI.amount(cost):cost.toFixed(2));statusNode.textContent=count?'Availability will be checked again when you save.':'Select at least one bed to continue.';}
+  function update(){let count=0,cost=0;for(const row of rows){const input=row.querySelector('input[type=number]');if(!input||input.disabled)continue;const value=Number(input.value);if(Number.isInteger(value)&&value>=0){count+=value;cost+=(document.documentElement.dataset.bookingUnit==='room'?(value>0?1:0):value)*window.SummitDeskSeasonal.total(row.dataset,'{{ check_in_value|escapejs }}','{{ check_out_value|escapejs }}');}}totalNode.textContent=String(count);priceNode.textContent=(window.SummitDeskUI?window.SummitDeskUI.amount(cost):cost.toFixed(2));statusNode.textContent=count?'Availability will be checked again when you save.':'Select at least one bed to continue.';}
   for(const row of rows){const input=row.querySelector('input[type=number]');if(input)input.addEventListener('input',update);}update();
   form.addEventListener('submit',e=>{let count=0;for(const row of rows){const input=row.querySelector('input[type=number]');if(!input||input.disabled)continue;const value=Number(input.value),max=Number(row.dataset.free);if(!Number.isInteger(value)||value<0||value>max){e.preventDefault();input.focus();statusNode.textContent='Choose a whole number within the available beds for each room.';return;}count+=value;}if(!count){e.preventDefault();statusNode.textContent='Select at least one bed before creating the reservation.';return;}const name=form.querySelector('[name=name]');if(name&&!name.value.trim()){e.preventDefault();name.focus();statusNode.textContent='Enter the guest name.';return;}const email=form.querySelector('[name=email]'),phone=form.querySelector('[name=phone]');if(email&&email.required&&!email.value.trim()){e.preventDefault();email.focus();statusNode.textContent='Enter the guest email.';return;}if(email&&!email.required&&!email.value.trim()&&phone&&!phone.value.trim()){e.preventDefault();phone.focus();statusNode.textContent='Enter a phone number or email.';}});
 })();

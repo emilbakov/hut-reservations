@@ -51,7 +51,7 @@ DEFAULTS = {
         "Hello {guest},\n\n"
         "We look forward to your arrival at {hut} on {check_in}. "
         "Your reservation reference is {code}. "
-        "Contact the hut for arrival instructions.\n",
+        "Contact the hut if your arrival plans change.\n",
     ),
     "cancellation": (
         "Reservation {code} cancelled",
@@ -116,7 +116,11 @@ def render_message(reservation, hut, kind, summary=None):
         "due_date": str(summary["due_date"]) if summary else "",
     }
 
-    return subject.format_map(values), body.format_map(values)
+    rendered = body.format_map(values)
+    if kind in ('confirmation', 'prearrival'):
+        from .arrival_v189 import arrival_email_text
+        rendered += arrival_email_text(hut)
+    return subject.format_map(values), rendered
 
 
 def message_candidates(reservation, today):
@@ -141,7 +145,7 @@ def message_candidates(reservation, today):
     if reservation.status not in Reservation.HOLDING:
         return events
 
-    if reservation.check_in == today + timedelta(days=2):
+    if reservation.status == Reservation.Status.CONFIRMED and reservation.check_in == today + timedelta(days=2):
         events.append(
             ("prearrival", reservation.check_in, summary)
         )

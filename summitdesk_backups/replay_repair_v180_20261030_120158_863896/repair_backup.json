@@ -1,0 +1,20 @@
+[
+  {
+    "path": "v180_deposit_flow_package/files/bookings/test_reliability_v145.py",
+    "before_sha256": "e557e8f9b0f993f18573bb44198a45baa08f4ccbf3bf2ba8347b106d665decc4",
+    "after_sha256": "036796cbedce91a884b933374e13b3aadc541d4f087b8cf983e3a0dce66ebf94",
+    "mode": 420
+  },
+  {
+    "path": "v180_deposit_flow_package/manifest.json",
+    "before_sha256": "05930bfd3cb10d30a06d14f96104ecb0fb1ce48bedab2f517eb062dc786912a3",
+    "after_sha256": "28233bb1ebf5039e3c5b721f5063befce207858ec0b93bb2a51b200d6c38a999",
+    "mode": 420
+  },
+  {
+    "path": "v180_deposit_flow_package/deploy_v180.sh",
+    "before_sha256": "79bf7a1e9822097c879b81bfe21b062bf3cbec6aa502a0812cba8c339013624f",
+    "after_sha256": "396685e43caf0489fd15309c47a7db9d0f62e28670382033aed2f29fb10a57ba",
+    "mode": 420
+  }
+]

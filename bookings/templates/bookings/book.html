@@ -341,7 +341,7 @@
                             {{ CURRENCY }}
                         </strong>
 
-                        <small>per bed / night</small>
+                        <small>{% if WHOLE_UNITS %}per unit / night{% else %}per bed / night{% endif %}</small>
                     </div>
 
                     <div class="room-select">
@@ -373,7 +373,7 @@
             <span>Estimated total</span>
 
             <strong>
-                <span id="total" aria-live="polite">{% if selected_beds %}{{ estimated_total|floatformat:2 }}{% else %}{% translate "Choose beds to see the total" %}{% endif %}</span>
+                <span id="total" aria-live="polite">{% if selected_beds %}{{ estimated_total|floatformat:2 }}{% else %}{% if WHOLE_UNITS %}{% translate "Choose a room to see the total" %}{% else %}{% translate "Choose beds to see the total" %}{% endif %}{% endif %}</span>
                 <span id="legacy-currency" {% if not selected_beds %}hidden{% endif %}>{{ CURRENCY }}</span>
             </strong>
         </div>
@@ -423,7 +423,7 @@
                     selected += beds;
                     const price = Number(input.dataset.price) || 0;
 
-                    cents += Math.round(price * 100) * beds * nights;
+                    cents += Math.round(Number(input.dataset.stayTotal ?? (price * nights)) * 100) * (input.dataset.pricingUnit === 'room' ? (beds > 0 ? 1 : 0) : beds);
                 });
 
                 if (total) {

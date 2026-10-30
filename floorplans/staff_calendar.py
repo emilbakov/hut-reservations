@@ -57,6 +57,10 @@ def staff_calendar(request, hut_id):
         room__in=rooms, reservation__status__in=['pending', 'confirmed'],
         reservation__check_in__lt=end, reservation__check_out__gt=start,
     ).select_related('reservation')) if rooms else []
+    from bookings.deposit_flow_v180 import exclude_elapsed
+    active_ids = set(exclude_elapsed(ReservationItem.objects.filter(pk__in=[i.pk for i in availability_items])).values_list("pk", flat=True))
+    availability_items = [i for i in availability_items if i.pk in active_ids]
+    items = [i for i in items if i.pk in active_ids]
     demand_by_room = {r.pk: [0] * window for r in rooms}
     for item in availability_items:
         first = max(0, (item.reservation.check_in - start).days)
@@ -137,7 +141,7 @@ def staff_calendar(request, hut_id):
         for idx, day in enumerate(days):
             demand = demand_by_room[room.pk][idx]
             closed = len(closed_by_room[room.pk][idx])
-            remaining = room.capacity - demand - closed
+            remaining = unit_remaining(room.capacity, demand, closed)
             # Room-level quantities may not correspond to assigned physical beds.
             # This is a conservative capacity indicator, not a per-bed guarantee.
             heat_cells.append({
@@ -184,3 +188,5 @@ def staff_calendar(request, hut_id):
         'room_count': len(rooms), 'all_rooms': all_rooms, 'room_filter': room_filter,
         'window': window, 'search': search, 'status_filter': status,
     })
+
+from bookings.whole_units_v183 import remaining as unit_remaining

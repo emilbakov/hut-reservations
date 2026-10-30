@@ -54,7 +54,7 @@
     <p>Personalize reservation emails for each mountain hut and keep an eye on recent message delivery.</p>
   </header>
 
-  <section class="panel"><div class="panel-head"><div><h2>Direct guest messaging</h2><p>Send a personal email, use quick replies, and read in-app guest messages.</p></div></div><div class="toolbar"><a class="button" href="{% url 'bookings:conversation_inbox' %}">Open guest inbox →</a><a class="button" href="{% url 'bookings:quick_replies' %}">Manage quick replies →</a></div></section>
+  <section class="panel"><div class="panel-head"><div><h2>Direct guest messaging</h2><p>Send a personal email, use quick replies, and read in-app guest messages.</p></div></div><div class="toolbar"><a class="button" href="{% url 'bookings:arrival_settings' %}{% if selected_hut %}?hut={{ selected_hut.slug|urlencode }}{% endif %}">Arrival information →</a><a class="button" href="{% url 'bookings:conversation_inbox' %}">Open guest inbox →</a><a class="button" href="{% url 'bookings:quick_replies' %}">Manage quick replies →</a></div></section>
   <section class="panel" aria-labelledby="hut-heading">
     <div class="panel-head">
       <div><h2 id="hut-heading">Choose a mountain hut</h2><p>Switch huts to manage their custom email messages.</p></div>

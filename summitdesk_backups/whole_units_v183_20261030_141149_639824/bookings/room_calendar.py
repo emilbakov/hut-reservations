@@ -1,0 +1,102 @@
+"""Staff room-by-room bed availability calendar."""
+from calendar import monthrange
+from datetime import date, timedelta
+
+from django.contrib.admin.views.decorators import staff_member_required
+from django.core.exceptions import PermissionDenied
+from django.db.models import Prefetch
+from django.http import HttpResponseBadRequest
+from django.shortcuts import get_object_or_404, render
+from django.utils import timezone
+from django.views.decorators.http import require_GET
+
+from .models import BedClosure, Hut, Reservation, ReservationItem, Room
+from .views import manageable_reservations
+
+
+@staff_member_required
+@require_GET
+def room_calendar(request):
+    """Read-only calendar; booking links lead to the existing locked booking form."""
+    today = timezone.localdate()
+    try:
+        year = int(request.GET.get("year", today.year))
+        month = int(request.GET.get("month", today.month))
+        first = date(year, month, 1)
+        if not 2000 <= year <= 2100:
+            raise ValueError
+    except (TypeError, ValueError):
+        return HttpResponseBadRequest("Invalid year or month.")
+
+    huts = Hut.objects.all() if request.user.is_superuser else Hut.objects.filter(managers=request.user)
+    huts = huts.order_by("name")
+    if not huts.exists() and not request.user.is_superuser:
+        raise PermissionDenied("No hut assigned to this manager.")
+
+    slug = request.GET.get("hut", "").strip()
+    if slug:
+        hut = get_object_or_404(huts, slug=slug)
+    else:
+        hut = huts.first()
+    if hut is None:
+        # Superuser with no huts yet.
+        return render(request, "bookings/room_calendar.html", {
+            "huts": huts, "selected_hut": None, "rows": [], "days": [],
+            "month": first, "prev": first - timedelta(days=1),
+            "next": first + timedelta(days=monthrange(year, month)[1]),
+            "today": today,
+        })
+
+    end = first + timedelta(days=monthrange(year, month)[1])
+    days = [first + timedelta(days=i) for i in range((end - first).days)]
+    rooms = list(Room.objects.filter(hut=hut).order_by("position", "name", "pk"))
+    room_ids = [room.pk for room in rooms]
+
+    # Occupancy includes pending and confirmed bookings, exactly like free_beds.
+    # All items contribute to availability even if their reservation is historical
+    # multi-hut data that the manager cannot inspect.
+    items = list(ReservationItem.objects.filter(
+        room_id__in=room_ids,
+        reservation__status__in=Reservation.HOLDING,
+        reservation__check_in__lt=end,
+        reservation__check_out__gt=first,
+    ).select_related("reservation"))
+
+    # Guest names/codes are only shown for fully manageable single-hut bookings.
+    visible_ids = set(manageable_reservations(request.user).filter(
+        pk__in=[item.reservation_id for item in items]
+    ).values_list("pk", flat=True))
+    visible = {}
+    for item in items:
+        if item.reservation_id in visible_ids and item.reservation.status in Reservation.HOLDING:
+            visible.setdefault(item.room_id, []).append(item)
+
+    closures = list(BedClosure.objects.filter(
+        bed__room_id__in=room_ids, start__lt=end, end__gt=first
+    ).values_list('bed__room_id', 'bed_id', 'start', 'end'))
+    rows = []
+    for room in rooms:
+        cells = []
+        room_items = [item for item in items if item.room_id == room.pk]
+        for day in days:
+            occupied = sum(item.beds for item in room_items
+                           if item.reservation.check_in <= day < item.reservation.check_out)
+            details = [
+                {"name": item.reservation.name, "code": item.reservation.code,
+                 "beds": item.beds, "status": item.reservation.get_status_display()}
+                for item in visible.get(room.pk, [])
+                if item.reservation.check_in <= day < item.reservation.check_out
+            ]
+            blocked = len({bed_id for room_id, bed_id, start, stop in closures
+                           if room_id == room.pk and start <= day < stop})
+            free = max(room.capacity - occupied - blocked, 0) if room.is_active else 0
+            cells.append({"date": day, "occupied": occupied, "free": free,
+                          "details": details, "is_full": free == 0,
+                          "is_empty": occupied == 0 and blocked == 0 and room.is_active})
+        rows.append({"room": room, "cells": cells})
+
+    return render(request, "bookings/room_calendar.html", {
+        "huts": huts, "selected_hut": hut, "rows": rows, "days": days,
+        "month": first, "prev": first - timedelta(days=1), "next": end,
+        "today": today,
+    })

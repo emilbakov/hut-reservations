@@ -19,6 +19,8 @@ def lifecycle_state(reservation, today=None):
     summary = deposit_summary(reservation, today=today)
     if summary is None:
         return None
+    if reservation.deposit_request_id:
+        return {**summary, "grace_days": 0, "cancellation_date": summary["due_date"], "auto_cancel_enabled": False, "eligible": False}
     policy = HutDepositPolicy.objects.filter(hut_id=summary["hut_id"]).first()
     grace = policy.grace_days if policy else DEFAULT_GRACE_DAYS
     cancel_enabled = policy.auto_cancel_enabled if policy else False

@@ -24,7 +24,7 @@ class GuestBookingFlowV150Tests(TestCase):
             reply_time_en="We reply during staffed reception hours.", reply_time_bg="Отговаряме в работното време на рецепцията.",
             payment_instructions_en="Pay the agreed deposit by bank transfer after approval.", payment_instructions_bg="Плати уговорения депозит по банков път след одобрение.")
         self.room = Room.objects.create(hut=self.hut, name="Dorm", capacity=20, price_per_night="18.00")
-        self.url = reverse("bookings:hut_detail", args=[self.hut.slug])
+        self.url = reverse("bookings:book")
         self.start = timezone.localdate() + timedelta(days=9)
 
     def payload(self, **extra):
@@ -100,8 +100,9 @@ class GuestBookingFlowV150Tests(TestCase):
         self.assertContains(response, "Location and directions")
         self.assertContains(response, "What happens next?")
         self.assertContains(response, self.hut.reply_time_en)
-        self.assertContains(response, self.hut.payment_instructions_en)
-        self.assertTemplateUsed(response, "bookings/public_base_v124.html")
+        self.assertNotContains(response, self.hut.payment_instructions_en)
+        self.assertContains(response, "Deposit terms follow approval.")
+        self.assertTemplateUsed(response, "bookings/reservation_base_v178.html")
         self.assertIn("no-store", response["Cache-Control"])
 
     def test_guest_email_contains_same_hut_information_and_correct_request_link_wording(self):
@@ -130,6 +131,7 @@ class GuestBookingFlowV150Tests(TestCase):
         self.hut.payment_instructions_en = '<script>alert("bad")</script>'
         self.hut.save()
         response = self.receipt()
+        response = self.client.get(reverse("bookings:book"), {"check_in": self.start.isoformat(), "check_out": (self.start + timedelta(days=2)).isoformat()})
         self.assertContains(response, "&lt;script&gt;")
         self.assertNotContains(response, '<script>alert("bad")</script>')
 
@@ -156,10 +158,10 @@ class GuestBookingFlowV150Tests(TestCase):
         self.client.force_login(staff)
         response = self.client.get(reservation.get_absolute_url())
         self.assertContains(response, "Cancel reservation")
-        self.assertTemplateUsed(response, "bookings/public_base_v124.html")
+        self.assertTemplateUsed(response, "bookings/reservation_base_v178.html")
         self.assertNotContains(response, 'class="site-header adventure-header"')
-        self.assertContains(response, 'class="pub-header"')
-        self.assertContains(response, 'class="pub-nav"')
+        self.assertContains(response, 'class="h168-header"')
+        self.assertContains(response, 'class="h168-nav"')
 
     def test_privacy_explanation_is_present_without_a_published_policy_and_link_appears_when_published(self):
         response = self.client.get(self.url, self.payload())
@@ -238,7 +240,8 @@ class GuestBookingFlowV150Tests(TestCase):
         self.assertContains(response, "Провери заявката си")
         response = self.receipt()
         self.assertContains(response, "Заявката е получена.")
-        self.assertContains(response, self.hut.payment_instructions_bg)
+        self.assertNotContains(response, self.hut.payment_instructions_bg)
+        self.assertContains(response, "Условията за депозит следват одобрението.")
         self.assertContains(response, self.hut.reply_time_bg)
         self.assertIn("Заявката ти ОЧАКВА ОДОБРЕНИЕ.", mail.outbox[0].body)
 

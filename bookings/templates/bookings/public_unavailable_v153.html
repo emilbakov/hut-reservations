@@ -1,0 +1,3 @@
+{% extends "bookings/public_base_v124.html" %}{% load i18n %}
+{% block title %}{% translate "Online booking unavailable" %}{% endblock %}
+{% block content %}<section class="pub-container pub-section"><h1>{% translate "Online booking unavailable" %}</h1><p>{% translate "Browse our huts. Online booking will be available soon." %}</p><a href="{% url 'bookings:hut_list' %}">{% translate "All huts" %} →</a></section>{% endblock %}

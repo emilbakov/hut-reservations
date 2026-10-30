@@ -103,7 +103,7 @@ class BookingPageTests(TestCase):
         self.hut = make_hut()
         self.dorm = Room.objects.create(hut=self.hut, name="Dorm", capacity=4, price_per_night="10.00")
         self.small = Room.objects.create(hut=self.hut, name="Small", capacity=2, price_per_night="20.00")
-        self.url = reverse("bookings:hut_detail", args=[self.hut.slug])
+        self.url = reverse("bookings:book")
 
     def post(self, start=1, end=3, **beds):
         data = {
@@ -335,6 +335,8 @@ class DashboardPhaseFourTests(TestCase):
 class MultiHutTests(TestCase):
     def setUp(self):
         self.first_hut = make_hut("first-hut")
+        from .models import PublicWebsiteSettings
+        PublicWebsiteSettings.objects.create(main_hut=self.first_hut)
         self.second_hut = make_hut("second-hut")
         self.first_room = Room.objects.create(
             hut=self.first_hut, name="Dorm", capacity=4, price_per_night="10.00"
@@ -368,7 +370,7 @@ class MultiHutTests(TestCase):
 
     def test_hut_booking_page_only_shows_its_rooms(self):
         response = self.client.get(
-            reverse("bookings:hut_detail", args=[self.first_hut.slug]),
+            reverse("bookings:book"),
             {"check_in": day(1).isoformat(), "check_out": day(3).isoformat()},
         )
         self.assertEqual(response.status_code, 200)
@@ -387,11 +389,11 @@ class MultiHutTests(TestCase):
         first = self.client.get(url, {**params, "hut": self.first_hut.slug})
         second = self.client.get(url, {**params, "hut": self.second_hut.slug})
         self.assertEqual(first.status_code, 200)
-        self.assertEqual(second.status_code, 200)
+        self.assertEqual(second.status_code, 404)
         first_day = next(x for x in first.json()["days"] if x["date"] == target.isoformat())
-        second_day = next(x for x in second.json()["days"] if x["date"] == target.isoformat())
         self.assertEqual(first_day["free_beds"], 0)
-        self.assertEqual(second_day["free_beds"], 4)
+        unscoped = self.client.get(url, params)
+        self.assertEqual(next(x for x in unscoped.json()["days"] if x["date"] == target.isoformat())["free_beds"], 0)
 
     def test_modification_cannot_move_reservation_to_another_hut(self):
         reservation = create_reservation(

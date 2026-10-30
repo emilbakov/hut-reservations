@@ -15,6 +15,8 @@ class Ux146Tests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.hut=Hut.objects.create(name='UX Test Lodge',slug='ux-lodge')
+        from .models import PublicWebsiteSettings
+        PublicWebsiteSettings.objects.create(main_hut=cls.hut)
         cls.room=Room.objects.create(hut=cls.hut,name='Pine Room',capacity=4,price_per_night=Decimal('24.50'))
         cls.other=Room.objects.create(hut=cls.hut,name='Ridge Room',capacity=2,price_per_night=Decimal('39.25'))
         cls.private_hut=Hut.objects.create(name='Private property',slug='ux-private')
@@ -25,13 +27,14 @@ class Ux146Tests(TestCase):
         cls.start=timezone.localdate()+timedelta(days=12)
         cls.end=cls.start+timedelta(days=2)
 
-    def url(self):return reverse('bookings:hut_detail',args=[self.hut.slug])
+    def url(self):return reverse('bookings:book')
     def dates(self,**extra):return dict(check_in=self.start.isoformat(),check_out=self.end.isoformat(),beds='2',**extra)
     def payload(self):return {**self.dates(),'name':'Kept Guest','email':'kept@example.com','phone':'12345','notes':'Keep my notes',f'room_{self.room.pk}':'2'}
 
-    def test_directory_links_keep_guest_count_and_hut_form_has_summary(self):
+    def test_directory_marks_main_hut_and_main_form_has_summary(self):
         response=self.client.get(reverse('bookings:hut_list'),self.dates())
-        self.assertContains(response,f'check_in={self.start.isoformat()}&amp;check_out={self.end.isoformat()}&amp;beds=2')
+        self.assertContains(response,'Information only · online booking unavailable')
+        self.assertContains(response,'View main hut & booking')
         page=self.client.get(self.url(),self.dates())
         self.assertEqual(page.context['requested_beds'],2)
         self.assertContains(page,'id="ph-party-size"')

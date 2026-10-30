@@ -1,0 +1,12 @@
+[Unit]
+Description=SummitDesk deposit holds
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=deploy
+WorkingDirectory=/home/deploy/hut-reservations
+UMask=0077
+ExecStart=/bin/bash /home/deploy/hut-reservations/v180_deposit_flow_package/run_deposit_job_v180.sh holds
+TimeoutStartSec=60

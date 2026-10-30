@@ -1,0 +1,38 @@
+[
+  {
+    "path": "bookings/admin.py",
+    "before_sha256": "63341355f99c37e917b41ecca8f998517f6a6b79e992b1b7edd108ea3a5e2bdd",
+    "after_sha256": "17488fae78ceb319be8a1486b867a5a7ad0ab8962df0c430f882b501f22df5c7",
+    "compatible_sha256": [],
+    "existed": true,
+    "mode": 420,
+    "backup_sha256": "63341355f99c37e917b41ecca8f998517f6a6b79e992b1b7edd108ea3a5e2bdd"
+  },
+  {
+    "path": "bookings/admin_room_delete_v185.py",
+    "before_sha256": null,
+    "after_sha256": "5e66c7a3c5b4bd22f868a6253894d5aade622cf238b9fab280c440578166cc15",
+    "compatible_sha256": [],
+    "existed": false,
+    "mode": 420,
+    "backup_sha256": null
+  },
+  {
+    "path": "bookings/templates/admin/bookings/room/delete_unused_v185.html",
+    "before_sha256": null,
+    "after_sha256": "577ae4532978a0863d97645faabc074239aedcc10243799a851d0bb4f9608be2",
+    "compatible_sha256": [],
+    "existed": false,
+    "mode": 420,
+    "backup_sha256": null
+  },
+  {
+    "path": "bookings/test_admin_room_delete_v185.py",
+    "before_sha256": null,
+    "after_sha256": "7cb455402cd0db9f582b0247772af58f1524d848b992647acc40568583ffe61c",
+    "compatible_sha256": [],
+    "existed": false,
+    "mode": 420,
+    "backup_sha256": null
+  }
+]

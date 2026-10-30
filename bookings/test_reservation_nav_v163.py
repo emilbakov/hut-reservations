@@ -18,4 +18,5 @@ class ReservationNavV163Tests(SimpleTestCase):
         for staff in (False, True):
             with self.subTest(staff=staff):
                 context = receipt_context(reservation, staff=staff)
-                self.assertEqual(context["reservation_base_template"], "bookings/public_base_v124.html")
+                self.assertEqual(context["reservation_base_template"], "bookings/reservation_base_v178.html")
+                self.assertFalse(context["can_request_changes"])

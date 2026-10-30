@@ -1,0 +1,10 @@
+[Unit]
+Description=Retry SummitDesk reservation notification failures every five minutes
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=5min
+Unit=summitdesk-notification-retry-v145.service
+
+[Install]
+WantedBy=timers.target

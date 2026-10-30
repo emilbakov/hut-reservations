@@ -1,0 +1,4 @@
+{% load i18n %}
+<div class="sd150-payment"><h3>{% translate "When and how do I pay?" %}</h3>
+{% if hut_info.payment %}<div lang="{{ hut_info.payment_lang }}">{{ hut_info.payment|linebreaks }}</div>{% else %}<p>{% translate "No payment is collected by this booking request form. The hut manager will confirm how and when to pay, including any deposit." %}</p>{% endif %}
+</div>

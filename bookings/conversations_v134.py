@@ -17,6 +17,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext as _
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_http_methods, require_POST
 
@@ -241,11 +242,11 @@ def guest_send_message(request, token):
     reservation = guest_reservation(token)  # Revocation and token checked on every POST.
     hut = _hut_for_reservation(reservation)
     if reservation.check_out < timezone.localdate() - timedelta(days=7):
-        messages.error(request, 'Messaging for this stay has closed.')
+        messages.error(request, _('Messaging for this stay has closed.'))
         return redirect('bookings:guest_self_service', token=token)
     body = request.POST.get('body', '').strip()
     if not body or len(body) > 2000:
-        messages.error(request, 'Enter a message of 1–2000 characters.')
+        messages.error(request, _('Enter a message of 1–2000 characters.'))
         return redirect('bookings:guest_self_service', token=token)
     # Per-reservation rate limiting prevents a leaked link being used for flooding.
     with transaction.atomic():
@@ -254,12 +255,12 @@ def guest_send_message(request, token):
             reservation=locked, sender=GuestConversationMessage.Sender.GUEST,
             created_at__gte=timezone.now() - timedelta(hours=1)).count()
         if recent >= 5:
-            messages.error(request, 'Too many messages. Please try again in an hour.')
+            messages.error(request, _('Too many messages. Please try again in an hour.'))
             return redirect('bookings:guest_self_service', token=token)
         GuestConversationMessage.objects.create(
             reservation=locked, hut=hut,
             sender=GuestConversationMessage.Sender.GUEST,
             body=body, delivery=GuestConversationMessage.Delivery.RECEIVED,
         )
-    messages.success(request, 'Your message was saved. The hut team can read it in SummitDesk.')
+    messages.success(request, _('Your message was saved. The hut team can read it in SummitDesk.'))
     return redirect('bookings:guest_self_service', token=token)

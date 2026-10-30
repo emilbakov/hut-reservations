@@ -67,7 +67,7 @@
       <span class="ma-step" aria-hidden="true">02</span>
       <div><h2 id="ma-beds-heading">Update your beds</h2><p class="ma-sub">Select the number of beds you need for your new stay.</p></div>
     </div>
-    <div class="ma-notice"><strong>{{ nights }} night{{ nights|pluralize }} selected.</strong> Prices are recalculated at current rates when you save your changes.</div>
+    <div class="ma-notice"><strong>{{ nights }} night{{ nights|pluralize }} selected.</strong> Existing rooms keep their agreed rates. Newly added rooms use current seasonal rates. Checkout night is not charged.</div>
     <form method="post">
       {% csrf_token %}
       <input type="hidden" name="check_in" value="{{ check_in|date:'Y-m-d' }}">
@@ -78,7 +78,7 @@
         <div class="ma-room">
           <div>
             <h3>{{ room.name }}</h3>
-            <p>{{ free }} beds available · {{ room.price_per_night }} {{ CURRENCY }} per bed/night</p>
+            <p>{{ free }} {% if WHOLE_UNITS %}guest places available in unreserved units{% else %}beds available{% endif %} · {% include "bookings/seasonal_room_v186.html" with room=room %}</p>
           </div>
           <div class="ma-room-control">
             {% if field %}

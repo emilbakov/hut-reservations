@@ -9,11 +9,12 @@ from django.urls import reverse
 from django.utils.translation import get_language, gettext as _
 
 from .models import PublicWebsiteSettings
+from .branding_v153 import brand_name
 
 
 def profile_for(request):
     if not hasattr(request, "_public_profile_v149"):
-        request._public_profile_v149 = PublicWebsiteSettings.objects.filter(pk=1).first() or PublicWebsiteSettings()
+        request._public_profile_v149 = PublicWebsiteSettings.objects.select_related('main_hut').filter(pk=1).first() or PublicWebsiteSettings()
     return request._public_profile_v149
 
 
@@ -28,16 +29,20 @@ def localized(profile, field):
 
 def public_context(request):
     profile = profile_for(request)
-    configured_name = settings.HUT_NAME.strip()
-    brand = profile.brand_name.strip() or (configured_name if configured_name != "Mountain Hut" else "SummitDesk")
+    brand = brand_name(profile)
     address, address_lang = localized(profile, "address")
     hero_alt, _lang = localized(profile, "hero_alt")
     # Metadata for a private link must never echo its path, code or query string.
     match = request.resolver_match
     public_route = match and match.url_name in {"public_home", "hut_list", "hut_detail", "public_policy"}
     canonical_path = request.path if public_route else reverse("bookings:public_home")
+    from .main_hut_v153 import main_hut
+    main = main_hut(request)
+    if main and match and match.url_name == 'hut_detail' and match.kwargs.get('slug') == main.slug:
+        canonical_path = reverse('bookings:public_home')
     return {
         "HUT_NAME": brand,
+        "MAIN_PUBLIC_HUT": main,
         "PUBLIC149": {
             "brand": brand,
             "phone": profile.contact_phone,

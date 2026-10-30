@@ -32,7 +32,8 @@ def selected_summary(booking, rooms, nights):
         except (ValueError, TypeError):
             quantity = 0
         if quantity:
-            subtotal = room.price_per_night * quantity * nights
+            from .whole_units_v183 import whole_units
+            subtotal = getattr(room, "quoted_total", room.price_per_night * nights) * (1 if whole_units() else quantity)
             rows.append({'room': room, 'beds': quantity, 'subtotal': subtotal})
             count += quantity
             total += subtotal

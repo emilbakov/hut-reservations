@@ -1,0 +1,27 @@
+/* Original transparent logo on a light badge, including dark staff surfaces. */
+.sd153-logo{display:block;box-sizing:border-box;width:64px;height:64px;max-width:none;flex:none;object-fit:contain;background:#fff;padding:3px;border-radius:50%;border:1px solid #d8e2d9}
+.sd153-brand-copy{display:block;min-width:0;overflow-wrap:anywhere;font-size:1.25rem;font-weight:800;line-height:1.2}
+.sd153-brand-copy small{display:block;font-size:12px;letter-spacing:normal;margin-top:4px;font-weight:600}
+.sd153-footer-brand{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:10px}.sd153-footer-logo{width:96px;height:96px}
+.sd116-brand .sd153-logo{width:68px;height:68px}.sd116-brand .sd153-brand-copy{font-size:22px}.sd116-brand .sd153-brand-copy small{font-size:12px!important;line-height:1.4;letter-spacing:normal}
+.sd117-brand .sd153-logo{width:100px;height:100px}.sd117-mobile-brand .sd153-logo{width:68px;height:68px}.sd117-brand .sd153-brand-copy{font-size:28px}.sd117-mobile-brand{align-items:center;gap:12px}
+.sd153-admin-brand{display:flex;align-items:center;gap:12px}.sd153-admin-brand .sd153-logo{width:56px;height:56px}
+.sd153-limit-brand{display:flex;align-items:center;gap:12px;text-decoration:none;font-weight:800;font-size:22px;margin-bottom:22px}
+.pub-brand .sd153-brand-copy{color:#193d30}.adventure-header .sd153-brand-copy{color:#fff}
+@media(max-width:720px){
+ .pub-brand .sd153-logo,.adventure-header .brand .sd153-logo{width:52px;height:52px}
+ .pub-brand .sd153-brand-copy,.adventure-header .brand .sd153-brand-copy{font-size:18px}
+ .public-v124 .pub-header .pub-brand{gap:10px;max-width:100%}
+ .public-v124 .pub-header .pub-brand-name small{font-size:12px;letter-spacing:normal}
+ .adventure-header .header-inner{display:grid!important;grid-template-columns:minmax(0,1fr) auto;gap:8px 10px!important}
+ .adventure-header .brand{grid-column:1;grid-row:1;gap:10px;min-width:0}
+ .adventure-header .mobile-menu{grid-column:2;grid-row:1;margin:0}
+ .adventure-header .sd147-language{grid-column:1/-1;grid-row:2;justify-self:start;margin:0!important}
+ .sd153-footer-logo{width:84px;height:84px}
+}
+
+.sd153-compact-logo{width:40px;height:40px;padding:2px}
+
+.sd153-directory-search{display:flex;align-items:center;flex-wrap:wrap;gap:12px;padding:18px;background:#fff;border:1px solid #c9dbcb;border-radius:12px}.sd153-directory-search label{font-weight:700}.sd153-directory-search input{flex:1;min-width:120px;min-height:44px;padding:8px 12px;font:inherit;border:1px solid #acc7b0;border-radius:8px}.sd153-directory-search button,.sd153-main-link{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 16px;background:#195b42;color:#fff;border:0;border-radius:8px;font:700 14px/1.5 system-ui,sans-serif;text-decoration:none;cursor:pointer}.sd153-booking-label{font-size:13px;color:#3f5a48;font-weight:700}.sd153-hut-info-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,330px);gap:30px;padding-block:30px}.sd153-booking-notice{align-self:start;padding:22px;border:1px solid #c5d8c7;border-radius:12px;background:#f1f6ee}.sd153-booking-notice h2{font-size:21px;margin-top:0}.sd153-booking-notice p{line-height:1.6}.sd153-room-info{display:grid;gap:12px}.sd153-room-info>div{padding:16px;border:1px solid #d5e2d6;border-radius:10px}.sd153-room-info h3{margin:0 0 6px}@media(max-width:720px){.sd153-hut-info-layout{grid-template-columns:1fr;gap:18px}.sd153-booking-notice{grid-row:1}.sd153-directory-search input{flex-basis:100%}}
+
+.sd153-legacy-brand{display:flex;align-items:center;gap:10px}.sd153-legacy-brand .sd153-logo{width:48px;height:48px}

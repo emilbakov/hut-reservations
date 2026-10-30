@@ -1,0 +1,54 @@
+{
+  "release": "v185-delete-unused-rooms-from-admin",
+  "compatible_baselines": [
+    "v184 normal rooms and studios"
+  ],
+  "prerequisites": [
+    {
+      "path": "bookings/models.py",
+      "sha256": "132a09d233bf589060f77d4d4e4f90d8c1a3125b07dec4021f6b00257fe0eb28"
+    },
+    {
+      "path": "bookings/migrations/0030_room_types_v184.py",
+      "sha256": "3fa3996df9200f3e3c1b92d948a4c7bd2ef081f4bc2402ed9c296b7d324dcc33"
+    },
+    {
+      "path": "bookings/whole_units_v183.py",
+      "sha256": "0b7a00fa521118c998bc583913923552b8ab5d8b341cc81808afe41b2fbed1c4"
+    },
+    {
+      "path": "config/settings.py",
+      "sha256": "30f47432055712227ae84dad39782c237a1986461a0c05a53a0d839c801055ad"
+    },
+    {
+      "path": "config/settings_deposit_pg_test_v180.py",
+      "sha256": "5439149b17fad3e6e0de4606487bc1a27fe5a52123b666d3fce19e1276681af3"
+    }
+  ],
+  "files": [
+    {
+      "path": "bookings/admin.py",
+      "before_sha256": "63341355f99c37e917b41ecca8f998517f6a6b79e992b1b7edd108ea3a5e2bdd",
+      "after_sha256": "17488fae78ceb319be8a1486b867a5a7ad0ab8962df0c430f882b501f22df5c7",
+      "compatible_sha256": []
+    },
+    {
+      "path": "bookings/admin_room_delete_v185.py",
+      "before_sha256": null,
+      "after_sha256": "5e66c7a3c5b4bd22f868a6253894d5aade622cf238b9fab280c440578166cc15",
+      "compatible_sha256": []
+    },
+    {
+      "path": "bookings/templates/admin/bookings/room/delete_unused_v185.html",
+      "before_sha256": null,
+      "after_sha256": "577ae4532978a0863d97645faabc074239aedcc10243799a851d0bb4f9608be2",
+      "compatible_sha256": []
+    },
+    {
+      "path": "bookings/test_admin_room_delete_v185.py",
+      "before_sha256": null,
+      "after_sha256": "7cb455402cd0db9f582b0247772af58f1524d848b992647acc40568583ffe61c",
+      "compatible_sha256": []
+    }
+  ]
+}

@@ -19,7 +19,7 @@ def single_hut_id(reservation):
 
 
 def deposit_summary(reservation, today=None):
-    """Compute deposit target and net paid using the reservation's current price.
+    """Use immutable approved terms for new holds, and live policy for legacy stays.
 
     Booking modifications can change the target; the due date stays anchored to
     creation. All payments count toward the deposit, refunds reduce net paid.
@@ -33,12 +33,19 @@ def deposit_summary(reservation, today=None):
     due_date = timezone.localtime(reservation.created).date() + timedelta(days=days)
     total = Decimal(reservation.total_price)
     target = (total * Decimal(percentage) / Decimal(100)).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+    hold = reservation.deposit_request if reservation.deposit_request_id else None
+    if hold and hold.state != 'withdrawn':
+        target = hold.amount
+        due_date = timezone.localdate(hold.due_at)
+        percentage = (target * 100 / total).quantize(Decimal('.01')) if total else Decimal('0.00')
     net = sum((t.amount if t.kind != PaymentTransaction.Kind.REFUND else -t.amount
                for t in reservation.payment_transactions.all()), Decimal('0.00'))
     remaining = max(target - net, Decimal('0.00'))
     today = today or timezone.localdate()
     active = reservation.status in Reservation.HOLDING
     overdue = active and remaining > 0 and today > due_date
+    if hold and hold.state != 'withdrawn':
+        overdue = hold.state == 'awaiting' and hold.due_at <= timezone.now() and remaining > 0
     return {'reservation': reservation, 'hut_id': hut_id, 'percentage': percentage,
             'due_date': due_date, 'target': target, 'net_paid': net,
             'remaining': remaining, 'overdue': overdue, 'active': active,
@@ -65,23 +72,10 @@ def deposit_dashboard(request):
                 hut=hut, defaults={'percentage': percentage, 'due_days': due_days,
                                    'reminders_enabled': request.POST.get('reminders_enabled') == 'on'})
             messages.success(request, 'Deposit policy updated.')
-            return redirect('bookings:deposit_dashboard')
+            from urllib.parse import urlencode
+            from django.urls import reverse
+            return redirect(reverse('bookings:deposit_dashboard')+'?'+urlencode({'hut': hut.slug}))
 
-    qs = manageable_reservations(request.user).filter(status__in=Reservation.HOLDING)
-    if selected_hut:
-        qs = qs.filter(items__room__hut=selected_hut)
-    qs = qs.distinct().prefetch_related('items__room', 'payment_transactions').order_by('check_in', 'pk')
-    rows = []
-    for reservation in qs:
-        summary = deposit_summary(reservation)
-        if summary is not None and summary['remaining'] > 0:
-            rows.append(summary)
-    rows.sort(key=lambda x: (not x['overdue'], x['due_date'], x['reservation'].check_in))
-    policy = HutDepositPolicy.objects.filter(hut=selected_hut).first() if selected_hut else None
-    return render(request, 'bookings/deposit_dashboard.html', {
-        'rows': rows[:200], 'total_awaiting': len(rows),
-        'overdue_count': sum(row['overdue'] for row in rows),
-        'huts': huts, 'selected_hut': selected_hut, 'selected_slug': selected_slug,
-        'manager_mode': not request.user.is_superuser, 'policy': policy,
-        'currency': settings.BOOKING_CURRENCY,
-    })
+    from .deposit_dashboard_v181 import dashboard_context
+    context = dashboard_context(request, manageable_reservations(request.user), huts, selected_hut, selected_slug)
+    return render(request, 'bookings/deposit_dashboard.html', context)

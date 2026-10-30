@@ -1,0 +1,44 @@
+/* v156: right-aligned Karlak public navigation and footer links.
+   Overrides the optional v155 left-links patch without touching staff layouts. */
+@media (min-width: 721px) {
+  .public-v124 .pub-header-inner { justify-content: space-between; }
+  .public-v124 .pub-header .pub-nav {
+    margin-left: auto;
+    margin-right: 0;
+    justify-content: flex-end;
+    text-align: right;
+  }
+}
+@media (min-width: 1051px) {
+  body:not(.sd116-active) .adventure-header .header-inner {
+    justify-content: space-between;
+  }
+  body:not(.sd116-active) .adventure-header .desktop-nav,
+  body:not(.sd116-active) .adventure-header .sd115-nav {
+    margin-left: auto;
+    margin-right: 0;
+    justify-content: flex-end;
+    text-align: right;
+  }
+}
+/* Footer columns: brand left, contact center, Useful links right. */
+.pub149-footer .pub149-footer-grid {
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr) minmax(0, 1fr);
+}
+.pub149-footer .pub149-footer-grid > nav {
+  justify-self: end;
+  text-align: right;
+  min-width: 0;
+}
+.pub149-footer .pub149-footer-grid > nav a {
+  margin-left: auto;
+  margin-right: 0;
+  justify-content: flex-end;
+  text-align: right;
+}
+@media (max-width: 720px) {
+  .pub149-footer .pub149-footer-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .pub149-footer .pub149-footer-grid > nav { justify-self: end; }
+}

@@ -1,8 +1,9 @@
 {% load i18n ui_v147 static %}
 <!doctype html>
 {% get_current_language as current_language %}
-<html lang="{{ current_language }}">
+<html lang="{{ current_language }}" data-booking-unit="{{ BOOKING_UNIT }}">
 <head>
+  <script src="{% static 'bookings/seasonal-v186.js' %}"></script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#183c30">
@@ -33,14 +34,16 @@
       </a>
       <nav class="pub-nav" aria-label="{% translate "Public navigation" %}">
         <a href="{% url 'bookings:public_home' %}" {% if homepage %}aria-current="page"{% endif %}>{% translate "Home" %}</a>
-        <a href="{% url 'bookings:hut_list' %}" {% if not homepage %}aria-current="page"{% endif %}>{% translate "Explore huts" %}</a>
+        <a href="{% url 'bookings:hut_list' %}" {% if request.resolver_match.url_name == "hut_list" %}aria-current="page"{% endif %}>{% translate "All huts" %}</a>
+        {% if MAIN_PUBLIC_HUT %}<a href="{% url 'bookings:book' %}" {% if request.resolver_match.url_name == 'book' %}aria-current="page"{% endif %}>{% translate "Book a stay" %} ↗</a>{% endif %}
       </nav>
       {% include "bookings/language_v147.html" %}
       <details class="pub-mobile-menu">
         <summary aria-label="{% translate "Open navigation menu" %}">{% translate "Menu" %} <span aria-hidden="true">☰</span></summary>
         <nav aria-label="{% translate "Mobile navigation" %}">
           <a href="{% url 'bookings:public_home' %}">{% translate "Home" %}</a>
-          <a href="{% url 'bookings:hut_list' %}">{% translate "Explore huts" %}</a>
+          <a href="{% url 'bookings:hut_list' %}">{% translate "All huts" %}</a>
+          {% if MAIN_PUBLIC_HUT %}<a href="{% url 'bookings:book' %}">{% translate "Book a stay" %} ↗</a>{% endif %}
         </nav>
       </details>
     </div>

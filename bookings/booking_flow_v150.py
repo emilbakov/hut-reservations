@@ -9,7 +9,9 @@ from .public_profile_v149 import localized
 def hut_information(hut):
     payment, payment_lang = localized(hut, "payment_instructions")
     reply, reply_lang = localized(hut, "reply_time")
+    from .arrival_v189 import arrival_information
     return {
+        **arrival_information(hut),
         "hut": hut, "phone": hut.public_phone,
         "tel": re.sub(r"[^+0-9]", "", hut.public_phone),
         "email": hut.public_email,
@@ -35,15 +37,18 @@ def error_summary(search, booking=None, party_error=""):
 
 
 def receipt_context(reservation, *, staff=False):
+    from .deposit_flow_v180 import deposit_context, terms_pending
     from django.utils import timezone
     huts = {}
     for item in reservation.items.all():
         if item.room.hut_id:
             huts.setdefault(item.room.hut_id, hut_information(item.room.hut))
     return {
+        'deposit180': deposit_context(reservation),
+            'deposit_terms_pending': terms_pending(reservation),
         # Keep the public Karlak header, links and footer on every /r/<code>/ receipt,
         # including when a staff user opens the private reservation link.
-        "reservation_base_template": "bookings/public_base_v124.html",
+        "reservation_base_template": "bookings/reservation_base_v178.html",
         "receipt_huts": list(huts.values()),
-        "can_request_changes": reservation.status in reservation.HOLDING and reservation.check_in > timezone.localdate(),
+        "can_request_changes": reservation.status in reservation.HOLDING and reservation.check_in > timezone.localdate() and not (deposit_context(reservation) or {}).get("expired"),
     }

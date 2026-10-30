@@ -1,0 +1,102 @@
+[
+  {
+    "path": "bookings/locale/bg/LC_MESSAGES/django.mo",
+    "before_sha256": "a88f7569f4fc5a1cca53f4bd71701c8fe743bdb2aa0e10e9ca7bf675a61d452b",
+    "after_sha256": "da5b34a7c43c06b0d3c52492eb3104bbe5f54b36784d0ad5e33ddd7830fc2c8f",
+    "compatible_sha256": [
+      "9854f54c97a4cc964ec7a00fe5b16cfbe3b692210d42ae2d28178897615980e2",
+      "d081a41e22a507b90b25d7549e5c3a6691624b800799edcb3949b425f5c3a832",
+      "823af80970d277f2846c1d60976f154da262eb2982511ea8ab0ff6989fffc275",
+      "190ab54e20f19d22e950bc7c7101ade5671ad5b4ee28d0ba3831911d3c4c14f0"
+    ],
+    "existed": true,
+    "mode": 420,
+    "backup_sha256": "a88f7569f4fc5a1cca53f4bd71701c8fe743bdb2aa0e10e9ca7bf675a61d452b"
+  },
+  {
+    "path": "bookings/locale/bg/LC_MESSAGES/django.po",
+    "before_sha256": "ba6af057ca56bcbc9807a7ad4c3181b3a887fa369582a52b22e6945cccd92263",
+    "after_sha256": "a155f10e7352d35fc2770510aeda5f6edd057998899dbdef7ba0a26126cb0465",
+    "compatible_sha256": [
+      "5bb71eb346c79a8e926a0d79eec75528834a3b128a78e206972eb6f2fc17c040",
+      "c761b153bfe34796f8ff19758ca128c024a5667e9e57b4c64b2deb0a0c9ea3b0",
+      "4eabef94480e1cb926cb739e1c3881d1a1d188b4a919bb4ec5041aaf11654cbb",
+      "8b4ff4b3a9fd820d6512df9de923e65b8d222b892f5372195d75d7bcd92cc02c"
+    ],
+    "existed": true,
+    "mode": 420,
+    "backup_sha256": "ba6af057ca56bcbc9807a7ad4c3181b3a887fa369582a52b22e6945cccd92263"
+  },
+  {
+    "path": "bookings/main_hut_v153.py",
+    "before_sha256": "553e1ff3c528bf6ade88b7d4afeef475b606cd81c25cafbc97a046881d6c642b",
+    "after_sha256": "a826853cbf826692d37a47572a52bdff637c9079c11932785b28260bfb9c185d",
+    "compatible_sha256": [],
+    "existed": true,
+    "mode": 420,
+    "backup_sha256": "553e1ff3c528bf6ade88b7d4afeef475b606cd81c25cafbc97a046881d6c642b"
+  },
+  {
+    "path": "bookings/public_site_v124.py",
+    "before_sha256": "025685c70ba6f4ecf1b928e3503f2c8ee1308e95d9af3dc265326f1124df3739",
+    "after_sha256": "680f4de3efa5f2883c6410df45f248217be9b70921c5c771b74e76c5fc9e3734",
+    "compatible_sha256": [],
+    "existed": true,
+    "mode": 420,
+    "backup_sha256": "025685c70ba6f4ecf1b928e3503f2c8ee1308e95d9af3dc265326f1124df3739"
+  },
+  {
+    "path": "bookings/static/bookings/huts-v177/huts.css",
+    "before_sha256": null,
+    "after_sha256": "cd1a67f2aa69d277a43e3dfc19bf5e7fc9af27ec6a764911af85309ca26e9231",
+    "compatible_sha256": [],
+    "existed": false,
+    "mode": 420,
+    "backup_sha256": null
+  },
+  {
+    "path": "bookings/templates/bookings/hut_information_v153.html",
+    "before_sha256": "7f3812844ac83827a05bc3c539b0397c8ebbfd66385070ab5ff373e769877ed4",
+    "after_sha256": "847fadf390ae038c6d5f37b4f517442600cc959829c47a42d0ea6dbb84f5e182",
+    "compatible_sha256": [],
+    "existed": true,
+    "mode": 420,
+    "backup_sha256": "7f3812844ac83827a05bc3c539b0397c8ebbfd66385070ab5ff373e769877ed4"
+  },
+  {
+    "path": "bookings/templates/bookings/hut_photo_v177.html",
+    "before_sha256": null,
+    "after_sha256": "d4a201c3074c683e3c35acad38c420a882a67ad81535001d9ff5ca6754c2961a",
+    "compatible_sha256": [],
+    "existed": false,
+    "mode": 420,
+    "backup_sha256": null
+  },
+  {
+    "path": "bookings/templates/bookings/huts_base_v177.html",
+    "before_sha256": null,
+    "after_sha256": "91c347bc7f78869d97701b223da7a9ff14b6a77f33d5027cddb895057762a232",
+    "compatible_sha256": [],
+    "existed": false,
+    "mode": 420,
+    "backup_sha256": null
+  },
+  {
+    "path": "bookings/templates/bookings/public_directory_v124.html",
+    "before_sha256": "c5523dd216f959914fdc2380f19f55825e5a965aa050aaa1db595e5b969d4abe",
+    "after_sha256": "f44b56e2e4407337342ad159767b9d91c3c9e37402a9f7c1d53709ea098d7304",
+    "compatible_sha256": [],
+    "existed": true,
+    "mode": 420,
+    "backup_sha256": "c5523dd216f959914fdc2380f19f55825e5a965aa050aaa1db595e5b969d4abe"
+  },
+  {
+    "path": "bookings/test_huts_v177.py",
+    "before_sha256": null,
+    "after_sha256": "066978809e83ce38767186b9064ae898383ef79cd53e901738e4894d13fc0139",
+    "compatible_sha256": [],
+    "existed": false,
+    "mode": 420,
+    "backup_sha256": null
+  }
+]

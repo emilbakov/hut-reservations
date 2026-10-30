@@ -53,6 +53,8 @@ def booking_month(rooms, selected_start, selected_end, *, today, month_value=Non
             reservation__check_in__lt=window_end,
             reservation__check_out__gt=window_start,
         ).values_list('room_id', 'beds', 'reservation__check_in', 'reservation__check_out'))
+        from .deposit_flow_v180 import exclude_elapsed
+        items = exclude_elapsed(items)
         for room_id, beds, start, end in items:
             night = max(start, window_start)
             while night < min(end, window_end):
@@ -74,7 +76,7 @@ def booking_month(rooms, selected_start, selected_end, *, today, month_value=Non
         enabled = today <= day <= latest
         available = None
         if enabled:
-            available = sum(max(0, capacity - booked[room_id][day] - len(blocked[room_id][day]))
+            available = sum(remaining(capacity, booked[room_id][day], len(blocked[room_id][day]))
                             for room_id, capacity in capacities.items())
         cells.append({
             'date': day.isoformat(), 'next_date': (day + timedelta(days=1)).isoformat(), 'number': day_number,
@@ -97,3 +99,5 @@ def booking_month(rooms, selected_start, selected_end, *, today, month_value=Non
         'next': next_month.strftime('%Y-%m') if next_month <= last_allowed else None,
         'capacity': sum(capacities.values()),
     }
+
+from bookings.whole_units_v183 import remaining

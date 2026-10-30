@@ -1,0 +1,26 @@
+{% extends "bookings/base.html" %}
+{% load i18n ui_v147 %}
+{% block title %}{% translate "Staff overview" %}{% endblock %}
+{% block content %}
+<!-- SummitDesk v135 dashboard replaced by the compact v152 overview. /* v133: mobile compatibility retained. */ -->
+<section class="sd152-page sd135">
+  <header class="sd152-header"><h1>{% translate "Overview" %}</h1><p>{{ selected_hut.name|default:HUT_NAME }} · {{ today|date:"D, j M Y" }}</p></header>
+  <div class="sd152-metrics" aria-label="Today's operations">
+    <a class="sd152-metric sd152-attention" href="#needs-decision"><span>{% translate "Needs your decision" %}</span><strong>{{ pending_count }}</strong><small>{% translate "Pending requests" %}</small></a>
+    <a class="sd152-metric" href="{% url 'bookings:manager_stays' %}{% if selected_slug %}?hut={{ selected_slug|urlencode }}{% endif %}"><span>{% translate "Arrivals today" %}</span><strong>{{ arrival_count }}</strong><small>{% translate "Confirmed bookings" %}</small></a>
+    <a class="sd152-metric" href="{% url 'bookings:manager_stays' %}{% if selected_slug %}?hut={{ selected_slug|urlencode }}{% endif %}"><span>{% translate "Departures today" %}</span><strong>{{ departure_count }}</strong><small>{% translate "Confirmed bookings" %}</small></a>
+    <a class="sd152-metric" href="{% url 'bookings:manager_stays' %}{% if selected_slug %}?hut={{ selected_slug|urlencode }}{% endif %}#stays-house-title"><span>{% translate "Checked in now" %}</span><strong>{{ in_house_count }}</strong><small>{% translate "Bookings actually in the hut" %}</small></a>
+  </div>
+  <details class="sd152-filters"><summary>{% translate "Filters" %} · {{ selected_hut.name|default:_("All huts") }}</summary><form class="sd152-filterform" method="get" data-sd152-auto><label for="sd152-hut">{% translate "Hut" %}<select id="sd152-hut" name="hut">{% if not manager_mode %}<option value="">{% translate "All huts" %}</option>{% endif %}{% for hut in huts %}<option value="{{ hut.slug }}" {% if selected_slug == hut.slug %}selected{% endif %}>{{ hut.name }}</option>{% endfor %}</select></label><button class="sd152-quiet" type="submit">{% translate "Apply filters" %}</button></form></details>
+  {% include "bookings/undo_decision_v152.html" with source="dashboard" %}
+  <section class="sd152-panel" id="needs-decision" aria-labelledby="needs-decision-title"><div class="sd152-panel-head"><h2 id="needs-decision-title">{% translate "Needs your decision" %} · {{ pending_count }}</h2><a class="sd152-quiet" href="{% url 'bookings:manager_reservations' %}?status=pending{% if selected_slug %}&amp;hut={{ selected_slug|urlencode }}{% endif %}">{% translate "All pending requests" %}</a></div>
+    <div class="sd152-list">{% for reservation in pending_requests %}<article class="sd152-request"><h3>{{ reservation.name }}</h3><p>{% for item in reservation.items.all %}{{ item.room.hut.name }} · {{ item.room.name }} · {{ item.beds|bed_count }}{% if not forloop.last %}; {% endif %}{% endfor %}</p><p>{{ reservation.check_in|date:"j M" }} – {{ reservation.check_out|date:"j M Y" }} · {{ reservation.total_price|floatformat:2 }} {{ currency }} · {% translate "Requested" %} {{ reservation.created|date:"j M, H:i" }}</p>
+    {% include "bookings/decision_actions_v152.html" with source="dashboard" %}</article>{% empty %}<p>{% translate "No requests awaiting your decision." %}</p>{% endfor %}</div>
+  </section>
+  <section class="sd152-panel" aria-labelledby="sd152-arrivals"><div class="sd152-panel-head"><h2 id="sd152-arrivals">{% translate "Confirmed arrivals" %}</h2><a class="sd152-quiet" href="{% url 'bookings:manager_stays' %}{% if selected_slug %}?hut={{ selected_slug|urlencode }}{% endif %}">{% translate "Arrivals & departures" %}</a></div>
+    <table class="sd152-table sd135-table"><thead><tr><th scope="col">{% translate "Guest" %}</th><th scope="col">{% translate "Check-in" %}</th><th scope="col">{% translate "Beds" %}</th></tr></thead><tbody>{% for row in upcoming %}<tr><td data-label="Guest"><a href="{% url 'bookings:calendar_edit' row.reservation.code %}">{{ row.reservation.name }}</a></td><td data-label="Check-in">{% if row.reservation.check_in == today %}<span class="sd152-today">{% translate "Today" %}</span> {% endif %}{{ row.reservation.check_in|date:"j M" }}</td><td data-label="Beds">{{ row.beds }}</td></tr>{% empty %}<tr><td colspan="3">{% translate "No confirmed arrivals scheduled." %}</td></tr>{% endfor %}</tbody></table>
+  </section>
+  <p class="sd152-capacity"><strong>{% translate "Beds held tonight" %}: {{ occupied }} / {{ capacity }}</strong><br>{% translate "Expected occupancy from pending and confirmed bookings. Checked in now counts bookings with an actual check-in and no check-out." %}</p>
+  <details class="sd152-filters"><summary>{{ month|date:"F Y" }} · {% translate "Monthly occupancy" %}: {{ occupancy }}%</summary><div class="sd152-panel"><p>{% translate "Booked bed-nights" %}: <strong>{{ booked_nights }}</strong></p><p>{% translate "Projected revenue" %}: <strong>{{ revenue|floatformat:2 }} {{ currency }}</strong></p><a class="sd152-quiet" href="{% url 'bookings:financial_dashboard' %}{% if selected_slug %}?hut={{ selected_slug|urlencode }}{% endif %}">{% translate "Finances" %}</a></div></details>
+</section>
+{% endblock %}

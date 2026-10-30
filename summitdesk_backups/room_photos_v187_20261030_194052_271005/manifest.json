@@ -1,0 +1,101 @@
+[
+  {
+    "path": "bookings/admin.py",
+    "before_sha256": "b1ef63fbf37f18c6ff1d113ed4e095779ea1c75509d814d0cf29baf2ca899e39",
+    "after_sha256": "081606537e43948bb6668749f7c24958e345632d19394bda5e979f69a1fc792b",
+    "compatible_sha256": [],
+    "existed": true,
+    "mode": 420,
+    "backup_sha256": "b1ef63fbf37f18c6ff1d113ed4e095779ea1c75509d814d0cf29baf2ca899e39"
+  },
+  {
+    "path": "bookings/locale/bg/LC_MESSAGES/django.mo",
+    "before_sha256": "ebf359367026438a6018287bc91d37d6b96282c7f96ca932634d8ca51164219a",
+    "after_sha256": "93598a7914ef663d539c1514874cb0880d1d3a0ce091f7fd85a6db42b3ed313e",
+    "compatible_sha256": [],
+    "existed": true,
+    "mode": 420,
+    "backup_sha256": "ebf359367026438a6018287bc91d37d6b96282c7f96ca932634d8ca51164219a"
+  },
+  {
+    "path": "bookings/locale/bg/LC_MESSAGES/django.po",
+    "before_sha256": "ab563a05ae63cf5a449083d2caf1f57a43b6a9bdb29712f5fde3172c03d1fbc6",
+    "after_sha256": "88bf3333946e1fe10c97dd85be2aaeed57a9b37301893e69ea8f17afc7ec32f1",
+    "compatible_sha256": [],
+    "existed": true,
+    "mode": 420,
+    "backup_sha256": "ab563a05ae63cf5a449083d2caf1f57a43b6a9bdb29712f5fde3172c03d1fbc6"
+  },
+  {
+    "path": "bookings/migrations/0032_room_photo_v187.py",
+    "before_sha256": null,
+    "after_sha256": "5649a67b01824e5ed9fc84999adfd0e8501a7e2d8f42a993c8af994339a8e8c2",
+    "compatible_sha256": [],
+    "existed": false,
+    "mode": 420,
+    "backup_sha256": null
+  },
+  {
+    "path": "bookings/models.py",
+    "before_sha256": "3071274aedc2e7b745faddd4e0cc737e9f86b338119b212b412d34cf9467fbf9",
+    "after_sha256": "6273d672bb0e3617ce76c83d8b8510c86c5423f6d84081ab7d98fe1897d778df",
+    "compatible_sha256": [],
+    "existed": true,
+    "mode": 420,
+    "backup_sha256": "3071274aedc2e7b745faddd4e0cc737e9f86b338119b212b412d34cf9467fbf9"
+  },
+  {
+    "path": "bookings/room_details_v184.py",
+    "before_sha256": "802be137d3742c36c9f2d770a32416f35ef9da9a6efba9a1530c0944b5d088ac",
+    "after_sha256": "67d3f863f8915dd3f6900f9d3a5c3e77500a35fe6540c9872224dc47c8e4fcfe",
+    "compatible_sha256": [],
+    "existed": true,
+    "mode": 420,
+    "backup_sha256": "802be137d3742c36c9f2d770a32416f35ef9da9a6efba9a1530c0944b5d088ac"
+  },
+  {
+    "path": "bookings/static/bookings/room-photos-v187.css",
+    "before_sha256": null,
+    "after_sha256": "6c1e02249e5ee4a0abd2e5708e9dcfc2bfc251305903aa0fd9ef4e20c7bddac5",
+    "compatible_sha256": [],
+    "existed": false,
+    "mode": 420,
+    "backup_sha256": null
+  },
+  {
+    "path": "bookings/templates/bookings/public_hut_v125.html",
+    "before_sha256": "a9cf7f6553779aab5dafae0a714fa1c415588f178baf969c699ff6e1b2b7bedc",
+    "after_sha256": "f8aaec0913820f29953134920bbcb88df31f2df9c64b6f6dbd790642525a988e",
+    "compatible_sha256": [],
+    "existed": true,
+    "mode": 420,
+    "backup_sha256": "a9cf7f6553779aab5dafae0a714fa1c415588f178baf969c699ff6e1b2b7bedc"
+  },
+  {
+    "path": "bookings/templates/bookings/room_details_v184.html",
+    "before_sha256": "c0077c52c9c6347dc8dab3f7074f4b2b01b064ce6a1ead2266c069930acf6f17",
+    "after_sha256": "e55bd796756cd6bf298dd06a20b7233c2f8e5464da9f3aa10cd2abd0f0cb10da",
+    "compatible_sha256": [],
+    "existed": true,
+    "mode": 420,
+    "backup_sha256": "c0077c52c9c6347dc8dab3f7074f4b2b01b064ce6a1ead2266c069930acf6f17"
+  },
+  {
+    "path": "bookings/templates/bookings/room_photo_v187.html",
+    "before_sha256": null,
+    "after_sha256": "220336be929ba48ffccda80e7c056187274408c53d0cd9584ae8c79520a1a1d5",
+    "compatible_sha256": [],
+    "existed": false,
+    "mode": 420,
+    "backup_sha256": null
+  },
+  {
+    "path": "bookings/test_room_photo_v187.py",
+    "before_sha256": null,
+    "after_sha256": "9fb8aa690cbe4edcb76da237d1f51489e493575f19e04438af995e0865f186db",
+    "compatible_sha256": [],
+    "existed": false,
+    "mode": 420,
+    "backup_sha256": null
+  }
+]

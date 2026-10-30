@@ -34,8 +34,11 @@ class ApprovalDashboardTests(TestCase):
         reservation = Reservation.objects.create(
             name=name, email='guest@example.com', phone='123456', notes='Vegetarian meal',
             check_in=self.start, check_out=self.start + timedelta(days=2),
-            status=status, guest_request=guest_request,
+            status=status, guest_request=guest_request and status != 'confirmed',
         )
+        if status == 'confirmed':
+            Reservation.objects.filter(pk=reservation.pk).update(guest_request=True)
+            reservation.refresh_from_db()
         ReservationItem.objects.create(reservation=reservation, room=room, beds=2, price_per_night=room.price_per_night)
         return reservation
 
@@ -77,7 +80,7 @@ class ApprovalDashboardTests(TestCase):
         pending = self.client.get(self.url)
         self.assertContains(pending, 'Waiting Guest')
         self.assertNotContains(pending, 'Approved Guest')
-        self.assertEqual(pending.context['counts'], {'pending': 1, 'confirmed': 1, 'cancelled': 1})
+        self.assertEqual(pending.context['counts'], {'pending': 1, 'confirmed': 1, 'cancelled': 1, 'awaiting_deposit': 0})
         approved = self.client.get(self.url, {'status': 'confirmed', 'q': 'Approved'})
         self.assertContains(approved, 'Approved Guest')
         self.assertNotContains(approved, 'Waiting Guest')
@@ -90,7 +93,7 @@ class ApprovalDashboardTests(TestCase):
         with self.captureOnCommitCallbacks(execute=True):
             response = self.client.post(
                 reverse('bookings:manager_reservation_action', args=[reservation.code]),
-                {'action': 'confirm', 'source': 'approvals'},
+                {'action': 'confirm', 'deposit_amount': '0', 'source': 'approvals'},
             )
         self.assertRedirects(response, self.url, fetch_redirect_response=False)
         reservation.refresh_from_db()
@@ -117,7 +120,7 @@ class ApprovalDashboardTests(TestCase):
         self.client.force_login(self.manager)
         response = self.client.post(
             reverse('bookings:manager_reservation_action', args=[reservation.code]),
-            {'action': 'confirm', 'source': 'approvals'},
+            {'action': 'confirm', 'deposit_amount': '0', 'source': 'approvals'},
         )
         self.assertEqual(response.status_code, 404)
         reservation.refresh_from_db()

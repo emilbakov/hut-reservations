@@ -15,11 +15,11 @@ document.addEventListener('DOMContentLoaded',()=>{
   fields().forEach(input=>{
    const qty=Number(input.value||0),price=Number(input.dataset.price);
    if(!Number.isInteger(qty)||qty<0||qty>Number(input.max))invalid=true;
-   const count=Number.isInteger(qty)?Math.max(0,qty):0,subtotal=Math.round(price*100)*count*nights;
+   const count=Number.isInteger(qty)?Math.max(0,qty):0,subtotal=Math.round(price*100)*(input.dataset.pricingUnit==='room'?(count>0?1:0):count)*nights;
    selected+=count;total+=subtotal;
    input.closest('[data-room-id]').classList.toggle('ph-room-selected',count>0);
    const controls=input.closest('.ph-quantity');controls.querySelector('[data-quantity="-1"]').disabled=count<=0;controls.querySelector('[data-quantity="1"]').disabled=count>=Number(input.max);
-   if(count){const li=document.createElement('li'),label=document.createElement('span'),value=document.createElement('strong');label.textContent=input.closest('[data-room-name]').dataset.roomName+' · '+count+' × '+money(price)+' × '+nights+' '+t(nights===1?'night':'nights');value.textContent=money(subtotal/100);li.append(label,value);$('ph-summary-lines').append(li);}
+   if(count){const li=document.createElement('li'),label=document.createElement('span'),value=document.createElement('strong');label.textContent=input.closest('[data-room-name]').dataset.roomName+' · '+(input.dataset.pricingUnit==='room'?t('Whole unit'):count)+' × '+money(price)+' × '+nights+' '+t(nights===1?'night':'nights');value.textContent=money(subtotal/100);li.append(label,value);$('ph-summary-lines').append(li);}
   });
   if(!selected){const li=document.createElement('li');li.textContent=t('Choose beds from the rooms above.');$('ph-summary-lines').append(li);}
   const valid=Number.isInteger(target)&&target>=1&&target<=30,remaining=target-selected;

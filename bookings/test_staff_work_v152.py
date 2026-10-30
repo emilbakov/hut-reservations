@@ -31,13 +31,17 @@ class StaffWork152Tests(TestCase):
         self.client.force_login(self.manager)
 
     def booking(self, *, room=None, beds=2, start=None, status='pending', name='Decision Guest'):
-        return create_reservation(check_in=start or self.start, check_out=(start or self.start)+timedelta(days=2),
+        reservation = create_reservation(check_in=start or self.start, check_out=(start or self.start)+timedelta(days=2),
             beds_by_room={(room or self.room).pk: beds}, status=status, name=name,
-            email='guest@example.test', guest_request=True)
+            email='guest@example.test', guest_request=status != 'confirmed')
+        if status == 'confirmed':
+            Reservation.objects.filter(pk=reservation.pk).update(guest_request=True)
+            reservation.refresh_from_db()
+        return reservation
 
     def decide(self, reservation, action='confirm', **data):
         return self.client.post(reverse('bookings:manager_reservation_action', args=[reservation.code]),
-                                {'action': action, 'source': 'dashboard', 'return_hut': self.hut.slug, **data})
+                                {'action': action, 'deposit_amount':'0', 'source': 'dashboard', 'return_hut': self.hut.slug, **data})
 
     def undo(self, reservation, decision=None, client=None):
         decision = decision or reservation.staff_decisions.latest('pk')

@@ -73,7 +73,7 @@ class MobilePagesV133Tests(TestCase):
     def test_overview_has_compact_mobile_layout(self):
         response = self.client.get(reverse('bookings:dashboard'))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, '/* v133:')
+        self.assertContains(response, 'bookings/staff-v176/dashboard.css')
         self.assertContains(response, 'New reservation')
 
     def test_calendar_shows_swipe_hint_and_keeps_timeline(self):

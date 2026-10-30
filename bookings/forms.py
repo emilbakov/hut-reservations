@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from django import forms
+from .whole_units_v183 import whole_units
 from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -59,12 +60,15 @@ class BookingForm(forms.Form):
         label=_("Notes for the hut keeper"),
     )
 
-    def __init__(self, *args, rooms, free, guests=None, **kwargs):
+    def __init__(self, *args, rooms, free, guests=None, check_in=None, check_out=None, price_items=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.rooms = rooms
         self.free = free
         self.guests = guests
+        self.check_in, self.check_out = check_in, check_out
         for room in rooms:
+            from .seasonal_v186 import attach_quote
+            stay_total = attach_quote(room, check_in, check_out, (price_items or {}).get(room.pk)) if check_in and check_out else None
             if free[room.pk] > 0:
                 self.fields[self.field_name(room)] = forms.IntegerField(
                     label=room.name,
@@ -73,7 +77,7 @@ class BookingForm(forms.Form):
                     required=False,
                     initial=0,
                     widget=forms.NumberInput(
-                        attrs={"data-price": str(room.price_per_night), "class": "beds"}
+                        attrs={**({"data-stay-total": str(stay_total)} if stay_total is not None else {}), "data-price": str(room.price_per_night), "class": "beds", "data-pricing-unit": getattr(settings, "BOOKING_UNIT", "room")}
                     ),
                     error_messages={
                         "max_value": _("Only %(count)s left in %(room)s.") % {"count": free[room.pk], "room": room.name},
@@ -104,7 +108,7 @@ class BookingForm(forms.Form):
         if not any(name in self.errors for name in room_fields):
             selected = sum(data.get(name) or 0 for name in room_fields)
             if not selected:
-                self.add_error(None, _("Choose at least one bed."))
+                self.add_error(None, (_("Choose at least one room and enter its guests.") if whole_units() else _("Choose at least one bed.")))
             elif self.guests is not None and selected != self.guests:
-                self.add_error(None, _("Select exactly %(count)s beds for your group, or update the group size.") % {"count": self.guests})
+                self.add_error(None, (_("Assign exactly %(count)s guests to your selected units, or update the group size.") if whole_units() else _("Select exactly %(count)s beds for your group, or update the group size.")) % {"count": self.guests})
         return data

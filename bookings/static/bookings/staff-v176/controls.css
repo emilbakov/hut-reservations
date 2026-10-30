@@ -1,0 +1,13 @@
+/* Staff controls are self-contained, including on standalone floorplan pages. */
+.sd116-topbar .sd147-language{display:inline-flex!important;align-items:center;flex:0 0 auto;flex-wrap:nowrap;gap:2px;width:auto!important;margin:0!important;padding:3px!important;border:1px solid #c8d9ce;border-radius:11px;background:#f0f5ee;box-shadow:none;line-height:1}
+.sd116-topbar .sd147-language button{display:inline-flex;align-items:center;justify-content:center;flex:0 0 44px;min-width:44px;min-height:44px;margin:0!important;padding:6px!important;border:0;border-radius:8px;background:transparent;color:#264c3a;font:700 13px/1.2 system-ui,sans-serif;cursor:pointer;box-shadow:none}
+.sd116-topbar .sd147-language button[aria-pressed=true]{background:#195b42;color:#fff}
+.sd116-topbar .sd147-language button:hover{background:#dce8d6;color:#183d2c}
+.sd116-topbar .sd147-language button[aria-pressed=true]:hover{background:#104b35;color:#fff}
+.sd116-topbar .sd147-language button:focus-visible{outline:3px solid #6c8e29;outline-offset:2px}
+.sd116-topbar .sd116-top-actions{flex:0 0 auto;flex-wrap:nowrap;gap:10px;min-width:0}
+.sd116-topbar .sd116-top-left{flex:1 1 auto;min-width:0}
+.sd116-topbar .sd116-top-title{min-width:0}
+@media(max-width:1100px){.sd116-topbar .sd116-top-search{display:none!important}}
+@media(max-width:600px){.sd116-topbar .sd116-top-actions{gap:7px}.sd116-topbar .sd116-top-left{gap:8px}.sd116-topbar .sd147-language{order:2}.sd116-topbar .sd116-top-title{max-width:100%}.sd116-topbar .sd116-top-title strong{max-width:100%}}
+@media(max-width:430px){.sd116-topbar .sd116-top-title>span{display:none}.sd116-topbar .sd116-top-title strong{font-size:13px}.sd116-topbar .sd116-top-actions{gap:5px}.sd116-topbar .sd147-language{padding:2px!important;gap:0}}

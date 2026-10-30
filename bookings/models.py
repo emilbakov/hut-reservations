@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator
 
 import secrets
 
@@ -6,10 +7,11 @@ from django.conf import settings
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator, URLValidator
-from django.db import models
+from django.db import models, transaction
 from django.db.models import F, Q
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 
 def make_code():
@@ -27,6 +29,16 @@ class Hut(models.Model):
     reply_time_bg = models.CharField(max_length=300, blank=True)
     payment_instructions_en = models.TextField(blank=True, help_text="Actual payment methods, timing and any deposit rules. Public plain text; no card details.")
     payment_instructions_bg = models.TextField(blank=True)
+
+    check_in_from = models.TimeField(_("Check-in from"), null=True, blank=True)
+    check_in_until = models.TimeField(_("Check-in until"), null=True, blank=True)
+    check_out_until = models.TimeField(_("Check-out by"), null=True, blank=True)
+    arrival_directions_en = models.TextField(_("Directions (English)"), max_length=2000, blank=True, default="", db_default="")
+    arrival_directions_bg = models.TextField(_("Directions (Bulgarian)"), max_length=2000, blank=True, default="", db_default="")
+    parking_en = models.TextField(_("Parking (English)"), max_length=1000, blank=True, default="", db_default="")
+    parking_bg = models.TextField(_("Parking (Bulgarian)"), max_length=1000, blank=True, default="", db_default="")
+    arrival_notes_en = models.TextField(_("Arrival notes (English)"), max_length=1500, blank=True, default="", db_default="")
+    arrival_notes_bg = models.TextField(_("Arrival notes (Bulgarian)"), max_length=1500, blank=True, default="", db_default="")
 
     name = models.CharField(max_length=150)
     slug = models.SlugField(max_length=160, unique=True)
@@ -51,7 +63,11 @@ class Hut(models.Model):
 
 
 class Room(models.Model):
-    """A room belonging to a mountain hut."""
+    """An exclusively rented normal room or studio belonging to a hut."""
+
+    class RoomType(models.TextChoices):
+        NORMAL = "normal", _("Normal room")
+        STUDIO = "studio", _("Studio")
 
     hut = models.ForeignKey(
         Hut,
@@ -63,17 +79,59 @@ class Room(models.Model):
 
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=200, blank=True)
+    image = models.ImageField(_("Room photo"), upload_to="rooms/", blank=True,
+        default="", db_default="", help_text=_("Optional. Shown only in booking room options. Leave blank until you have a photo."))
+
+    room_type = models.CharField(_("Accommodation type"), max_length=10,
+        choices=RoomType.choices, default=RoomType.NORMAL, db_default="normal")
+    extras_en = models.TextField(_("Extras (English)"), max_length=1000, blank=True,
+        db_default="", default="", help_text=_("List only extras this unit actually has, one per line. Leave blank if none are listed."))
+    extras_bg = models.TextField(_("Extras (Bulgarian)"), max_length=1000, blank=True,
+        db_default="", default="", help_text=_("Bulgarian version of the actual extras, one per line."))
+
+    @property
+    def extra_features(self):
+        from .public_profile_v149 import localized
+        value, _language = localized(self, "extras")
+        return [line.strip() for line in value.splitlines() if line.strip()]
+
+    @property
+    def extras_language(self):
+        from .public_profile_v149 import localized
+        return localized(self, "extras")[1]
 
     capacity = models.PositiveIntegerField(
         help_text="Number of beds in the room."
     )
 
-    price_per_night = models.DecimalField(
+    price_per_night = models.DecimalField(_("Fallback price / unit / night"),
         max_digits=7,
         decimal_places=2,
         default=0,
-        help_text="Price per bed, per night.",
+        help_text=_("Used when a seasonal price is blank. Set summer and winter prices for seasonal bookings."),
     )
+
+    summer_price = models.DecimalField(_("Summer price / unit / night"), max_digits=7, decimal_places=2,
+        null=True, blank=True, help_text=_("1 May–31 October. Blank uses the fallback nightly price."),
+        validators=[MinValueValidator(0)])
+    winter_price = models.DecimalField(_("Winter price / unit / night"), max_digits=7, decimal_places=2,
+        null=True, blank=True, help_text=_("1 November–30 April. Blank uses the fallback nightly price."),
+        validators=[MinValueValidator(0)])
+
+    @property
+    def booking_photos(self):
+        result = [{"url": self.image.url, "caption": ""}] if self.image else []
+        result.extend({"url": photo.image.url, "caption": photo.caption}
+                      for photo in self.photos.all() if photo.image)
+        return result
+
+    @property
+    def summer_rate(self):
+        return self.summer_price if self.summer_price is not None else self.price_per_night
+
+    @property
+    def winter_rate(self):
+        return self.winter_price if self.winter_price is not None else self.price_per_night
 
     is_active = models.BooleanField(
         default=True,
@@ -91,7 +149,10 @@ class Room(models.Model):
             models.UniqueConstraint(
                 fields=["hut", "name"],
                 name="unique_room_name_per_hut",
-            )
+            ),
+            models.CheckConstraint(condition=Q(room_type__in=["normal", "studio"]), name="room_type_v184_valid"),
+            models.CheckConstraint(condition=Q(summer_price__isnull=True) | Q(summer_price__gte=0), name="room_summer_nonnegative_v186"),
+            models.CheckConstraint(condition=Q(winter_price__isnull=True) | Q(winter_price__gte=0), name="room_winter_nonnegative_v186")
         ]
 
     def clean(self):
@@ -104,6 +165,21 @@ class Room(models.Model):
         if self.hut_id:
             return f"{self.hut.name} — {self.name}"
         return self.name
+
+
+class RoomPhoto(models.Model):
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="photos")
+    image = models.ImageField(_("Photo"), upload_to="rooms/gallery/")
+    caption = models.CharField(_("Caption / image description"), max_length=200, blank=True)
+    position = models.PositiveIntegerField(_("Order"), default=0)
+
+    class Meta:
+        ordering = ["position", "pk"]
+        verbose_name = _("Additional room photo")
+        verbose_name_plural = _("Additional room photos")
+
+    def __str__(self):
+        return self.caption or str(self.room)
 
 
 class Reservation(models.Model):
@@ -147,6 +223,9 @@ class Reservation(models.Model):
 
     created = models.DateTimeField(auto_now_add=True)
 
+    deposit_request = models.ForeignKey('ReservationDepositRequest', null=True, blank=True,
+        on_delete=models.PROTECT, related_name='+', editable=False)
+
     class Meta:
         ordering = ["-check_in", "-created"]
         constraints = [
@@ -171,6 +250,31 @@ class Reservation(models.Model):
             raise ValidationError({
                 "check_out": "Check-out must be after check-in."
             })
+        from .deposit_flow_v180 import validate_reservation_write
+        validate_reservation_write(self)
+
+    @transaction.atomic
+    def save(self, *args, **kwargs):
+        from .whole_units_v183 import guard_reservation
+        guard_reservation(self)
+        from .deposit_flow_v180 import validate_reservation_write, close_cancelled_hold
+        validate_reservation_write(self)
+        result = super().save(*args, **kwargs)
+        if self.status == self.Status.CANCELLED:
+            close_cancelled_hold(self)
+        return result
+
+    def get_status_display(self):
+        from django.utils.translation import gettext as _
+        if self.deposit_request_id:
+            hold = self.deposit_request
+            if hold.state == 'review' and self.status == self.Status.PENDING:
+                return _('Deposit received — staff review')
+            if hold.state == 'awaiting' and self.status == self.Status.PENDING:
+                return _('Awaiting deposit') if hold.due_at > timezone.now() else _('Deposit deadline passed')
+            if hold.state == 'expired' and self.status == self.Status.CANCELLED:
+                return _('Expired — deposit unpaid')
+        return dict(self.Status.choices).get(self.status, self.status)
 
     def get_absolute_url(self):
         return reverse(
@@ -213,14 +317,19 @@ class ReservationItem(models.Model):
         related_name="items",
     )
 
-    beds = models.PositiveIntegerField()
+    beds = models.PositiveIntegerField(help_text="Number of guests staying in this reserved unit.")
+
+    from .whole_units_v183 import default_pricing_unit
+    pricing_unit = models.CharField(max_length=4, choices=[("bed", "Legacy bed price"), ("room", "Whole unit price")], db_default="bed", default=default_pricing_unit, editable=False)
 
     price_per_night = models.DecimalField(
         max_digits=7,
         decimal_places=2,
         default=0,
-        help_text="Price per bed, per night, at the time of booking.",
+        help_text="Nightly price snapshot; pricing_unit records whether this is a whole-unit or legacy bed price.",
     )
+
+    seasonal_rates = models.JSONField(default=dict, db_default={}, blank=True, editable=False)
 
     class Meta:
         constraints = [
@@ -237,13 +346,57 @@ class ReservationItem(models.Model):
     def __str__(self):
         return f"{self.beds} x {self.room}"
 
+    def clean(self):
+        from .seasonal_v186 import validate_agreed_item
+        validate_agreed_item(self)
+        from .deposit_flow_v180 import validate_item_write
+        validate_item_write(self)
+
+    @transaction.atomic
+    def save(self, *args, **kwargs):
+        from .seasonal_v186 import snapshot, validate_snapshot, validate_agreed_item
+        validate_agreed_item(self)
+        if self._state.adding and self.pricing_unit == "room" and not self.seasonal_rates:
+            if self.price_per_night == self.room.price_per_night:
+                self.seasonal_rates = snapshot(self.room)
+        validate_snapshot(self.seasonal_rates)
+        if self.pk:
+            old_rates = type(self).objects.filter(pk=self.pk).values_list("seasonal_rates", flat=True).first()
+            if old_rates is not None and old_rates != self.seasonal_rates:
+                raise ValidationError("Agreed seasonal rates cannot be changed.")
+        from .whole_units_v183 import guard_item
+        guard_item(self)
+        if self.pk:
+            previous = type(self).objects.filter(pk=self.pk).values_list("pricing_unit", flat=True).first()
+            if previous is not None and previous != self.pricing_unit:
+                raise ValidationError("The recorded pricing basis cannot be changed.")
+        from .deposit_flow_v180 import validate_item_write
+        validate_item_write(self)
+        return super().save(*args, **kwargs)
+
+    @property
+    def nightly_total(self):
+        return self.nightly_total_on(self.reservation.check_in)
+
+    def nightly_total_on(self, day):
+        from .seasonal_v186 import rate_on
+        return rate_on(self, day) * (1 if self.pricing_unit == "room" else self.beds)
+
+    def total_between(self, start, end):
+        from .seasonal_v186 import nights, ZERO
+        first, after = max(start, self.reservation.check_in), min(end, self.reservation.check_out)
+        return sum((self.nightly_total_on(day) for day in nights(first, after)), ZERO)
+
+    @property
+    def seasonal_lines(self):
+        from .seasonal_v186 import lines
+        if not self.seasonal_rates:
+            return []
+        return lines(self.seasonal_rates, self.reservation.check_in, self.reservation.check_out)
+
     @property
     def subtotal(self):
-        return (
-            self.beds
-            * self.price_per_night
-            * self.reservation.nights
-        )
+        return self.total_between(self.reservation.check_in, self.reservation.check_out)
 
 
 class GuestStay(models.Model):
@@ -318,6 +471,7 @@ class PaymentTransaction(models.Model):
     note = models.CharField(max_length=500, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     recorded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='recorded_hut_payments')
+    recording_key = models.CharField(max_length=64, null=True, blank=True, unique=True, editable=False)
 
     class Meta:
         ordering = ['-created', '-pk']
@@ -703,6 +857,9 @@ class PublicWebsiteSettings(models.Model):
     """One owner-managed public profile; blank contact details stay private."""
     id = models.PositiveSmallIntegerField(primary_key=True, default=1, editable=False)
     brand_name = models.CharField(max_length=80, blank=True)
+    main_hut = models.ForeignKey(Hut, null=True, blank=True, on_delete=models.PROTECT,
+        related_name='+', limit_choices_to={'is_active': True},
+        help_text='Shown at the main URL. Only this hut accepts new public reservation requests. Other huts remain browse-only. With one active hut it is selected automatically.')
     operator_name = models.CharField(max_length=200, blank=True, help_text="Legal operator / data controller, for published policies.")
     contact_phone = models.CharField(max_length=40, blank=True)
     contact_email = models.EmailField(blank=True)
@@ -737,6 +894,8 @@ class PublicWebsiteSettings(models.Model):
         errors = {}
         if self.pk != 1:
             errors["id"] = "Only one public website profile is supported."
+        if self.main_hut_id and not self.main_hut.is_active:
+            errors['main_hut'] = 'Choose an active hut as the main hut.'
         if self.contact_phone and not re.fullmatch(r"\+?[0-9 () .-]{6,40}", self.contact_phone):
             errors["contact_phone"] = "Use a phone number with digits, spaces, +, brackets or dashes."
         if self.map_url:
@@ -788,3 +947,51 @@ class ReservationDecision(models.Model):
     fingerprint = models.CharField(max_length=64)
     created_at = models.DateTimeField(auto_now_add=True)
     undone_at = models.DateTimeField(null=True, blank=True)
+
+
+class ReservationDepositRequest(models.Model):
+    """Immutable approved payment terms; later approvals create new versions."""
+    class State(models.TextChoices):
+        AWAITING = 'awaiting', 'Awaiting deposit'
+        PAID = 'paid', 'Deposit received'
+        REVIEW = 'review', 'Deposit received — staff review'
+        WAIVED = 'waived', 'No deposit required'
+        EXPIRED = 'expired', 'Expired — deposit unpaid'
+        WITHDRAWN = 'withdrawn', 'Approval withdrawn'
+
+    reservation = models.ForeignKey(Reservation, on_delete=models.PROTECT, related_name='deposit_requests')
+    state = models.CharField(max_length=12, choices=State.choices)
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    due_at = models.DateTimeField(db_index=True)
+    approved_at = models.DateTimeField(default=timezone.now)
+    approved_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL,
+                                    related_name='approved_deposit_requests')
+    instructions_en = models.TextField(blank=True)
+    instructions_bg = models.TextField(blank=True)
+    origin = models.URLField(max_length=500)
+    reminder_at = models.DateTimeField()
+    reminder_queued_at = models.DateTimeField(null=True, blank=True)
+    paid_at = models.DateTimeField(null=True, blank=True)
+    net_received_at_confirmation = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    closed_at = models.DateTimeField(null=True, blank=True)
+    closed_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+                                  related_name='closed_deposit_requests')
+    close_reason = models.CharField(max_length=1000, blank=True)
+    reminders_enabled = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['-pk']
+        constraints = [
+            models.CheckConstraint(condition=Q(amount__gte=0), name='deposit_v180_nonnegative'),
+            models.UniqueConstraint(fields=['reservation'], condition=Q(state='awaiting'),
+                                    name='one_awaiting_deposit_v180'),
+        ]
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            fields = ['reservation_id', 'amount', 'due_at', 'approved_at', 'approved_by_id',
+                      'instructions_en', 'instructions_bg', 'origin', 'reminder_at', 'reminders_enabled']
+            previous = type(self).objects.filter(pk=self.pk).values(*fields).first()
+            if previous and any(previous[name] != getattr(self, name) for name in fields):
+                raise ValidationError('Approved deposit terms are immutable; withdraw and issue a new request.')
+        return super().save(*args, **kwargs)

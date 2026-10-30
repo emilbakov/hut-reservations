@@ -13,7 +13,8 @@
     {% endif %}
     <nav aria-label="{% translate 'Footer navigation' %}"><h2>{% translate "Useful links" %}</h2>
       <a href="{% url 'bookings:hut_list' %}">{% translate "Explore huts" %}</a>
-      <a href="{% url 'bookings:public_home' %}#questions">{% translate "Booking questions" %}</a>
+      {% if MAIN_PUBLIC_HUT %}<a href="{% url 'bookings:book' %}">{% translate "Rooms & reservations" %}</a>{% endif %}
+      <a href="{% url 'bookings:book' %}#questions">{% translate "Booking questions" %}</a>
       {% if PUBLIC149.cancellation %}<a href="{% url 'bookings:public_policy' 'cancellation' %}">{% translate "Cancellation policy" %}</a>{% endif %}
       {% if PUBLIC149.privacy %}<a href="{% url 'bookings:public_policy' 'privacy' %}">{% translate "Privacy notice" %}</a>{% endif %}
       <a href="{% url 'bookings:staff_login' %}">{% translate "Staff portal" %} <span aria-hidden="true">↗</span></a>

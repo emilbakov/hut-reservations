@@ -11,6 +11,8 @@ from . import manager_digest_history_v132
 from .request_operations_v128 import request_export
 from .staff_decisions_v152 import undo_decision
 from .staff_auth_v117 import StaffLoginView, StaffLogoutView
+from .reservation_pages_v178 import reservation_entry
+from .deposit_views_v180 import withdraw_deposit
 
 app_name = "bookings"
 
@@ -37,6 +39,8 @@ urlpatterns = [
     ),
 
     # Reservation management
+    path("r/", reservation_entry, name="reservation_entry"),
+    path("staff/reservations/<str:code>/withdraw-deposit/", withdraw_deposit, name="withdraw_deposit"),
     path(
         "r/<str:code>/modify/",
         views.reservation_modify,
@@ -190,3 +194,10 @@ urlpatterns += [
 # v145: property-scoped delivery status and retry.
 from .delivery_views_v145 import notification_deliveries
 urlpatterns += [path('staff/reservation-email/', notification_deliveries, name='notification_deliveries')]
+
+# Manager-scoped accommodation type and actual extras.
+from .room_details_v184 import room_details
+urlpatterns += [path("staff/rooms/<int:room_id>/details/", room_details, name="room_details")]
+
+from .arrival_v189 import arrival_settings
+urlpatterns += [path("staff/arrival/", arrival_settings, name="arrival_settings")]

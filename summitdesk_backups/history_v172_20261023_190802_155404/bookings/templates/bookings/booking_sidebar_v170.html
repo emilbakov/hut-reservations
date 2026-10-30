@@ -1,0 +1,18 @@
+{% load static i18n ui_v147 %}
+<aside class="ph-sidebar b170-sidebar" aria-label="{% translate 'Your stay at the hut' %}">
+  <div class="b170-stay-card">
+    <a class="b170-hut-photo" href="{% url 'bookings:public_home' %}" aria-label="{% translate 'Discover the hut' %}">{% if hut.image %}<img src="{{ hut.image.url }}" alt="{{ hut.name }}" loading="lazy" decoding="async">{% else %}<img src="{% static 'bookings/heritage-v168/studenets-today-640.webp' %}" width="640" height="357" alt="{% blocktranslate with name=hut.name %}{{ name }} surrounded by snow-covered forest.{% endblocktranslate %}" loading="lazy" decoding="async">{% endif %}<span>{% translate "Your mountain base" %}<span aria-hidden="true">↗</span></span></a>
+    <div class="b170-stay-name"><span class="pub-eyebrow">{% translate "YOUR CHOSEN HUT" %}</span><h2>{{ hut.name }}</h2>{% if hut.location %}<p>{{ hut.location }}</p>{% endif %}</div>
+    {% if booking %}
+    <div class="ph-booking-result" id="ph-booking-result"><div class="ph-result-top"><span>{% translate "YOUR STAY" %}</span><strong>{{ nights|night_count }}</strong></div><p>{{ check_in|date:'j M' }} – {{ check_out|date:'j M Y' }}</p>{% if any_free %}<div class="ph-status-good"><span aria-hidden="true">●</span> {% translate "Beds available for your stay" %}</div>{% else %}<div class="ph-status-full">{% translate "No beds available for these dates" %}</div>{% endif %}<a href="#booking-dates" class="ph-result-link">{% translate "Change dates" %}<span aria-hidden="true">↗</span></a></div>
+    <section class="b170-price-summary" id="b170-price-summary" aria-labelledby="b170-summary-title" {% if not any_free %}hidden{% endif %}>
+      <h3 id="b170-summary-title">{% translate "Your selection" %}</h3>
+      <ul id="b170-summary-lines">{% for line in summary_rows %}<li><span>{% blocktranslate with v0=line.room.name v1=line.beds v2=nights %}{{ v0 }} · {{ v1 }} beds × {{ v2 }} nights{% endblocktranslate %}</span><strong>{{ line.subtotal|floatformat:2 }} {{ CURRENCY }}</strong></li>{% empty %}<li>{% translate "Choose beds from the rooms above." %}</li>{% endfor %}</ul>
+      <div class="b170-estimate"><span>{% translate "Estimated total" %}</span><strong id="b170-total" {% if not selected_beds %}class="b170-total-prompt"{% endif %}>{% if selected_beds %}{{ estimated_total|floatformat:2 }} {{ CURRENCY }}{% else %}{% translate "Choose beds to see the total" %}{% endif %}</strong></div>
+      <a class="h168-button h168-button-dark b170-continue" id="b170-continue" href="{% if selected_beds %}#guest-details{% else %}#rooms{% endif %}" data-label-empty="{% translate 'Choose your beds' %}" data-label-ready="{% translate 'Continue to your details' %}"><span data-continue-label>{% if selected_beds %}{% translate "Continue to your details" %}{% else %}{% translate "Choose your beds" %}{% endif %}</span><span aria-hidden="true">↓</span></a>
+    </section>
+    {% else %}<div class="b170-date-hint"><span aria-hidden="true">01</span><p>{% translate "Start with your dates. We’ll show the beds available for your whole stay." %}</p><a href="#booking-dates">{% translate "Choose your dates" %}<span aria-hidden="true">↑</span></a></div>{% endif %}
+    <p class="b170-trust"><span aria-hidden="true">✓</span>{% translate "Manager approval required · no account needed" %}</p>
+  </div>
+  <a class="b170-help-link" href="#questions">{% translate "Questions about booking?" %}<span aria-hidden="true">↓</span></a>
+</aside>

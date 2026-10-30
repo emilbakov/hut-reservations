@@ -20,6 +20,8 @@ class GuestApprovalTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.hut = Hut.objects.create(name='Summit Hut', slug='summit-hut')
+        from .models import PublicWebsiteSettings
+        PublicWebsiteSettings.objects.create(main_hut=cls.hut)
         cls.room = Room.objects.create(hut=cls.hut, name='Dorm', capacity=3, price_per_night=Decimal('22.00'))
         cls.start = timezone.localdate() + timedelta(days=8)
         cls.end = cls.start + timedelta(days=2)
@@ -43,7 +45,7 @@ class GuestApprovalTests(TestCase):
     def submit(self, beds=2):
         with self.captureOnCommitCallbacks(execute=True):
             return self.client.post(
-                reverse('bookings:hut_detail', kwargs={'slug': self.hut.slug}),
+                reverse('bookings:book'),
                 self.guest_payload(beds),
             )
 
@@ -94,7 +96,7 @@ class GuestApprovalTests(TestCase):
         with self.captureOnCommitCallbacks(execute=True) as callbacks:
             response = self.client.post(
                 reverse('bookings:manager_reservation_action', args=[reservation.code]),
-                {'action': 'confirm'},
+                {'action': 'confirm', 'deposit_amount': '0'},
             )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(len(callbacks), 1)
@@ -118,7 +120,7 @@ class GuestApprovalTests(TestCase):
         self.assertEqual(free_beds([self.room], self.start, self.end)[self.room.pk], 3)
         self.assertTrue(any('declined' in m.subject.lower() for m in mail.outbox))
 
-    def test_property_staff_reservation_confirmation_sends_email(self):
+    def test_property_staff_reservation_cannot_bypass_deposit(self):
         self.submit()
         reservation = Reservation.objects.get()
         mail.outbox.clear()
@@ -128,10 +130,10 @@ class GuestApprovalTests(TestCase):
         url = reverse('floorplans:staff_reservation', args=[self.hut.pk, reservation.code])
         with self.captureOnCommitCallbacks(execute=True):
             response = self.client.post(url, {'action': 'status', 'status': 'confirmed'})
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
         reservation.refresh_from_db()
-        self.assertEqual(reservation.status, Reservation.Status.CONFIRMED)
-        self.assertTrue(any('confirmed' in m.body.lower() for m in mail.outbox if 'guest@example.com' in m.to))
+        self.assertEqual(reservation.status, Reservation.Status.PENDING)
+        self.assertFalse(mail.outbox)
 
     def test_deposit_auto_cancellation_skips_unapproved_request(self):
         from .lifecycle import process_lifecycle
@@ -146,11 +148,11 @@ class GuestApprovalTests(TestCase):
         self.submit()
         reservation = Reservation.objects.get()
         url = reverse('bookings:manager_reservation_action', args=[reservation.code])
-        self.assertEqual(self.client.post(url, {'action': 'confirm'}).status_code, 302)
+        self.assertEqual(self.client.post(url, {'action': 'confirm', 'deposit_amount': '0'}).status_code, 302)
         self.client.force_login(self.outside_manager)
-        self.assertEqual(self.client.post(url, {'action': 'confirm'}).status_code, 404)
+        self.assertEqual(self.client.post(url, {'action': 'confirm', 'deposit_amount': '0'}).status_code, 404)
         self.client.force_login(self.cleaner)
-        self.assertEqual(self.client.post(url, {'action': 'confirm'}).status_code, 403)
+        self.assertEqual(self.client.post(url, {'action': 'confirm', 'deposit_amount': '0'}).status_code, 403)
         reservation.refresh_from_db()
         self.assertEqual(reservation.status, Reservation.Status.PENDING)
 
@@ -170,9 +172,9 @@ class GuestApprovalTests(TestCase):
 
     def test_public_form_explains_approval_before_submission(self):
         response = self.client.get(
-            reverse('bookings:hut_detail', kwargs={'slug': self.hut.slug}),
+            reverse('bookings:book'),
             {'check_in': self.start.isoformat(), 'check_out': self.end.isoformat()},
         )
         self.assertContains(response, 'Request reservation')
         self.assertNotContains(response, 'Confirm reservation')
-        self.assertContains(response, 'not confirmed until they approve it')
+        self.assertContains(response, 'Approval is followed by deposit instructions')

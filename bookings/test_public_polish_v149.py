@@ -42,7 +42,7 @@ class PublicPolishV149Tests(TestCase):
         return PublicWebsiteSettings.objects.create(**kwargs)
 
     @override_settings(HUT_NAME="Mountain Hut")
-    def test_guest_header_has_no_staff_login_and_default_brand_is_summitdesk(self):
+    def test_guest_header_has_no_staff_login_and_default_brand_is_karlak(self):
         for url in (self.url, self.detail, reverse("bookings:book")):
             with self.subTest(url=url):
                 response = self.client.get(url)
@@ -51,7 +51,7 @@ class PublicPolishV149Tests(TestCase):
                 header = html.split("<header", 1)[1].split("</header>", 1)[0]
                 self.assertNotIn(reverse("bookings:staff_login"), header)
                 self.assertIn(reverse("bookings:staff_login"), html.split("<footer", 1)[1])
-                self.assertContains(response, "SummitDesk")
+                self.assertContains(response, "Карлък")
 
     @override_settings(HUT_NAME="Existing Custom Brand")
     def test_custom_environment_brand_is_preserved_and_admin_can_override_it(self):
@@ -64,11 +64,11 @@ class PublicPolishV149Tests(TestCase):
         html = response.content.decode()
         head = HeadParser(html)
         self.assertContains(response, 'fetchpriority="high"')
-        self.assertContains(response, 'width="1920" height="1080"')
-        self.assertContains(response, 'hero-v149-2560.avif')
+        self.assertContains(response, 'width="1280" height="714"')
+        self.assertContains(response, 'studenets-today-1280.webp')
         self.assertIn("icon", head.links)
-        self.assertEqual(head.meta["og:image:width"], "1200")
-        self.assertEqual(head.meta["og:image:height"], "630")
+        self.assertEqual(head.meta["og:image:width"], "1280")
+        self.assertEqual(head.meta["og:image:height"], "714")
         self.assertTrue(head.meta["og:image"].startswith("https://testserver/static/"))
         self.assertEqual(head.meta["og:url"], "https://testserver/")
         self.assertEqual(head.links["canonical"], "https://testserver/")
@@ -125,7 +125,7 @@ class PublicPolishV149Tests(TestCase):
         self.assertContains(response, "Example Operator")
         self.assertContains(response, 'mailto:privacy@example.com')
         start = timezone.localdate() + timedelta(days=8)
-        response = self.client.get(self.detail, {"check_in": start.isoformat(), "check_out": (start + timedelta(days=2)).isoformat()})
+        response = self.client.get(reverse('bookings:book'), {"check_in": start.isoformat(), "check_out": (start + timedelta(days=2)).isoformat()})
         self.assertContains(response, "How we use your booking details")
         self.assertContains(response, url)
 

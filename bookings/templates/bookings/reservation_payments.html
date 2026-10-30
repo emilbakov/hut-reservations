@@ -1,4 +1,5 @@
 {% extends "bookings/base.html" %}
+{% load i18n static %}
 {% block title %}Reservation payments{% endblock %}
 {% block content %}
 <style>
@@ -56,6 +57,8 @@
     <div class="pay-ref">Booking reference: <strong>{{ reservation.code }}</strong></div>
   </header>
 
+  <link rel="stylesheet" href="{% static 'bookings/deposit-v180/flow.css' %}">
+  {% if deposit180 %}<section class="dp180-staff"><h2>{{ reservation.get_status_display }}</h2><p>{% translate "Required deposit" %}: <strong>{{ deposit180.hold.amount|floatformat:2 }} {{ currency }}</strong> · {% translate "Still to be recorded" %}: <strong>{{ deposit180.remaining|floatformat:2 }} {{ currency }}</strong> · {% translate "Payment deadline" %}: {{ deposit180.hold.due_at|date:'j M Y H:i T' }} ({{ deposit180.timezone }})</p>{% if deposit180.awaiting %}<p>{% translate "Record funds only after verifying receipt. Reaching the required deposit confirms this stay automatically. A payment recorded after the deadline does not reopen an expired hold." %}</p>{% elif deposit180.review %}<p>{% translate "Funds are recorded, but room availability needs review. Withdraw the approval to change the stay, then approve again with the existing payment credit." %}</p>{% elif deposit180.expired %}<p>{% translate "The hold expired. Record any actual late funds, then review availability and refunds manually." %}</p>{% endif %}{% if deposit180.awaiting or deposit180.review %}<details><summary>{% translate "Withdraw approval and review terms" %}</summary><form method="post" action="{% url 'bookings:withdraw_deposit' reservation.code %}">{% csrf_token %}<label>{% translate "Reason" %}<textarea name="reason" required maxlength="1000"></textarea></label><p>{% translate "The old payment request is withdrawn. Existing funds stay in the ledger. Review and approve new terms before asking the guest to pay again." %}</p><button class="dp180-button" type="submit">{% translate "Withdraw deposit approval" %}</button></form></details>{% endif %}</section>{% endif %}
   <section class="pay-grid" aria-label="Payment overview">
     <div class="pay-metric"><span class="pay-label">Reservation total</span><strong class="pay-value">{{ reservation.total_price|floatformat:2 }}</strong><span class="pay-unit">{{ currency }}</span></div>
     <div class="pay-metric"><span class="pay-label">Payments received</span><strong class="pay-value">{{ summary.paid|floatformat:2 }}</strong><span class="pay-unit">{{ currency }}</span></div>
@@ -68,9 +71,9 @@
       <h2>Record transaction</h2>
       <p class="pay-sub">Record a payment, deposit or refund against this reservation.</p>
       <form class="pay-form" method="post" id="payment-entry-form">
-        {% csrf_token %}
-        <div><label for="kind">Transaction type</label><select name="kind" id="kind" required>{% for value,label in kinds %}<option value="{{ value }}">{{ label }}</option>{% endfor %}</select></div>
-        <div><label for="amount">Amount ({{ currency }})</label><input id="amount" name="amount" type="number" min="0.01" max="99999999.99" step="0.01" inputmode="decimal" required></div>
+        {% csrf_token %}<input type="hidden" name="recording_token" value="{{ recording_token }}">
+        <div><label for="kind">Transaction type</label><select name="kind" id="kind" required>{% for value,label in kinds %}<option value="{{ value }}" {% if deposit180.awaiting and value == 'deposit' %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+        <div><label for="amount">Amount ({{ currency }})</label><input id="amount" name="amount" type="number" min="0.01" max="99999999.99" step="0.01" inputmode="decimal" {% if deposit180.awaiting %}value="{{ deposit180.remaining|stringformat:'.2f' }}"{% endif %} required></div>
         <div><label for="method">Payment method</label><select name="method" id="method" required>{% for value,label in methods %}<option value="{{ value }}">{{ label }}</option>{% endfor %}</select></div>
         <div><label for="note">Reference or note</label><input id="note" name="note" maxlength="500" placeholder="Optional payment reference"></div>
         <button class="pay-button" type="submit">Save transaction</button>
@@ -96,7 +99,7 @@
   </div>
 
   <section class="pay-panel">
-    <h2>Transaction history</h2>
+    <h2 id="payment-history">Transaction history</h2>
     <p class="pay-sub">Previously recorded transactions for this reservation.</p>
     <div class="pay-table-wrap"><table class="pay-table">
       <thead><tr><th scope="col">Recorded</th><th scope="col">Type</th><th scope="col">Amount</th><th scope="col">Method</th><th scope="col">Note</th><th scope="col">Staff</th></tr></thead>

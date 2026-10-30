@@ -44,8 +44,11 @@ class ManagerDigestV129Tests(TestCase):
         reservation = Reservation.objects.create(
             name=name, email='private-guest@example.com', check_in=start,
             check_out=start + timedelta(days=2), status=status,
-            guest_request=guest_request,
+            guest_request=guest_request and status != 'confirmed',
         )
+        if status == 'confirmed':
+            Reservation.objects.filter(pk=reservation.pk).update(guest_request=True)
+            reservation.refresh_from_db()
         ReservationItem.objects.create(
             reservation=reservation, room=room, beds=2, price_per_night=room.price_per_night,
         )

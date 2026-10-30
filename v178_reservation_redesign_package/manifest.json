@@ -1,0 +1,106 @@
+{
+  "release": "v178-private-reservation-presentation",
+  "compatible_baselines": [
+    "v177 application sources"
+  ],
+  "prerequisites": [
+    {
+      "path": "bookings/static/bookings/huts-v177/huts.css",
+      "sha256": "cd1a67f2aa69d277a43e3dfc19bf5e7fc9af27ec6a764911af85309ca26e9231"
+    },
+    {
+      "path": "bookings/static/bookings/heritage-v168/heritage.css",
+      "sha256": "bef5c3e363fa6eedba3a5fe295e6fe7d906f5d24a568499b2182f1e1d739a372"
+    },
+    {
+      "path": "bookings/static/bookings/heritage-v168/heritage.js",
+      "sha256": "0baf60ae69020665332dfd4f12f2f54a95f6d57e387f02a32fcafa21a03335d4"
+    }
+  ],
+  "files": [
+    {
+      "path": "bookings/booking_flow_v150.py",
+      "before_sha256": "e4996566a75a2e85094e6d27de448f05da6ad44712e97da186fa7ef4f2835e6b",
+      "after_sha256": "ad59531106ac6d286b3380c098898e2297d604220fcd0d86e2a9803ff866ea23",
+      "compatible_sha256": []
+    },
+    {
+      "path": "bookings/locale/bg/LC_MESSAGES/django.mo",
+      "before_sha256": "da5b34a7c43c06b0d3c52492eb3104bbe5f54b36784d0ad5e33ddd7830fc2c8f",
+      "after_sha256": "592b7c306952c5b580f244f88f35008678af3414d67f9d60241be6377d6d2730",
+      "compatible_sha256": []
+    },
+    {
+      "path": "bookings/locale/bg/LC_MESSAGES/django.po",
+      "before_sha256": "a155f10e7352d35fc2770510aeda5f6edd057998899dbdef7ba0a26126cb0465",
+      "after_sha256": "b7779a1b0a7d0ffbff52e0c607dc19ac6d747186ba585e9c01998c282c418f28",
+      "compatible_sha256": []
+    },
+    {
+      "path": "bookings/reservation_pages_v178.py",
+      "before_sha256": null,
+      "after_sha256": "735f3bdafd6b59f217777e4369cf715f12e06f1d435b20e521e7aa197b212ecd",
+      "compatible_sha256": []
+    },
+    {
+      "path": "bookings/static/bookings/reservation-v178/reservation.css",
+      "before_sha256": null,
+      "after_sha256": "6cf6f4de348c1c5912c12dde385032954269597bcbc311a0a5a91f8d3b190116",
+      "compatible_sha256": []
+    },
+    {
+      "path": "bookings/static/bookings/reservation-v178/reservation.js",
+      "before_sha256": null,
+      "after_sha256": "251406970a4bc4b41a9099c71f8373bbd90e38486ff8b6f5d88f57e68fbd84b0",
+      "compatible_sha256": []
+    },
+    {
+      "path": "bookings/templates/bookings/huts_base_v177.html",
+      "before_sha256": "91c347bc7f78869d97701b223da7a9ff14b6a77f33d5027cddb895057762a232",
+      "after_sha256": "2f0f06e2c77008c491a9d256388df44b1c147dda1a67cca098973b1a3b2a85a0",
+      "compatible_sha256": []
+    },
+    {
+      "path": "bookings/templates/bookings/private_link_v145.html",
+      "before_sha256": "9a4fad022b65a3e598fe71e3d43d5ae9d501926af79629fb15ffb6503f6a57fe",
+      "after_sha256": "ee72eb2370c01df889105514e249f46f509cfee5af48900bc678e2ce38b42071",
+      "compatible_sha256": []
+    },
+    {
+      "path": "bookings/templates/bookings/reservation.html",
+      "before_sha256": "b49bf580ae63c734c5c5f536b16765ac46c578e4c2627a6492b5ff3385af8c36",
+      "after_sha256": "64edf9d2d57125535d92d558051b6660d64b046f7bc0b5bd059c3bb475fc1871",
+      "compatible_sha256": []
+    },
+    {
+      "path": "bookings/templates/bookings/reservation_base_v178.html",
+      "before_sha256": null,
+      "after_sha256": "adb737e09c922b02c2f79df06d3cde6b31da86001e2d12571223f85b876e462b",
+      "compatible_sha256": []
+    },
+    {
+      "path": "bookings/test_booking_flow_v150.py",
+      "before_sha256": "11ff0c972e2e6d9b409557077c6add979b1de0fe73793c3a1ccdc97b5928c16c",
+      "after_sha256": "b486e87d8e768e58b66df4afbd1cd9a95fc6097b6c74ba5fcea104357b6ce1c4",
+      "compatible_sha256": []
+    },
+    {
+      "path": "bookings/test_reservation_nav_v163.py",
+      "before_sha256": "ed8d83369fa5baa576ce4e3e63b079e1af14f60ba45b2ed34c9be66160edcacb",
+      "after_sha256": "52c385c42084458bac5dab1f0d89a7d3913126e232a60a5eea20f0147d543054",
+      "compatible_sha256": []
+    },
+    {
+      "path": "bookings/test_reservation_v178.py",
+      "before_sha256": null,
+      "after_sha256": "d0950652d70d4eddafa149666d5bfc388618c13c3611484fbd17b442b473eb1e",
+      "compatible_sha256": []
+    },
+    {
+      "path": "bookings/urls.py",
+      "before_sha256": "4038586665b2452fe8d8ddb8d331b2e4c9e490e8d9890b38e03b0a73d59a07ed",
+      "after_sha256": "d65414f77127e3fe6bfcac96e3c4a53ba62cfaabebbe1542640984d53702d4b4",
+      "compatible_sha256": []
+    }
+  ]
+}

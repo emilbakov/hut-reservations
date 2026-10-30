@@ -1,0 +1,8 @@
+{% extends "bookings/base.html" %}{% load static i18n %}
+{% block title %}{% translate "Arrival information" %}{% endblock %}
+{% block content %}<link rel="stylesheet" href="{% static 'bookings/arrival-v189.css' %}">
+<section class="a189-settings"><h1>{% translate "Arrival information" %}</h1><p>{% translate "Add the actual hut directions, parking and arrival times. Leave unknown details blank. Guests see this on their booking page and in new confirmation and pre-arrival emails." %}</p>
+<form method="get" class="a189-choose"><label for="arrival-hut">{% translate "Choose hut" %}</label><select name="hut" id="arrival-hut"><option value="">{% translate "Choose hut" %}</option>{% for hut in huts %}<option value="{{ hut.slug }}"{% if hut == selected_hut %} selected{% endif %}>{{ hut.name }}</option>{% endfor %}</select><button type="submit">{% translate "Select hut" %}</button></form>
+{% if form %}<div class="a189-layout"><form method="post" class="a189-form">{% csrf_token %}<input type="hidden" name="hut_id" value="{{ selected_hut.pk }}"><h2>{{ selected_hut.name }}</h2>{{ form.non_field_errors }}
+{% for field in form %}<div class="a189-field">{{ field.label_tag }}{{ field }}{{ field.errors }}{% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}</div>{% endfor %}<button type="submit">{% translate "Save arrival information" %}</button></form><aside><h2>{% translate "Guest preview" %}</h2>{% include "bookings/arrival_info_v189.html" %}</aside></div>{% endif %}
+</section>{% endblock %}

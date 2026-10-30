@@ -20,6 +20,8 @@ class RangeAvailability147Tests(TestCase):
         cls.today = timezone.localdate()
         cls.first = (cls.today.replace(day=28) + timedelta(days=4)).replace(day=1)
         cls.hut = Hut.objects.create(name='Range Lodge', slug='range-lodge')
+        from .models import PublicWebsiteSettings
+        PublicWebsiteSettings.objects.create(main_hut=cls.hut)
         cls.room = Room.objects.create(hut=cls.hut, name='Dorm', capacity=5)
         cls.twin = Room.objects.create(hut=cls.hut, name='Twin', capacity=2)
         cls.inactive = Room.objects.create(hut=cls.hut, name='Inactive', capacity=40, is_active=False)
@@ -50,11 +52,11 @@ class RangeAvailability147Tests(TestCase):
         self.assertEqual(result[self.first+timedelta(days=1)][self.room.pk], 0)
         self.assertEqual(result[self.first+timedelta(days=5)][self.room.pk], 5)
 
-    def test_month_query_budget_is_four_for_a_hut_and_three_globally(self):
+    def test_month_query_budget_is_four_including_main_hut_policy(self):
         self.booking(self.room, 2)
         factory = RequestFactory()
         params = {'year':self.first.year, 'month':self.first.month}
-        for extra, budget in (({'hut':self.hut.slug},4), ({},3)):
+        for extra, budget in (({'hut':self.hut.slug},4), ({},4)):
             with self.subTest(extra=extra), self.assertNumQueries(budget):
                 response = availability_calendar(factory.get('/availability/calendar/', {**params, **extra}))
             self.assertEqual(response.status_code, 200)
@@ -115,7 +117,7 @@ class Locale147Tests(TestCase):
         return {'check_in':self.start.isoformat(),'check_out':self.end.isoformat(),'beds':'2'}
 
     def url(self):
-        return reverse('bookings:hut_detail',args=[self.hut.slug])
+        return reverse('bookings:book')
 
     def bulgarian(self):
         self.client.cookies[settings.LANGUAGE_COOKIE_NAME] = 'bg'

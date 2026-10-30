@@ -1,0 +1,1 @@
+{% load i18n %}{% if room.image %}<figure class="room187-photo"><img src="{{ room.image.url }}" alt="{% blocktranslate with name=room.name hut=room.hut.name %}{{ name }} at {{ hut }}{% endblocktranslate %}" width="960" height="600" loading="lazy" decoding="async"></figure>{% endif %}

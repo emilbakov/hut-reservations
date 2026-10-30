@@ -107,6 +107,10 @@ def register_signals():
 
 
 def _response(request, status, seconds=None):
+    if status == 503:
+        # Branding must not query the same unavailable database while rendering
+        # the login guard's temporary failure response.
+        request._skip_brand_profile_v153 = True
     response = render(request, "bookings/login_limited_v151.html", {
         "login_unavailable": status == 503,
         "retry_minutes": max(1, math.ceil(seconds / 60)) if seconds else 1,

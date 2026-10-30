@@ -1,0 +1,210 @@
+[
+  {
+    "path": "bookings/admin.py",
+    "before_sha256": "34bfc7a230ad530bff7e55944843fb0c12a3278ecf0077357eee76ed0ffdba53",
+    "after_sha256": "25293be8c996e669d6753c4d4aced8741337e47ade3a0347b67a2cc5ad2bd7ce",
+    "existed": true,
+    "mode": 420,
+    "backup_sha256": "34bfc7a230ad530bff7e55944843fb0c12a3278ecf0077357eee76ed0ffdba53"
+  },
+  {
+    "path": "bookings/branding_v153.py",
+    "before_sha256": null,
+    "after_sha256": "a66a706e441adb893ecf428ed2fd6f420356e4b5377a82ecd9e567be66f47067",
+    "existed": false,
+    "mode": 420,
+    "backup_sha256": null
+  },
+  {
+    "path": "bookings/context_processors.py",
+    "before_sha256": "f8a4b7043603e126efdbe448a31ab4183254a9a45efce9c44eac6b794ea0de8b",
+    "after_sha256": "7eab17095d9693d2a9d603343da05cfca2b40cc543a13c30dee9ab87b7d419ff",
+    "existed": true,
+    "mode": 436,
+    "backup_sha256": "f8a4b7043603e126efdbe448a31ab4183254a9a45efce9c44eac6b794ea0de8b"
+  },
+  {
+    "path": "bookings/locale/bg/LC_MESSAGES/django.mo",
+    "before_sha256": "c83419e74bdc2dc8bc9106371ef1268c233651fbaec8839a2c16b110176d6c75",
+    "after_sha256": "36570993ecba97446af78d5e67faf1c56a0b46c7403ff79d110ccaaba94d4048",
+    "existed": true,
+    "mode": 420,
+    "backup_sha256": "c83419e74bdc2dc8bc9106371ef1268c233651fbaec8839a2c16b110176d6c75"
+  },
+  {
+    "path": "bookings/locale/bg/LC_MESSAGES/django.po",
+    "before_sha256": "ded9901c553cfe5649eeb2c4fd8844a01c8597317a0b529036de2d2a4bc38170",
+    "after_sha256": "b54a2eb9ca9d34ea10acb8648a00f9fa76785bf0e51525c8a44b951fe71f5d05",
+    "existed": true,
+    "mode": 420,
+    "backup_sha256": "ded9901c553cfe5649eeb2c4fd8844a01c8597317a0b529036de2d2a4bc38170"
+  },
+  {
+    "path": "bookings/login_guard_v151.py",
+    "before_sha256": "6a8d2f576d52ea3cc6dd82dede1a77776c26bd83a98a9075ad8352b185d8e31e",
+    "after_sha256": "b9d7797f6c847cc66a9a291d27fd8bf06974a1cae349220f2630a3157f3ea268",
+    "existed": true,
+    "mode": 420,
+    "backup_sha256": "6a8d2f576d52ea3cc6dd82dede1a77776c26bd83a98a9075ad8352b185d8e31e"
+  },
+  {
+    "path": "bookings/main_hut_v153.py",
+    "before_sha256": null,
+    "after_sha256": "553e1ff3c528bf6ade88b7d4afeef475b606cd81c25cafbc97a046881d6c642b",
+    "existed": false,
+    "mode": 420,
+    "backup_sha256": null
+  },
+  {
+    "path": "bookings/migrations/0027_main_hut_v153_1.py",
+    "before_sha256": null,
+    "after_sha256": "6eb1363c87e653035ad3d1c0bedb639df99952d78c0eaf7d2f5e901889c23144",
+    "existed": false,
+    "mode": 420,
+    "backup_sha256": null
+  },
+  {
+    "path": "bookings/models.py",
+    "before_sha256": "14af1d8387845a381f2b309519afaa8f042bf13a2f1dd7786c5e87dcbc14999c",
+    "after_sha256": "2388e96e1fb0212c86352505e10eea3563ba9a6ad888e4b7fd86beb90c50fa70",
+    "existed": true,
+    "mode": 420,
+    "backup_sha256": "14af1d8387845a381f2b309519afaa8f042bf13a2f1dd7786c5e87dcbc14999c"
+  },
+  {
+    "path": "bookings/public_profile_v149.py",
+    "before_sha256": "66ed37a18aa3e0fb7c5bcdb3b747c342fbc98dd313c743e74dff42687dccc400",
+    "after_sha256": "41fe68a7d26cee6bcb15f3e22a28fa87268cfd22c673ad84d894219b522d5ee0",
+    "existed": true,
+    "mode": 420,
+    "backup_sha256": "66ed37a18aa3e0fb7c5bcdb3b747c342fbc98dd313c743e74dff42687dccc400"
+  },
+  {
+    "path": "bookings/public_site_v124.py",
+    "before_sha256": "56793c0af075d66ff3f3cc20aa21d89312d23a211bad95ef9e97acd2bbe2e676",
+    "after_sha256": "86436da66e588f0f6cba8ddf912d41da15547ccddbae267482e0cf85999160f0",
+    "existed": true,
+    "mode": 420,
+    "backup_sha256": "56793c0af075d66ff3f3cc20aa21d89312d23a211bad95ef9e97acd2bbe2e676"
+  },
+  {
+    "path": "bookings/templates/bookings/hut_information_v153.html",
+    "before_sha256": null,
+    "after_sha256": "7f3812844ac83827a05bc3c539b0397c8ebbfd66385070ab5ff373e769877ed4",
+    "existed": false,
+    "mode": 420,
+    "backup_sha256": null
+  },
+  {
+    "path": "bookings/templates/bookings/public_base_v124.html",
+    "before_sha256": "5f5fc070cbd620efebf683340fdbf0adfdff9f0f43e94424c840ef0a6345f1b1",
+    "after_sha256": "bde87c96cc8e6712c91c9370a8a39a29c95fd2a7f2771ebb5e804e5f8f14d848",
+    "existed": true,
+    "mode": 420,
+    "backup_sha256": "5f5fc070cbd620efebf683340fdbf0adfdff9f0f43e94424c840ef0a6345f1b1"
+  },
+  {
+    "path": "bookings/templates/bookings/public_cards_v124.html",
+    "before_sha256": "6c81556b1fa08408827882312ea5ffa4b9a8b5340fc16c24119cac2335e5e0ee",
+    "after_sha256": "d06b2077ba340e812b07d1489edd6fe9677b5979e8676d7ed67774195db9d1d4",
+    "existed": true,
+    "mode": 420,
+    "backup_sha256": "6c81556b1fa08408827882312ea5ffa4b9a8b5340fc16c24119cac2335e5e0ee"
+  },
+  {
+    "path": "bookings/templates/bookings/public_directory_v124.html",
+    "before_sha256": "c120e61724963c4807c64cc484046c039e7c79561dae1a608676766962d08f83",
+    "after_sha256": "c5523dd216f959914fdc2380f19f55825e5a965aa050aaa1db595e5b969d4abe",
+    "existed": true,
+    "mode": 420,
+    "backup_sha256": "c120e61724963c4807c64cc484046c039e7c79561dae1a608676766962d08f83"
+  },
+  {
+    "path": "bookings/templates/bookings/public_hut_v125.html",
+    "before_sha256": "c725f83172aa45dfa4c80907b60c2e73294322b90d756085fe6376c8604cf0a0",
+    "after_sha256": "6424888fa0f22eca02d1d53b64aa143e4a578069aa8dcd97d0e7e0acdf0a103e",
+    "existed": true,
+    "mode": 420,
+    "backup_sha256": "c725f83172aa45dfa4c80907b60c2e73294322b90d756085fe6376c8604cf0a0"
+  },
+  {
+    "path": "bookings/templates/bookings/public_unavailable_v153.html",
+    "before_sha256": null,
+    "after_sha256": "99a47bcf5ca4a01ed0b7235d1976d6511574b31cf6fd5460fd8ad52612cd610b",
+    "existed": false,
+    "mode": 420,
+    "backup_sha256": null
+  },
+  {
+    "path": "bookings/test_guest_approval_v126.py",
+    "before_sha256": "e313e3cd07d7a7121743de23d86d5366b96ef985c6c73c2b6403e1b6e398bd63",
+    "after_sha256": "54743778eb7a6fd8354346754e8d1c82f93ad724b298ad2c3e1694b403583604",
+    "existed": true,
+    "mode": 420,
+    "backup_sha256": "e313e3cd07d7a7121743de23d86d5366b96ef985c6c73c2b6403e1b6e398bd63"
+  },
+  {
+    "path": "bookings/test_login_guard_v151.py",
+    "before_sha256": "4acbca92f9e4c5e1f2f9aedb4b4d8ee729a61c45ab35028c1a13302d3b4cf5b7",
+    "after_sha256": "f0efe930ca84163818032a76e7dcd185f9a1d4d4d81a24f9e7c916bd57613f0e",
+    "existed": true,
+    "mode": 420,
+    "backup_sha256": "4acbca92f9e4c5e1f2f9aedb4b4d8ee729a61c45ab35028c1a13302d3b4cf5b7"
+  },
+  {
+    "path": "bookings/test_main_hut_v153.py",
+    "before_sha256": null,
+    "after_sha256": "3e50919f7fda00093a75d786b8beeefc6bed515c3ac226ff1841dc97bab838f8",
+    "existed": false,
+    "mode": 420,
+    "backup_sha256": null
+  },
+  {
+    "path": "bookings/test_public_polish_v149.py",
+    "before_sha256": "77b97e9ab65e475380d915ae2f2e3169d7c21e0ae75f51b8baf29d8ab02c764d",
+    "after_sha256": "32ae69ef168f5869c9f33207656c1897264da7df1a57c12923885b5c84fc3fc5",
+    "existed": true,
+    "mode": 420,
+    "backup_sha256": "77b97e9ab65e475380d915ae2f2e3169d7c21e0ae75f51b8baf29d8ab02c764d"
+  },
+  {
+    "path": "bookings/test_public_site_v124.py",
+    "before_sha256": "0deeb09ca68621f1767fd14886003f645fe5f3380b932732f6da573aad5b8671",
+    "after_sha256": "dd9ae08f885551230068d00a184604a39378ba9b520c4c5132aa85eeaac9e6f3",
+    "existed": true,
+    "mode": 420,
+    "backup_sha256": "0deeb09ca68621f1767fd14886003f645fe5f3380b932732f6da573aad5b8671"
+  },
+  {
+    "path": "bookings/test_ui_v147.py",
+    "before_sha256": "297a2656e97b59565dfd9eb91bd4c3ae1fc206d068c11665e46ffdd29ed762bc",
+    "after_sha256": "28bfd7634a7ca631506c35fa21851b230e98979ecea29708546214c82f966c10",
+    "existed": true,
+    "mode": 420,
+    "backup_sha256": "297a2656e97b59565dfd9eb91bd4c3ae1fc206d068c11665e46ffdd29ed762bc"
+  },
+  {
+    "path": "bookings/test_ux_v146.py",
+    "before_sha256": "d1fd02c8dcf6bd1d841d7a5fe6f4d870c1d847003801cdce49b372780fe3117f",
+    "after_sha256": "71f68b7f69593ba0a879b3e95267b62647cc4f36fe400cd230cc2d7212c04067",
+    "existed": true,
+    "mode": 420,
+    "backup_sha256": "d1fd02c8dcf6bd1d841d7a5fe6f4d870c1d847003801cdce49b372780fe3117f"
+  },
+  {
+    "path": "bookings/tests.py",
+    "before_sha256": "303ab6e753292d74c7ba9419ca07ad7c1b4aa6b6749af66c375e5fd9074449a0",
+    "after_sha256": "dd709f1b9412b7601182d0e6921d7b4f225b58064937e733b7ae3c992f11fa28",
+    "existed": true,
+    "mode": 436,
+    "backup_sha256": "303ab6e753292d74c7ba9419ca07ad7c1b4aa6b6749af66c375e5fd9074449a0"
+  },
+  {
+    "path": "bookings/views.py",
+    "before_sha256": "e8501d468cd57837f209a4be6c34ed9b9daea0f187620f5b596025df202431be",
+    "after_sha256": "916b272f6385d8aae4a4ef54e913dcc2b58091fea1ae8e809104bd8bd3a7868c",
+    "existed": true,
+    "mode": 436,
+    "backup_sha256": "e8501d468cd57837f209a4be6c34ed9b9daea0f187620f5b596025df202431be"
+  }
+]

@@ -1,0 +1,6 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ BRAND_NAME|default:'Карлък' }}{% endblock %}
+{% block extrahead %}{{ block.super }}{% include "bookings/brand_head_v153.html" %}{% endblock %}
+{% block branding %}<div id="site-name"><a class="sd153-admin-brand" href="{% url 'admin:index' %}">{% include "bookings/brand_logo_v153.html" %}<span>{{ BRAND_NAME|default:'Карлък' }} · {% translate 'Administration' %}</span></a></div>{% if user.is_anonymous %}{% include "admin/color_theme_toggle.html" %}{% endif %}{% endblock %}
+{% block nav-global %}{% endblock %}

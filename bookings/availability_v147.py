@@ -19,12 +19,13 @@ def nightly_availability(rooms, start, end):
     capacities = {room.pk: room.capacity for room in rooms}
     booked = defaultdict(lambda: defaultdict(int))
     blocked = defaultdict(lambda: defaultdict(set))
-    items = ReservationItem.objects.filter(
+    from .deposit_flow_v180 import exclude_elapsed
+    items = exclude_elapsed(ReservationItem.objects.filter(
         room_id__in=capacities,
         reservation__status__in=Reservation.HOLDING,
         reservation__check_in__lt=end,
         reservation__check_out__gt=start,
-    ).order_by().values_list(
+    )).order_by().values_list(
         'room_id', 'beds', 'reservation__check_in', 'reservation__check_out',
     )
     for room_id, beds, arrival, departure in items:
@@ -44,8 +45,10 @@ def nightly_availability(rooms, start, end):
     night = start
     while night < end:
         result[night] = {
-            room_id: max(0, capacity - booked[night][room_id] - len(blocked[night][room_id]))
+            room_id: remaining(capacity, booked[night][room_id], len(blocked[night][room_id]))
             for room_id, capacity in capacities.items()
         }
         night += timedelta(days=1)
     return result
+
+from bookings.whole_units_v183 import remaining

@@ -11,6 +11,8 @@ from django.db import transaction
 from django.utils import timezone
 
 from .models import BedClosure, Reservation, ReservationItem, Room
+from .seasonal_v186 import snapshot
+from .whole_units_v183 import whole_units
 
 
 class NotAvailable(Exception):
@@ -39,6 +41,9 @@ def free_beds(rooms, check_in, check_out, exclude=None):
         reservation__check_in__lt=check_out,
         reservation__check_out__gt=check_in,
     ).select_related("reservation")
+
+    from .deposit_flow_v180 import exclude_elapsed
+    items = exclude_elapsed(items)
 
     if exclude is not None:
         items = items.exclude(reservation=exclude)
@@ -71,7 +76,8 @@ def free_beds(rooms, check_in, check_out, exclude=None):
         available = room.capacity
         night = check_in
         while night < check_out:
-            available = min(available, room.capacity - booked[room.pk][night] - len(blocked[room.pk][night]))
+            from .whole_units_v183 import remaining
+            available = min(available, remaining(room.capacity, booked[room.pk][night], len(blocked[room.pk][night])))
             night += timedelta(days=1)
         result[room.pk] = max(available, 0)
     return result
@@ -197,6 +203,7 @@ def create_reservation(
             room=room,
             beds=beds_by_room[room.pk],
             price_per_night=room.price_per_night,
+            seasonal_rates=snapshot(room) if whole_units() else {},
         )
 
     return reservation
@@ -254,6 +261,10 @@ def modify_reservation(
         Reservation.objects.select_for_update()
         .get(code=code)
     )
+
+    from .deposit_flow_v180 import awaiting
+    if awaiting(reservation):
+        raise ValidationError("Withdraw the deposit request before changing dates, rooms or beds.")
 
     if reservation.status not in Reservation.HOLDING:
         raise ValidationError(
@@ -376,6 +387,7 @@ def modify_reservation(
                 room=room,
                 beds=requested_beds,
                 price_per_night=room.price_per_night,
+            seasonal_rates=snapshot(room) if whole_units() else {},
             )
         elif item.beds != requested_beds:
             item.beds = requested_beds
